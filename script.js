@@ -23,6 +23,10 @@ function init() {
   var buttonRow = 1;
   var buttonMargin = 8;
 
+  var dragOriginX;
+  var dragOriginY;
+  var dragOriginParent;
+
   var positionSelectors = [];
   var shapeSelectors = [];
   //var logic = [];
@@ -143,9 +147,9 @@ function init() {
   // PLAYER CONTROLS
 
   var selectorsBox = new createjs.Container();
-  var logicBox = new createjs.Container();
+  var logicBox = new createjs.Container(); logicBox.name = "logicBox";
   var sequenceBox = new createjs.Container();
-  var actionsBox = new createjs.Container();
+  var actionsBox = new createjs.Container(); actionsBox.name = "actionsBox";
 
   var selectorsBG = new createjs.Shape();
   selectorsBG.graphics.beginFill(white);
@@ -427,6 +431,7 @@ function init() {
   // SELECTOR ITEMS
 
   var selectors = new createjs.Container;
+  selectors.name = "selectorsInnerBox";
 
   var CCRR = new createjs.Container();
   CCRR.addChild(generateGreenButton(),generateTopLeftC(),generateTopRightC(),generateBottomRightR(),generateBottomLeftR());
@@ -488,6 +493,7 @@ function init() {
   for (var i = 0; i < 4; i++) {
 
     var rowSelector = new createjs.Container();
+    rowSelector.type = "position";
     rowSelector.addEventListener("mousedown",grabItem);
     rowSelector.addEventListener("pressmove",dragAndDrop);
     rowSelector.addEventListener("pressup",snapTo);
@@ -503,6 +509,7 @@ function init() {
     selectors.addChild(rowSelector);
 
     var colSelector = new createjs.Container();
+    colSelector.type = "position";
     colSelector.addEventListener("mousedown",grabItem);
     colSelector.addEventListener("pressmove",dragAndDrop);
     colSelector.addEventListener("pressup",snapTo);
@@ -528,6 +535,7 @@ function init() {
   // for (var i = 0; i < shapeSelectors.length; i++) {
   for (var i = 0; i < 8; i++) {
 
+    shapeSelectors[i].type = "shape";
     shapeSelectors[i].addEventListener("mousedown",grabItem);
     shapeSelectors[i].addEventListener("pressmove",dragAndDrop);
     shapeSelectors[i].addEventListener("pressup",snapTo);
@@ -555,17 +563,19 @@ function init() {
   // LOGIC ITEMS
 
     var andLogic = new createjs.Container();
+    andLogic.type = "logic";
     andLogic.addEventListener("mousedown",grabItem);
     andLogic.addEventListener("pressmove",dragAndDrop);
     andLogic.addEventListener("pressup",snapTo);
-    andLogic.x = 74;
-    andLogic.y = 1830;
+    andLogic.x = 34;
+    andLogic.y = 106;
     var orLogic = new createjs.Container();
+    orLogic.type = "logic";
     orLogic.addEventListener("mousedown",grabItem);
     orLogic.addEventListener("pressmove",dragAndDrop);
     orLogic.addEventListener("pressup",snapTo);
-    orLogic.x = 74 + buttonSize + buttonMargin;
-    orLogic.y = 1830;
+    orLogic.x = 34 + buttonSize + buttonMargin;
+    orLogic.y = 106;
 
     var andLabel = new createjs.Text("AND", mediumLabelStyle, white);
     andLabel.x = 65;
@@ -580,49 +590,59 @@ function init() {
     andLogic.addChild(generateBlueButton(),andLabel);
     orLogic.addChild(generateBlueButton(),orLabel);
 
-    stage.addChild(andLogic,orLogic);
+    logicBox.addChild(andLogic,orLogic);
     stage.update();
 
 
   // ACTION ITEMS
   
   var transformTL = new createjs.Container();
+  transformTL.type = "action";
   transformTL.addEventListener("mousedown",grabItem);
   transformTL.addEventListener("pressmove",dragAndDrop);
   transformTL.addEventListener("pressup",snapTo);
   var transformTR = new createjs.Container();
+  transformTR.type = "action";
   transformTR.addEventListener("mousedown",grabItem);
   transformTR.addEventListener("pressmove",dragAndDrop);
   transformTR.addEventListener("pressup",snapTo);
   var transformBR = new createjs.Container();
+  transformBR.type = "action";
   transformBR.addEventListener("mousedown",grabItem);
   transformBR.addEventListener("pressmove",dragAndDrop);
   transformBR.addEventListener("pressup",snapTo);
   var transformBL = new createjs.Container();
+  transformBL.type = "action";
   transformBL.addEventListener("mousedown",grabItem);
   transformBL.addEventListener("pressmove",dragAndDrop);
   transformBL.addEventListener("pressup",snapTo);
   var rotate90cc = new createjs.Container();
+  rotate90cc.type = "action";
   rotate90cc.addEventListener("mousedown",grabItem);
   rotate90cc.addEventListener("pressmove",dragAndDrop);
   rotate90cc.addEventListener("pressup",snapTo);
   var rotate90c = new createjs.Container();
+  rotate90c.type = "action";
   rotate90c.addEventListener("mousedown",grabItem);
   rotate90c.addEventListener("pressmove",dragAndDrop);
   rotate90c.addEventListener("pressup",snapTo);
   var rotate180cc = new createjs.Container();
+  rotate180cc.type = "action";
   rotate180cc.addEventListener("mousedown",grabItem);
   rotate180cc.addEventListener("pressmove",dragAndDrop);
   rotate180cc.addEventListener("pressup",snapTo);
   var rotate180c = new createjs.Container();
+  rotate180c.type = "action";
   rotate180c.addEventListener("mousedown",grabItem);
   rotate180c.addEventListener("pressmove",dragAndDrop);
   rotate180c.addEventListener("pressup",snapTo);
   var flipV = new createjs.Container();
+  flipV.type = "action";
   flipV.addEventListener("mousedown",grabItem);
   flipV.addEventListener("pressmove",dragAndDrop);
   flipV.addEventListener("pressup",snapTo);
   var flipH = new createjs.Container();
+  flipH.type = "action";
   flipH.addEventListener("mousedown",grabItem);
   flipH.addEventListener("pressmove",dragAndDrop);
   flipH.addEventListener("pressup",snapTo);
@@ -858,7 +878,7 @@ function init() {
     dropZone.graphics.beginFill(green);
     dropZone.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
     dropZone.alpha = .25;
-    dropZone.x = 50 + (buttonSize*2) + ((buttonMargin+4)*2);
+    dropZone.x = 50
     dropZone.y = (dropZoneRow * 200) - 68;
 
     } else {
@@ -866,12 +886,12 @@ function init() {
     dropZone.graphics.beginFill(green);
     dropZone.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
     dropZone.alpha = .25;
-    dropZone.x = 50;
+    dropZone.x = 50 + (buttonSize*2) + ((buttonMargin+4)*2);;
     dropZone.y = (dropZoneRow * 200) - 68;
 
     }
 
-    //dropZone.hitArea = dropZone;
+    dropZone.slot = i;
     // console.log(i + " " + dropZone.hitArea);
     sequenceBox.addChild(dropZone);
   }
@@ -881,6 +901,11 @@ function init() {
   // INTERACTION
 
   function grabItem(event) {
+
+    dragOriginX = event.currentTarget.x;
+    dragOriginY = event.currentTarget.y;
+    dragOriginParent = event.currentTarget.parent;
+
     if (event.currentTarget.parent.parent != null) {
       var pt = event.currentTarget.localToGlobal(event.currentTarget.x,event.currentTarget.y);
       event.currentTarget.x = (pt.x - event.currentTarget.x);
@@ -900,26 +925,43 @@ function init() {
 
   function snapTo(event) {
 
+    console.log(dragOriginX);
+    console.log(dragOriginY);
+    console.log(dragOriginParent.name);
+
+    event.currentTarget.set({
+      x: event.stageX-65,
+      y: event.stageY-65
+    });
+
+  console.log(event.currentTarget.type);
+
+  for (var i = 0; i < stage.getObjectsUnderPoint(event.stageX,event.stageY,0).length; i++) {
+    if (stage.getObjectsUnderPoint(event.stageX,event.stageY,0)[i].slot != null) {
+    var slot = stage.getObjectsUnderPoint(event.stageX,event.stageY,0)[i].slot;
+    console.log(slot);
+    }
+  }
+
+  returnToOrigin(event.currentTarget,dragOriginParent,dragOriginX,dragOriginY);
+
   //sequenceBox.addChild(event.currentTarget);
   //var pt = event.currentTarget.globalToLocal(event.currentTarget.x,event.currentTarget.y);
   //event.currentTarget.x = pt.x;
   //event.currentTarget.y = pt.y;
   //event.currentTarget.x = event.stageX;
   //event.currentTarget.y = event.stageY;
-  console.log(event.currentTarget.x);
-  console.log(event.currentTarget.y);
 
-    //console.log(event.currentTarget.parent.parent);
-    //sequenceBox.addChild(event.currentTarget);
-    //var pt = event.currentTarget.globalToLocal(event.stageX,event.stageY);
-    //event.currentTarget.x = pt.x;
-    //event.currentTarget.y = pt.y;
-    // var pt = event.currentTarget.globalToLocal(event.currentTarget.x,event.currentTarget.y);
-    //console.log(pt.x);
-    //console.log(pt.y);
-    
-    //console.log(event.currentTarget.getObjectUnderPoint(event.stageX,event.stageY,0));
     stage.update();
+  }
+
+  function returnToOrigin (target,parent,x,y) {
+
+    parent.addChild(target);
+    target.x = x;
+    target.y = y;
+    stage.update();
+
   }
 
   function loadPositionButtons(event) {
@@ -941,8 +983,6 @@ function init() {
     createjs.Tween.get(selectors, {override:true}).to({x:-336}, 400, createjs.Ease.cubicOut);
 
   }
-
-
 
 
 
