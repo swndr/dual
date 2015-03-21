@@ -38,7 +38,10 @@ function init() {
   stage.enableMouseOver(20);
 
   createjs.Ticker.setFPS(60);
-  createjs.Ticker.addEventListener("tick", stage);
+  createjs.Ticker.addEventListener("tick", tick);
+  createjs.Ticker.setPaused(true);
+
+  var tweening = false;
 
   // BACKGROUND
 
@@ -67,7 +70,9 @@ function init() {
     }
 
   stage.addChild(bg);
+  bg.cache(0,0,canvas.width,896);
   stage.addChild(grid);
+  grid.cache(0,0,canvas.width,896);
 
     for (var i = 0; i < gridSize; i++) {
         var hLabel = new createjs.Text(i, "100 25px Avenir", "#E01062");
@@ -510,6 +515,7 @@ function init() {
     rowLabel.textAlign = "center";
 
     rowSelector.addChild(generateGreenButton(),generateRow(),rowLabel);
+    rowSelector.cache(0,0,130,130);
     selectors.addChild(rowSelector);
 
     var colSelector = new createjs.Container();
@@ -529,7 +535,9 @@ function init() {
     colLabel.textAlign = "center";
 
     colSelector.addChild(generateGreenButton(),generateCol(),colLabel);
+    colSelector.cache(0,0,130,130);
     selectors.addChild(colSelector);
+
     selectorsBox.addChild(selectors);
     buttonRow++;
 
@@ -566,6 +574,7 @@ function init() {
     shapeSelectors[i].originX = shapeSelectors[i].x;
     shapeSelectors[i].originY = shapeSelectors[i].y;
     shapeSelectors[i].originParent = selectors;
+    //shapeSelectors[i].cache(0,0,130,130);
 
     stage.update();
 
@@ -607,6 +616,9 @@ function init() {
 
     andLogic.addChild(generateBlueButton(),andLabel);
     orLogic.addChild(generateBlueButton(),orLabel);
+
+    andLogic.cache(0,0,130,130);
+    orLogic.cache(0,0,130,130);
 
     logicBox.addChild(andLogic,orLogic);
     stage.update();
@@ -842,6 +854,14 @@ function init() {
   flipH.originParent = actionsBox;
 
   actionsBox.addChild(transformTL,transformTR,transformBR,transformBL,rotate90cc,rotate90c,rotate180cc,rotate180c,flipV,flipH);
+
+  for (var i = 0; i < actionsBox.children.length; i++) {
+    if (actionsBox.children[i].type != null) {
+    actionsBox.children[i].cache(0,0,130,130);
+    }
+  }
+
+
   stage.update();
 
 
@@ -853,55 +873,27 @@ function init() {
     sequence[i] = null;
   }
 
-  var sequence1 = new createjs.Shape();
-  sequence1.graphics.beginStroke(green).setStrokeStyle(8).beginFill(black);
-  sequence1.graphics.drawRoundRect(0,0,442,150,5);
-  sequence1.x = 36;
-  sequence1.y = 122;
+  for (var i = 0; i < 4; i++) {
+    var sequenceTray = new createjs.Shape();
+    sequenceTray.graphics.beginStroke(green).setStrokeStyle(8).beginFill(black);
+    sequenceTray.graphics.drawRoundRect(0,0,442,150,5);
+    sequenceTray.x = 36;
+    sequenceTray.y = 122 + (i*200);
 
-  var sequence2 = new createjs.Shape();
-  sequence2.graphics.beginStroke(green).setStrokeStyle(8).beginFill(black);
-  sequence2.graphics.drawRoundRect(0,0,442,150,5);
-  sequence2.x = 36;
-  sequence2.y = 322;
+    sequenceBox.addChild(sequenceTray);
+    sequenceTray.cache(-4,-4,450,158);
+  }
 
-  var sequence3 = new createjs.Shape();
-  sequence3.graphics.beginStroke(green).setStrokeStyle(8).beginFill(black);
-  sequence3.graphics.drawRoundRect(0,0,442,150,5);
-  sequence3.x = 36;
-  sequence3.y = 522;
+  for (var i = 0; i < 4; i++) {
+    var actionTray = new createjs.Shape();
+    actionTray.graphics.beginStroke(yellow).setStrokeStyle(8).beginFill(black);
+    actionTray.graphics.drawRoundRect(0,0,160,150,5);
+    actionTray.x = 508;
+    actionTray.y = 122 + (i*200);
 
-  var sequence4 = new createjs.Shape();
-  sequence4.graphics.beginStroke(green).setStrokeStyle(8).beginFill(black);
-  sequence4.graphics.drawRoundRect(0,0,442,150,5);
-  sequence4.x = 36;
-  sequence4.y = 722;
-
-  var action1 = new createjs.Shape();
-  action1.graphics.beginStroke(yellow).setStrokeStyle(8).beginFill(black);
-  action1.graphics.drawRoundRect(0,0,160,150,5);
-  action1.x = 508;
-  action1.y = 122;
-
-  var action2 = new createjs.Shape();
-  action2.graphics.beginStroke(yellow).setStrokeStyle(8).beginFill(black);
-  action2.graphics.drawRoundRect(0,0,160,150,5);
-  action2.x = 508;
-  action2.y = 322;
-
-  var action3 = new createjs.Shape();
-  action3.graphics.beginStroke(yellow).setStrokeStyle(8).beginFill(black);
-  action3.graphics.drawRoundRect(0,0,160,150,5);
-  action3.x = 508;
-  action3.y = 522;
-
-  var action4 = new createjs.Shape();
-  action4.graphics.beginStroke(yellow).setStrokeStyle(8).beginFill(black);
-  action4.graphics.drawRoundRect(0,0,160,150,5);
-  action4.x = 508;
-  action4.y = 722;
-
-  sequenceBox.addChild(sequence1,sequence2,sequence3,sequence4,action1,action2,action3,action4);
+    sequenceBox.addChild(actionTray);
+    actionTray.cache(-4,-4,168,158);
+  }
 
   var dropZoneRow = 1;
 
@@ -1004,13 +996,6 @@ function init() {
 
     dragging = false;
 
-    event.currentTarget.set({
-      x: event.stageX-65,
-      y: event.stageY-65
-    });
-
-    //console.log(event.currentTarget.type);
-
     for (var i = 0; i < stage.getObjectsUnderPoint(event.stageX,event.stageY,0).length; i++) {
       if (stage.getObjectsUnderPoint(event.stageX,event.stageY,0)[i].slot != null) {
       dropPosition = stage.getObjectsUnderPoint(event.stageX,event.stageY,0)[i];
@@ -1099,24 +1084,35 @@ function init() {
 
   function loadPositionButtons(event) {
 
+    createjs.Ticker.setPaused(false);
+
     positionLabel.color = green;
     shapeLabel.color = darkGray;
     stage.update();
 
-    createjs.Tween.get(selectors, {override:true}).to({x:0}, 400, createjs.Ease.cubicOut);
+    createjs.Tween.get(selectors, {override:true}).to({x:0}, 400, createjs.Ease.cubicOut).call(endTween);
   }
   
   function loadShapeButtons(event) {
-    
+
+    createjs.Ticker.setPaused(false);
+
     positionLabel.color = darkGray;
     shapeLabel.color = green;
     stage.update();
 
-    createjs.Tween.get(selectors, {override:true}).to({x:-336}, 400, createjs.Ease.cubicOut);
-
+    createjs.Tween.get(selectors, {override:true}).to({x:-336}, 400, createjs.Ease.cubicOut).call(endTween);
   }
 
+  function tick(event) {
+    if (!event.paused) {
+      stage.update(event);
+    }
+  }
 
+  function endTween() {
+    createjs.Ticker.setPaused(true);
+  }
 
   // TOGGLE GAME OBJECTS
 
