@@ -23,9 +23,10 @@ function init() {
   var buttonRow = 1;
   var buttonMargin = 8;
 
-  var dragOriginX;
-  var dragOriginY;
-  var dragOriginParent;
+  var dragging = false;
+  var dropPosition = null;
+
+  var sequence = [];
 
   var positionSelectors = [];
   var shapeSelectors = [];
@@ -42,8 +43,8 @@ function init() {
   // BACKGROUND
 
   var bg = new createjs.Shape();
-    bg.graphics.beginFill("#AAA5A5");
-    bg.graphics.rect(0,0,canvas.width,896);
+  bg.graphics.beginFill("#AAA5A5");
+  bg.graphics.rect(0,0,canvas.width,896);
 
   // BUILD GRID
 
@@ -499,6 +500,9 @@ function init() {
     rowSelector.addEventListener("pressup",snapTo);
     rowSelector.x = 34;
     rowSelector.y = 16 + (buttonRow * (buttonSize + buttonMargin));
+    rowSelector.originX = rowSelector.x;
+    rowSelector.originY = rowSelector.y;
+    rowSelector.originParent = selectors;
 
     var rowLabel = new createjs.Text(i, lightLabelStyle, white);
     rowLabel.x = 65;
@@ -515,6 +519,9 @@ function init() {
     colSelector.addEventListener("pressup",snapTo);
     colSelector.x = 34 + buttonSize + buttonMargin;
     colSelector.y = 16 + (buttonRow * (buttonSize + buttonMargin));
+    colSelector.originX = colSelector.x;
+    colSelector.originY = colSelector.y;
+    colSelector.originParent = selectors;
 
     var colLabel = new createjs.Text(i, lightLabelStyle, white);
     colLabel.x = 65;
@@ -556,6 +563,10 @@ function init() {
     buttonRow++;
     }
 
+    shapeSelectors[i].originX = shapeSelectors[i].x;
+    shapeSelectors[i].originY = shapeSelectors[i].y;
+    shapeSelectors[i].originParent = selectors;
+
     stage.update();
 
   }
@@ -569,6 +580,10 @@ function init() {
     andLogic.addEventListener("pressup",snapTo);
     andLogic.x = 34;
     andLogic.y = 106;
+    andLogic.originX = andLogic.x;
+    andLogic.originY = andLogic.y;
+    andLogic.originParent = logicBox;
+
     var orLogic = new createjs.Container();
     orLogic.type = "logic";
     orLogic.addEventListener("mousedown",grabItem);
@@ -576,6 +591,9 @@ function init() {
     orLogic.addEventListener("pressup",snapTo);
     orLogic.x = 34 + buttonSize + buttonMargin;
     orLogic.y = 106;
+    orLogic.originX = orLogic.x;
+    orLogic.originY = orLogic.y;
+    orLogic.originParent = logicBox;
 
     var andLabel = new createjs.Text("AND", mediumLabelStyle, white);
     andLabel.x = 65;
@@ -658,6 +676,9 @@ function init() {
   transformTL.addChild(generateYellowButton(),generateTransformR(50,50),transformTLCircle);
   transformTL.x = 34;
   transformTL.y = 16 + buttonSize + buttonMargin;
+  transformTL.originX = transformTL.x;
+  transformTL.originY = transformTL.y;
+  transformTL.originParent = actionsBox;
 
   var transformTRCircle = new createjs.Shape();
     transformTRCircle.graphics.beginFill(white);
@@ -668,6 +689,9 @@ function init() {
   transformTR.addChild(generateYellowButton(),generateTransformR(35,50),transformTRCircle);
   transformTR.x = 34 + buttonSize + buttonMargin;
   transformTR.y = 16 + buttonSize + buttonMargin;
+  transformTR.originX = transformTR.x;
+  transformTR.originY = transformTR.y;
+  transformTR.originParent = actionsBox;
 
   var transformBRCircle = new createjs.Shape();
     transformBRCircle.graphics.beginFill(white);
@@ -678,6 +702,9 @@ function init() {
   transformBR.addChild(generateYellowButton(),generateTransformR(35,35),transformBRCircle);
   transformBR.x = 34 + buttonSize + buttonMargin;
   transformBR.y = 16 + (buttonSize*2) + (buttonMargin*2);
+  transformBR.originX = transformBR.x;
+  transformBR.originY = transformBR.y;
+  transformBR.originParent = actionsBox;
 
   var transformBLCircle = new createjs.Shape();
     transformBLCircle.graphics.beginFill(white);
@@ -688,6 +715,9 @@ function init() {
   transformBL.addChild(generateYellowButton(),generateTransformR(50,35),transformBLCircle);
   transformBL.x = 34
   transformBL.y = 16 + (buttonSize*2) + (buttonMargin*2);
+  transformBL.originX = transformBL.x;
+  transformBL.originY = transformBL.y;
+  transformBL.originParent = actionsBox;
 
   // rotate buttons
 
@@ -706,6 +736,9 @@ function init() {
     rotate90cc.addChild(generateYellowButton(),counter90Arc,counter90Arrow);
     rotate90cc.x = 34;
     rotate90cc.y = 520;
+    rotate90cc.originX = rotate90cc.x;
+    rotate90cc.originY = rotate90cc.y;
+    rotate90cc.originParent = actionsBox;
 
   var clock90Arc = new createjs.Shape();
     clock90Arc.graphics.beginStroke(pink);
@@ -722,6 +755,9 @@ function init() {
     rotate90c.addChild(generateYellowButton(),clock90Arc,clock90Arrow);
     rotate90c.x = 34 + buttonSize + buttonMargin;
     rotate90c.y = 520;
+    rotate90c.originX = rotate90c.x;
+    rotate90c.originY = rotate90c.y;
+    rotate90c.originParent = actionsBox;
 
   var cc180Arc = new createjs.Shape();
     cc180Arc.graphics.beginStroke(pink);
@@ -738,6 +774,9 @@ function init() {
     rotate180cc.addChild(generateYellowButton(),cc180Arc,cc180Arrow);
     rotate180cc.x = 34
     rotate180cc.y = 520 + buttonSize + buttonMargin;
+    rotate180cc.originX = rotate180cc.x;
+    rotate180cc.originY = rotate180cc.y;
+    rotate180cc.originParent = actionsBox;
 
   var c180Arc = new createjs.Shape();
     c180Arc.graphics.beginStroke(pink);
@@ -754,6 +793,9 @@ function init() {
   rotate180c.addChild(generateYellowButton(),c180Arc,c180Arrow);
   rotate180c.x = 34 + buttonSize + buttonMargin;
   rotate180c.y = 520 + buttonSize + buttonMargin;
+  rotate180c.originX = rotate180c.x;
+  rotate180c.originY = rotate180c.y;
+  rotate180c.originParent = actionsBox;
 
   // flip buttons
 
@@ -774,6 +816,9 @@ function init() {
   flipV.addChild(generateYellowButton(),originFlipV,targetFlipV);
   flipV.x = 34;
   flipV.y = 886;
+  flipV.originX = flipV.x;
+  flipV.originY = flipV.y;
+  flipV.originParent = actionsBox;
 
   var originFlipH = new createjs.Shape();
     originFlipH.graphics.beginFill(darkGray);
@@ -792,12 +837,21 @@ function init() {
   flipH.addChild(generateYellowButton(),originFlipH,targetFlipH);
   flipH.x = 34 + buttonSize + buttonMargin;
   flipH.y = 886;
+  flipHoriginX = flipH.x;
+  flipH.originY = flipH.y;
+  flipH.originParent = actionsBox;
 
   actionsBox.addChild(transformTL,transformTR,transformBR,transformBL,rotate90cc,rotate90c,rotate180cc,rotate180c,flipV,flipH);
   stage.update();
 
 
   // SEQUENCE TRAY
+
+  // fill sequence array with null
+
+  for (var i = 0; i < 15; i++) {
+    sequence[i] = null;
+  }
 
   var sequence1 = new createjs.Shape();
   sequence1.graphics.beginStroke(green).setStrokeStyle(8).beginFill(black);
@@ -854,6 +908,8 @@ function init() {
   for (var i = 0; i < 16; i++) {
 
     var dropZone = new createjs.Shape();
+    //dropZone.on("mouseover", startHighlight);
+    //dropZone.on("mouseout", endHighlight);
 
     if (i == 1 || i == 5 || i == 9 || i == 13) {
 
@@ -892,19 +948,23 @@ function init() {
     }
 
     dropZone.slot = i;
-    // console.log(i + " " + dropZone.hitArea);
     sequenceBox.addChild(dropZone);
   }
 
   stage.update();
 
+
   // INTERACTION
 
   function grabItem(event) {
 
-    dragOriginX = event.currentTarget.x;
-    dragOriginY = event.currentTarget.y;
-    dragOriginParent = event.currentTarget.parent;
+    if (event.currentTarget.parent == sequenceBox) {
+      for (var i = 0; i < sequence.length; i++) {
+        if (sequence[i] == event.currentTarget.id) {
+          sequence[i] = null;
+        }
+      }
+    }
 
     if (event.currentTarget.parent.parent != null) {
       var pt = event.currentTarget.localToGlobal(event.currentTarget.x,event.currentTarget.y);
@@ -916,56 +976,129 @@ function init() {
   }
 
   function dragAndDrop(event) {
+
+    dragging = true;
+
     event.currentTarget.set({
       x: event.stageX-65,
       y: event.stageY-65
     });
+
+    // trying to highlight, but poor performance
+
+    // if (event.stageX > 416 && event.stageX < 1121) {
+
+    //   for (var i = 0; i < stage.getObjectsUnderPoint(event.stageX,event.stageY,0).length; i++) {
+    //     if (stage.getObjectsUnderPoint(event.stageX,event.stageY,0)[i].slot != null) {
+    //     var slot = stage.getObjectsUnderPoint(event.stageX,event.stageY,0)[i].slot;
+    //     console.log(i + " " + slot);
+    //     }
+    //   }
+    // }
+
     stage.update();
+
   }
 
   function snapTo(event) {
 
-    console.log(dragOriginX);
-    console.log(dragOriginY);
-    console.log(dragOriginParent.name);
+    dragging = false;
 
     event.currentTarget.set({
       x: event.stageX-65,
       y: event.stageY-65
     });
 
-  console.log(event.currentTarget.type);
+    //console.log(event.currentTarget.type);
 
-  for (var i = 0; i < stage.getObjectsUnderPoint(event.stageX,event.stageY,0).length; i++) {
-    if (stage.getObjectsUnderPoint(event.stageX,event.stageY,0)[i].slot != null) {
-    var slot = stage.getObjectsUnderPoint(event.stageX,event.stageY,0)[i].slot;
-    console.log(slot);
+    for (var i = 0; i < stage.getObjectsUnderPoint(event.stageX,event.stageY,0).length; i++) {
+      if (stage.getObjectsUnderPoint(event.stageX,event.stageY,0)[i].slot != null) {
+      dropPosition = stage.getObjectsUnderPoint(event.stageX,event.stageY,0)[i];
+      }
     }
+
+    if (dropPosition != null && sequence[dropPosition] == null) {
+      addToSlot(event.currentTarget,dropPosition);
+    } else {
+      returnToOrigin(event.currentTarget,event.currentTarget.originParent,event.currentTarget.originX,event.currentTarget.originY);
+    }
+
+    dropPosition = null;
+    stage.update();
+  
   }
 
-  returnToOrigin(event.currentTarget,dragOriginParent,dragOriginX,dragOriginY);
+  function addToSlot(item,pos) {
 
-  //sequenceBox.addChild(event.currentTarget);
-  //var pt = event.currentTarget.globalToLocal(event.currentTarget.x,event.currentTarget.y);
-  //event.currentTarget.x = pt.x;
-  //event.currentTarget.y = pt.y;
-  //event.currentTarget.x = event.stageX;
-  //event.currentTarget.y = event.stageY;
+    if (item.type == "position" || item.type == "shape") {
+
+      if (pos.slot % 2 == 0) { 
+        sequenceBox.addChild(item);
+        item.x = pos.x; 
+        item.y = pos.y;
+        sequence[pos.slot] = item.id;
+      } else { 
+        returnToOrigin(item,item.originParent,item.originX,item.originY); 
+      }
+
+    } else if (item.type == "logic") {
+
+      if (pos.slot == 1 || pos.slot == 5 || pos.slot == 9 || pos.slot == 13) { 
+        sequenceBox.addChild(item);
+        item.x = pos.x; 
+        item.y = pos.y; 
+        sequence[pos.slot] = item.id;
+      } else { 
+        returnToOrigin(item,item.originParent,item.originX,item.originY); 
+      }
+
+    } else {
+
+      if (pos.slot == 3 || pos.slot == 7 || pos.slot == 11 || pos.slot == 15) { 
+        sequenceBox.addChild(item);
+        item.x = pos.x; 
+        item.y = pos.y; 
+        sequence[pos.slot] = item.id;
+      } else { 
+        returnToOrigin(item,item.originParent,item.originX,item.originY); 
+      }
+
+    }
 
     stage.update();
+
   }
 
-  function returnToOrigin (target,parent,x,y) {
+  function returnToOrigin(item,parent,x,y) {
 
-    parent.addChild(target);
-    target.x = x;
-    target.y = y;
+    parent.addChild(item);
+    item.x = x;
+    item.y = y;
     stage.update();
 
   }
+
+  function startHighlight(event) {
+    console.log(dragging);
+    if (dragging == true) {
+      event.currentTarget.alpha = .5;
+      stage.update();
+    }
+
+  }
+
+  function endHighlight(event) {
+
+    if (dragging == true) {
+      event.currentTarget.alpha = .25;
+      stage.update();
+    }
+
+  }
+
 
   function loadPositionButtons(event) {
-    console.log(event);
+
     positionLabel.color = green;
     shapeLabel.color = darkGray;
     stage.update();
@@ -973,7 +1106,6 @@ function init() {
     createjs.Tween.get(selectors, {override:true}).to({x:0}, 400, createjs.Ease.cubicOut);
   }
   
-
   function loadShapeButtons(event) {
     
     positionLabel.color = darkGray;
@@ -983,7 +1115,6 @@ function init() {
     createjs.Tween.get(selectors, {override:true}).to({x:-336}, 400, createjs.Ease.cubicOut);
 
   }
-
 
 
 
@@ -1069,6 +1200,9 @@ function init() {
     }
 
   }
+
+
+  // UTILITIES
 
   function getRandomInt(min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
