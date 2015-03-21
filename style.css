@@ -1,0 +1,24 @@
+
+@font-face {
+font-family: Avenir;
+src: url("fonts/Avenir-Medium.otf") format("opentype");
+}
+
+@font-face {
+font-family: AvenirHeavy;
+src: url("fonts/Avenir-Heavy.otf") format("opentype");
+}
+
+html, body {
+	background: 444;
+  margin: 0;
+  -webkit-user-select: none;
+}
+
+canvas {
+	background: #EAEAEA;
+	display: block;
+	margin: 0 auto;
+  width: 768px;
+  height: 1024px;
+}
