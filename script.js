@@ -26,7 +26,7 @@ function init() {
   var positionSelectors = [];
   var shapeSelectors = [];
   //var logic = [];
-  var actions = [];
+  //var actions = [];
 
   var stage = new createjs.Stage(canvas);
   createjs.Touch.enable(stage);
@@ -50,7 +50,7 @@ function init() {
     var gridLeft = ((canvas.width - ((gridSize-1) * gridSpacing))/2);
     var gridTop = ((896 - ((gridSize-1) * gridSpacing))/2);
 
-    grid.graphics.beginStroke("white");
+    grid.graphics.beginStroke(white);
     grid.graphics.setStrokeStyle(2);
     grid.alpha = .2;
     
@@ -871,22 +871,21 @@ function init() {
 
     }
 
+    //dropZone.hitArea = dropZone;
+    // console.log(i + " " + dropZone.hitArea);
     sequenceBox.addChild(dropZone);
   }
 
   stage.update();
 
-
-
   // INTERACTION
 
   function grabItem(event) {
-    //console.log(event.currentTarget.parent.parent);
     if (event.currentTarget.parent.parent != null) {
       var pt = event.currentTarget.localToGlobal(event.currentTarget.x,event.currentTarget.y);
+      event.currentTarget.x = (pt.x - event.currentTarget.x);
+      event.currentTarget.y = (pt.y - event.currentTarget.y);
       stage.addChild(event.currentTarget);
-      event.currentTarget.x = pt.x;
-      event.currentTarget.y = pt.y;
       stage.update();
     }
   }
@@ -900,8 +899,27 @@ function init() {
   }
 
   function snapTo(event) {
-    // to decide where to snap dragged item
-    console.log(event.currentTarget.parent.parent);
+
+  //sequenceBox.addChild(event.currentTarget);
+  //var pt = event.currentTarget.globalToLocal(event.currentTarget.x,event.currentTarget.y);
+  //event.currentTarget.x = pt.x;
+  //event.currentTarget.y = pt.y;
+  //event.currentTarget.x = event.stageX;
+  //event.currentTarget.y = event.stageY;
+  console.log(event.currentTarget.x);
+  console.log(event.currentTarget.y);
+
+    //console.log(event.currentTarget.parent.parent);
+    //sequenceBox.addChild(event.currentTarget);
+    //var pt = event.currentTarget.globalToLocal(event.stageX,event.stageY);
+    //event.currentTarget.x = pt.x;
+    //event.currentTarget.y = pt.y;
+    // var pt = event.currentTarget.globalToLocal(event.currentTarget.x,event.currentTarget.y);
+    //console.log(pt.x);
+    //console.log(pt.y);
+    
+    //console.log(event.currentTarget.getObjectUnderPoint(event.stageX,event.stageY,0));
+    stage.update();
   }
 
   function loadPositionButtons(event) {
