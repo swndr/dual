@@ -25,7 +25,6 @@ function init() {
   var buttonRow = 1;
   var buttonMargin = 8;
 
-  var dragging = false;
   var dropPosition = null;
 
   var sequence = [];
@@ -94,21 +93,13 @@ function init() {
 
   // SCORES
 
-  var whiteIcon = new createjs.Shape();
+  var whiteIcon = new createjs.Shape().set({x:80,y:448});
   whiteIcon.graphics.beginFill(white).drawCircle(0,0,iconRadius,iconRadius);
-  whiteIcon.x = 80;
-  whiteIcon.y = 448;
-  var whiteScore = new createjs.Text(wScore, largeLabelStyle, white);
-  whiteScore.x = 140;
-  whiteScore.y = 428;
+  var whiteScore = new createjs.Text(wScore, largeLabelStyle, white).set({x:140,y:428});
   whiteScore.textAlign = "left";
-  var blackIcon = new createjs.Shape();
+  var blackIcon = new createjs.Shape().set({x:(canvas.width - iconRadius - 80),y:(448 - iconRadius)});
   blackIcon.graphics.beginFill(black).drawRect(0,0,iconRadius*2,iconRadius*2);
-  blackIcon.x = canvas.width - iconRadius - 80;
-  blackIcon.y = 448 - iconRadius;
-  var blackScore = new createjs.Text(bScore, largeLabelStyle, black);
-  blackScore.x = canvas.width - 140;
-  blackScore.y = 428;
+  var blackScore = new createjs.Text(bScore, largeLabelStyle, black).set({x:(canvas.width - 140),y:428});
   blackScore.textAlign = "right";
   stage.addChild(whiteIcon,whiteScore,blackIcon,blackScore);
   stage.update();
@@ -198,12 +189,7 @@ function init() {
 
   for (var i = 0; i < (gridSize*gridSize); i++) {
 
-    if (i/(row+1) == gridSize) {
-
-      row++;
-      column = 0;
-
-    }
+    if (i/(row+1) == gridSize) { row++; column = 0; }
 
     var fourm = new GameObject(startObjects[i][0],startObjects[i][1],startObjects[i][2],startObjects[i][3]);
     fourm.x = colVal(column);
@@ -256,13 +242,11 @@ function init() {
 
   var positionLabelButton = new createjs.Shape().set({x:0,y:76});
   positionLabelButton.graphics.beginFill(white).drawRect(0,0,168,70);
-
   var positionLabel = new createjs.Text("POSITION", mediumLabelStyle, green).set({x:102,y:96});
   positionLabel.textAlign = "center";
 
   var shapeLabelButton = new createjs.Shape().set({x:168,y:76});
   shapeLabelButton.graphics.beginFill(white).drawRect(0,0,168,70);
-
   var shapeLabel = new createjs.Text("SHAPE", mediumLabelStyle, darkGray).set({x:252,y:96});
   shapeLabel.textAlign = "center";
 
@@ -274,7 +258,6 @@ function init() {
   var clearButton = new createjs.Shape().set({x:56,y:910});
   clearButton.graphics.beginFill("#616060").drawRect(0,0,200,100);
   clearButton.addEventListener("click",clearSequence);
-
   var clearLabel = new createjs.Text("CLEAR", largeLabelStyle, lightGray).set({x:156,y:940});
   clearLabel.textAlign = "center";
 
@@ -285,7 +268,6 @@ function init() {
 
   var playButton = new createjs.Shape().set({x:458,y:925});
   playButton.graphics.beginFill(gray).drawRoundRect(0,0,180,80,10);
-
   var playLabel = new createjs.Text("PLAY", largeLabelStyle, pink).set({x:548,y:940});
   playLabel.textAlign = "center";
 
@@ -633,9 +615,9 @@ function init() {
   var RCRC = [0,1,0,1]; shapeSelectors.push(RCRC);
   var CRCR = [1,0,1,0]; shapeSelectors.push(CRCR);
 
-  var shuffledShapeSelectors = shuffle(shapeSelectors);
+  var shuffledShapeSelectors = shuffle(shapeSelectors); // randomize shape selectors
 
-  for (var i = 0; i < 8; i++) { // update to random from shapeSelectors.length
+  for (var i = 0; i < 8; i++) { // load first 8 from randomized array
 
     if (!(i % 2)) {
     var shapeSelector = new ShapeButton(shuffledShapeSelectors[i][0],shuffledShapeSelectors[i][1],shuffledShapeSelectors[i][2],shuffledShapeSelectors[i][3],372,(16 + (buttonRow * (buttonSize + buttonMargin))));
@@ -746,8 +728,6 @@ function init() {
   for (var i = 0; i < 16; i++) {
 
     var dropZone = new createjs.Shape();
-    //dropZone.on("mouseover", startHighlight);
-    //dropZone.on("mouseout", endHighlight);
 
     if (i == 1 || i == 5 || i == 9 || i == 13) {
 
@@ -785,12 +765,11 @@ function init() {
 
     }
 
-    dropZone.slot = i;
+    dropZone.slot = i; // to determine which slot items dropped in
     sequenceBox.addChild(dropZone);
   }
 
   stage.update();
-
 
   // INTERACTION
 
@@ -809,6 +788,8 @@ function init() {
       }
     }
 
+    // translate local to global, re-parent to stage
+
     if (event.currentTarget.parent.parent != null) {
       var pt = event.currentTarget.localToGlobal(event.currentTarget.x,event.currentTarget.y);
       event.currentTarget.x = (pt.x - event.currentTarget.x);
@@ -816,36 +797,49 @@ function init() {
       stage.addChild(event.currentTarget);
       stage.update();
     }
+
+    // slot highlighting
+
+    if (event.currentTarget.type == "logic") {
+
+      for (var i = 0; i < sequenceBox.children.length; i++) {
+        if (sequenceBox.children[i].slot == 1 || sequenceBox.children[i].slot == 5 || sequenceBox.children[i].slot == 9 || sequenceBox.children[i].slot == 13) {
+          sequenceBox.children[i].alpha = .5;
+        }
+      }
+
+    } else if (event.currentTarget.type == "action") {
+
+      for (var i = 0; i < sequenceBox.children.length; i++) {
+        if (sequenceBox.children[i].slot == 3 || sequenceBox.children[i].slot == 7 || sequenceBox.children[i].slot == 11 || sequenceBox.children[i].slot == 15) {
+          sequenceBox.children[i].alpha = .5;
+        }
+      }
+    
+    } else {
+
+      for (var i = 0; i < sequenceBox.children.length; i++) {
+        if ((sequenceBox.children[i].slot % 2) == 0) {
+          sequenceBox.children[i].alpha = .5;
+        }
+      }      
+    }
+
+    stage.update();
   }
 
   function dragAndDrop(event) {
-
-    dragging = true;
 
     event.currentTarget.set({
       x: event.stageX-65,
       y: event.stageY-65
     });
-
-    // trying to highlight, but poor performance
-
-    // if (event.stageX > 416 && event.stageX < 1121) {
-
-    //   for (var i = 0; i < stage.getObjectsUnderPoint(event.stageX,event.stageY,0).length; i++) {
-    //     if (stage.getObjectsUnderPoint(event.stageX,event.stageY,0)[i].slot != null) {
-    //     var slot = stage.getObjectsUnderPoint(event.stageX,event.stageY,0)[i].slot;
-    //     console.log(i + " " + slot);
-    //     }
-    //   }
-    // }
-
+   
     stage.update();
 
   }
 
   function snapTo(event) {
-
-    dragging = false;
 
     // determine if dragged over a sequence slot, record which one
 
@@ -861,10 +855,18 @@ function init() {
       addToSlot(event.currentTarget,dropPosition);
     } else {
       if (event.currentTarget.type == "logic" && removedFromSlot == true) {
-        stage.removeChild(event.currentTarget);
+        stage.removeChild(event.currentTarget); // logic is removed, as new ones spawn
       } else {
         returnToOrigin(event.currentTarget,event.currentTarget.originParent,event.currentTarget.originX,event.currentTarget.originY);
       } 
+    }
+
+    // unhighlight slots
+
+    for (var i = 0; i < sequenceBox.children.length; i++) {
+      if (sequenceBox.children[i].slot != null) {
+        sequenceBox.children[i].alpha = .25;
+      }
     }
 
     dropPosition = null;
@@ -895,10 +897,10 @@ function init() {
         sequence[pos.slot] = item.name;
 
         if (item.name == "AND") {
-          var andLogic = new LogicButton("AND",34,106);
+          var andLogic = new LogicButton("AND",34,106); // generate new AND button
           logicBox.addChild(andLogic);
         } else {
-          var orLogic = new LogicButton("OR",(34 + buttonSize + buttonMargin),106);
+          var orLogic = new LogicButton("OR",(34 + buttonSize + buttonMargin),106); // generate new OR button
           logicBox.addChild(orLogic);
         }
       } else { 
@@ -955,25 +957,6 @@ function init() {
     }
   }
 
-  function startHighlight(event) {
-    console.log(dragging);
-    if (dragging == true) {
-      event.currentTarget.alpha = .5;
-      stage.update();
-    }
-
-  }
-
-  function endHighlight(event) {
-
-    if (dragging == true) {
-      event.currentTarget.alpha = .25;
-      stage.update();
-    }
-
-  }
-
-
   function loadPositionButtons(event) {
 
     createjs.Ticker.setPaused(false);
@@ -1010,6 +993,8 @@ function init() {
 
   function shapeClick(event) {
 
+    // transform corners
+    
     if (event.target.round == false) {
       if (event.target.name == "TL") {
         event.target.graphics
@@ -1057,6 +1042,8 @@ function init() {
       }
       event.target.round = false;
     }
+
+  // update scores
 
   var wCount = 0;
   var bCount = 0;
