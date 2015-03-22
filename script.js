@@ -19,12 +19,13 @@ function init() {
   var darkGray = "#AA9696";
   var pink = "#E01062";
 
+  var radius = 75;
   var iconRadius = 40;
   var buttonSize = 130;
   var buttonRow = 1;
   var buttonMargin = 8;
 
-  var dragging = false;
+  //var dragging = false;
   var dropPosition = null;
 
   var sequence = [];
@@ -90,15 +91,88 @@ function init() {
 
   // CONSTRUCT SHAPES
 
-  var row = 0;
-  var column = 0;
-
   function rowVal (r) {return (gridTop-gridSpacing)+((r+1)*gridSpacing)} // calcs row
   function colVal (c) {return (gridLeft+(c*gridSpacing))} // calcs col
 
-  var radius = 75;
+  function GameObject(tl,tr,br,bl) {
 
-    for (var i = 0; i < (gridSize*gridSize); i++) {
+    var gameObject = new createjs.Container();
+
+    var TL = new createjs.Shape();
+    var TR = new createjs.Shape();
+    var BR = new createjs.Shape();
+    var BL = new createjs.Shape();
+
+    if (tl == 1) {
+      TL.graphics.beginFill(white);
+      TL.graphics.drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0);
+      TL.round = true;
+      TL.name = "TL";
+      TL.addEventListener("click", shapeClick);
+    } else {
+      TL.graphics.beginFill(black);
+      TL.graphics.drawRoundRectComplex(-radius,-radius,radius,radius,0,0,0,0);
+      TL.round = false;
+      TL.name = "TL";
+      TL.addEventListener("click", shapeClick);
+    }
+
+    if (tr == 1) {
+      TR.graphics.beginFill(white);
+      TR.graphics.drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0);
+      TR.round = true;
+      TR.name = "TR";
+      TR.addEventListener("click", shapeClick);
+    } else {
+      TR.graphics.beginFill(black);
+      TR.graphics.drawRoundRectComplex(0,-radius,radius,radius,0,0,0,0);
+      TR.round = false;
+      TR.name = "TR";
+      TR.addEventListener("click", shapeClick);
+    }
+
+    if (br == 1) {
+      BR.graphics.beginFill(white);
+      BR.graphics.drawRoundRectComplex(0,0,radius,radius,0,0,radius,0);
+      BR.round = true;
+      BR.name = "BR";
+      BR.addEventListener("click", shapeClick);
+    } else {
+      BR.graphics.beginFill(black);
+      BR.graphics.drawRoundRectComplex(0,0,radius,radius,0,0,0,0);
+      BR.round = false;
+      BR.name = "BR";
+      BR.addEventListener("click", shapeClick);
+    }
+
+    if (bl == 1) {
+      BL.graphics.beginFill(white);
+      BL.graphics.drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius);
+      BL.round = true;
+      BL.name = "BL";
+      BL.addEventListener("click", shapeClick);
+    } else {
+      BL.graphics.beginFill(black);
+      BL.graphics.drawRoundRectComplex(-radius,0,radius,radius,0,0,0,0);
+      BL.round = false;
+      BL.name = "BL";
+      BL.addEventListener("click", shapeClick);
+    }
+
+    gameObject.addChild(TL,TR,BR,BL);
+
+    return gameObject;
+
+  }
+
+  // ADD START OBJECTS TO BOARD
+
+  var row = 0;
+  var column = 0;
+
+  var startObjects = shuffle([[0,0,1,1],[0,0,1,1],[0,1,1,0],[0,1,1,0],[1,1,0,0],[1,1,0,0],[1,0,0,1],[1,0,0,1],[1,0,1,1],[0,1,1,1],[0,1,0,0],[1,0,0,0],[1,0,1,0],[1,0,1,0],[0,1,0,1],[0,1,0,1]]);
+
+  for (var i = 0; i < (gridSize*gridSize); i++) {
 
     if (i/(row+1) == gridSize) {
 
@@ -107,47 +181,17 @@ function init() {
 
     }
 
-    var rectTL = new createjs.Shape();
-    rectTL.x = colVal(column);
-    rectTL.y = rowVal(row);
-    rectTL.graphics.beginFill(white);
-    rectTL.graphics.drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0);
-    rectTL.round = true;
-    stage.addChild(rectTL);
-    rectTL.addEventListener("click", shapeClickTL);
+    var fourm = new GameObject(startObjects[i][0],startObjects[i][1],startObjects[i][2],startObjects[i][3]);
+    fourm.x = colVal(column);
+    fourm.y = rowVal(row);
 
-    var rectTR = new createjs.Shape();
-    rectTR.x = colVal(column);
-    rectTR.y = rowVal(row);
-    rectTR.graphics.beginFill(white);
-    rectTR.graphics.drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0);
-    rectTR.round = true;
-    stage.addChild(rectTR);
-    rectTR.addEventListener("click", shapeClickTR);
-
-    var rectBR = new createjs.Shape();
-    rectBR.x = colVal(column);
-    rectBR.y = rowVal(row);
-    rectBR.graphics.beginFill(white);
-    rectBR.graphics.drawRoundRectComplex(0,0,radius,radius,0,0,radius,0);
-    rectBR.round = true;
-    stage.addChild(rectBR);  
-    rectBR.addEventListener("click", shapeClickBR);  
-
-    var rectBL = new createjs.Shape();
-    rectBL.x = colVal(column);
-    rectBL.y = rowVal(row);
-    rectBL.graphics.beginFill(white);
-    rectBL.graphics.drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius);
-    rectBL.round = true;
-    stage.addChild(rectBL);
-    rectBL.addEventListener("click", shapeClickBL);
-
-    stage.update();
+    stage.addChild(fourm);
 
     column++;
 
   }
+
+  stage.update();
 
   // PLAYER CONTROLS
 
@@ -183,25 +227,22 @@ function init() {
   var actionsBox = new Box(1160,940,336,1054,white,yellow,"ACTIONS","actionsBox");
 
   var selectorsMask = new createjs.Shape();
-  selectorsMask.graphics.beginFill(white);
-  selectorsMask.graphics.drawRoundRect(40,940,336,750,10);
+  selectorsMask.graphics.beginFill(white).drawRoundRect(40,940,336,750,10);
   selectorsBox.mask = selectorsMask;
 
-  var positionButton = new createjs.Shape();
-  positionButton.graphics.beginFill(white);
-  positionButton.graphics.drawRect(0,0,168,70);
-  positionButton.y = 76;
+  var positionLabelButton = new createjs.Shape();
+  positionLabelButton.graphics.beginFill(white).drawRect(0,0,168,70);
+  positionLabelButton.y = 76;
 
   var positionLabel = new createjs.Text("POSITION", mediumLabelStyle, green);
   positionLabel.textAlign = "center";
   positionLabel.x = 102;
   positionLabel.y = 96;
 
-  var shapeButton = new createjs.Shape();
-  shapeButton.graphics.beginFill(white);
-  shapeButton.graphics.drawRect(0,0,168,70);
-  shapeButton.x = 168;
-  shapeButton.y = 76;
+  var shapeLabelButton = new createjs.Shape();
+  shapeLabelButton.graphics.beginFill(white).drawRect(0,0,168,70);
+  shapeLabelButton.x = 168;
+  shapeLabelButton.y = 76;
 
   var shapeLabel = new createjs.Text("SHAPE", mediumLabelStyle, darkGray);
   shapeLabel.textAlign = "center";
@@ -209,14 +250,13 @@ function init() {
   shapeLabel.y = 96;
 
   // switch between selector sets
-  positionButton.addEventListener("click", loadPositionButtons);
-  shapeButton.addEventListener("click", loadShapeButtons);
+  positionLabelButton.addEventListener("click", loadPositionButtons);
+  shapeLabelButton.addEventListener("click", loadShapeButtons);
 
-  selectorsBox.addChild(positionButton,shapeButton,positionLabel,shapeLabel);
+  selectorsBox.addChild(positionLabelButton,shapeLabelButton,positionLabel,shapeLabel);
 
   var clearButton = new createjs.Shape();
-  clearButton.graphics.beginFill("#616060");
-  clearButton.graphics.drawRect(0,0,200,100);
+  clearButton.graphics.beginFill("#616060").drawRect(0,0,200,100);
   clearButton.x = 56;
   clearButton.y = 910;
 
@@ -226,8 +266,7 @@ function init() {
   clearLabel.y = 940;
 
   var testButton = new createjs.Shape();
-  testButton.graphics.beginFill("#616060");
-  testButton.graphics.drawRect(0,0,200,100);
+  testButton.graphics.beginFill("#616060").drawRect(0,0,200,100);
   testButton.x = 252;
   testButton.y = 910;
 
@@ -237,8 +276,7 @@ function init() {
   testLabel.y = 940;
 
   var playButton = new createjs.Shape();
-  playButton.graphics.beginFill(gray);
-  playButton.graphics.drawRoundRect(0,0,180,80,10);
+  playButton.graphics.beginFill(gray).drawRoundRect(0,0,180,80,10);
   playButton.x = 458;
   playButton.y = 925;
 
@@ -538,7 +576,6 @@ function init() {
 
     return flipButton;
   }
-
   
   // SELECTOR ITEMS
 
@@ -883,89 +920,91 @@ function init() {
 
   // TOGGLE GAME OBJECTS
 
-  function shapeClickTL(event) {
+  function shapeClick(event) {
 
-    if (event.target.round == true) {
-       event.target.graphics
+    if (event.target.round == false) {
+      if (event.target.name == "TL") {
+        event.target.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0)
+        stage.update();
+        event.target.round = true;
+      } else if (event.target.name == "TR") {
+        event.target.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0)
+        stage.update();
+        event.target.round = true;
+      } else if (event.target.name == "BR") {
+        event.target.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(0,0,radius,radius,0,0,radius,0)
+        stage.update();
+        event.target.round = true;
+      } else {
+        event.target.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius)
+        stage.update();
+        event.target.round = true;
+      }
+    } else {
+      if (event.target.name == "TL") {
+        event.target.graphics
         .clear()
         .beginFill(black)
         .drawRoundRectComplex(-radius,-radius,radius,radius,0,0,0,0)
         stage.update();
         event.target.round = false;
-    } else {
+      } else if (event.target.name == "TR") {
         event.target.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0)
-        event.target.round = true;
-        stage.update();
-    }
-
-  }
-
-  function shapeClickTR(event) {
-
-    if (event.target.round == true) {
-       event.currentTarget.graphics
         .clear()
         .beginFill(black)
         .drawRoundRectComplex(0,-radius,radius,radius,0,0,0,0)
         stage.update();
-        event.currentTarget.round = false;
-    } else {
-        event.currentTarget.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0)
-        event.currentTarget.round = true;
-        stage.update();
-    }
-
-  }
-
-  function shapeClickBR(event) {
-
-    if (event.target.round == true) {
-       event.target.graphics
+        event.target.round = false;
+      } else if (event.target.name == "BR") {
+        event.target.graphics
         .clear()
         .beginFill(black)
         .drawRoundRectComplex(0,0,radius,radius,0,0,0,0)
         stage.update();
         event.target.round = false;
-    } else {
+      } else {
         event.target.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(0,0,radius,radius,0,0,radius,0)
-        event.target.round = true;
-        stage.update();
-    }
-
-  }
-
-  function shapeClickBL(event) {
-
-    if (event.target.round == true) {
-      console.log(event.target.graphics);
-       event.target.graphics
         .clear()
         .beginFill(black)
         .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,0)
         stage.update();
         event.target.round = false;
-    } else {
-        event.target.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius)
-        event.target.round = true;
-        stage.update();
+      }
     }
-
   }
 
-
   // UTILITIES
+
+  function shuffle(array) {
+    var currentIndex = array.length, temporaryValue, randomIndex ;
+
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+
+      // Pick a remaining element...
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex -= 1;
+
+      // And swap it with the current element.
+      temporaryValue = array[currentIndex];
+      array[currentIndex] = array[randomIndex];
+      array[randomIndex] = temporaryValue;
+    }
+
+    return array;
+  }
 
   function getRandomInt(min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
