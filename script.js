@@ -25,7 +25,7 @@ function init() {
   var buttonRow = 1;
   var buttonMargin = 8;
 
-  //var dragging = false;
+  var dragging = false;
   var dropPosition = null;
 
   var sequence = [];
@@ -254,77 +254,51 @@ function init() {
   selectorsMask.graphics.beginFill(white).drawRoundRect(40,940,336,750,10);
   selectorsBox.mask = selectorsMask;
 
-  var positionLabelButton = new createjs.Shape();
+  var positionLabelButton = new createjs.Shape().set({x:0,y:76});
   positionLabelButton.graphics.beginFill(white).drawRect(0,0,168,70);
-  positionLabelButton.y = 76;
 
-  var positionLabel = new createjs.Text("POSITION", mediumLabelStyle, green);
+  var positionLabel = new createjs.Text("POSITION", mediumLabelStyle, green).set({x:102,y:96});
   positionLabel.textAlign = "center";
-  positionLabel.x = 102;
-  positionLabel.y = 96;
 
-  var shapeLabelButton = new createjs.Shape();
+  var shapeLabelButton = new createjs.Shape().set({x:168,y:76});
   shapeLabelButton.graphics.beginFill(white).drawRect(0,0,168,70);
-  shapeLabelButton.x = 168;
-  shapeLabelButton.y = 76;
 
-  var shapeLabel = new createjs.Text("SHAPE", mediumLabelStyle, darkGray);
+  var shapeLabel = new createjs.Text("SHAPE", mediumLabelStyle, darkGray).set({x:252,y:96});
   shapeLabel.textAlign = "center";
-  shapeLabel.x = 252;
-  shapeLabel.y = 96;
 
-  // switch between selector sets
-  positionLabelButton.addEventListener("click", loadPositionButtons);
-  shapeLabelButton.addEventListener("click", loadShapeButtons);
+  positionLabelButton.addEventListener("click", loadPositionButtons); // switch between selector sets
+  shapeLabelButton.addEventListener("click", loadShapeButtons); // switch between selector sets
 
   selectorsBox.addChild(positionLabelButton,shapeLabelButton,positionLabel,shapeLabel);
 
-  var clearButton = new createjs.Shape();
+  var clearButton = new createjs.Shape().set({x:56,y:910});
   clearButton.graphics.beginFill("#616060").drawRect(0,0,200,100);
-  clearButton.x = 56;
-  clearButton.y = 910;
+  clearButton.addEventListener("click",clearSequence);
 
-  var clearLabel = new createjs.Text("CLEAR", largeLabelStyle, lightGray);
+  var clearLabel = new createjs.Text("CLEAR", largeLabelStyle, lightGray).set({x:156,y:940});
   clearLabel.textAlign = "center";
-  clearLabel.x = 156;
-  clearLabel.y = 940;
 
-  var testButton = new createjs.Shape();
+  var testButton = new createjs.Shape().set({x:252,y:910});
   testButton.graphics.beginFill("#616060").drawRect(0,0,200,100);
-  testButton.x = 252;
-  testButton.y = 910;
-
-  var testLabel = new createjs.Text("TEST", largeLabelStyle, white);
+  var testLabel = new createjs.Text("TEST", largeLabelStyle, white).set({x:352,y:940});
   testLabel.textAlign = "center";
-  testLabel.x = 352;
-  testLabel.y = 940;
 
-  var playButton = new createjs.Shape();
+  var playButton = new createjs.Shape().set({x:458,y:925});
   playButton.graphics.beginFill(gray).drawRoundRect(0,0,180,80,10);
-  playButton.x = 458;
-  playButton.y = 925;
 
-  var playLabel = new createjs.Text("PLAY", largeLabelStyle, pink);
+  var playLabel = new createjs.Text("PLAY", largeLabelStyle, pink).set({x:548,y:940});
   playLabel.textAlign = "center";
-  playLabel.x = 548;
-  playLabel.y = 940;
 
   sequenceBox.addChild(clearButton,clearLabel,testButton,testLabel,playButton,playLabel);
 
-  var transformLabel = new createjs.Text("TRANSFORM", mediumLabelStyle, yellow);
+  var transformLabel = new createjs.Text("TRANSFORM", mediumLabelStyle, yellow).set({x:168,y:96});
   transformLabel.textAlign = "center";
-  transformLabel.x = 168;
-  transformLabel.y = 96;
 
-  var rotateLabel = new createjs.Text("ROTATE", mediumLabelStyle, yellow);
+  var rotateLabel = new createjs.Text("ROTATE", mediumLabelStyle, yellow).set({x:168,y:462});
   rotateLabel.textAlign = "center";
-  rotateLabel.x = 168;
-  rotateLabel.y = 462;
 
-  var flipLabel = new createjs.Text("FLIP", mediumLabelStyle, yellow);
+  var flipLabel = new createjs.Text("FLIP", mediumLabelStyle, yellow).set({x:168,y:830});
   flipLabel.textAlign = "center";
-  flipLabel.x = 168;
-  flipLabel.y = 830;
 
   actionsBox.addChild(transformLabel,rotateLabel,flipLabel);
 
@@ -346,7 +320,7 @@ function init() {
     return button;
   }
 
-  function PositionButton(axisW,axisH,axisX,axisY,label,x,y) {
+  function PositionButton(axis,axisW,axisH,axisX,axisY,label,x,y) {
 
     var posButton = new createjs.Container();
 
@@ -376,6 +350,7 @@ function init() {
     posButton.addChild(button,axisShape,axisLabel);
     posButton.x = x;
     posButton.y = y;
+    posButton.name = axis + label;
     posButton.cache(0,0,buttonSize,buttonSize);
 
     return posButton;
@@ -476,6 +451,7 @@ function init() {
     logicButton.addChild(button,logicLabel);
     logicButton.x = x;
     logicButton.y = y;
+    logicButton.name = label;
     logicButton.cache(0,0,buttonSize,buttonSize);
 
     return logicButton;
@@ -623,11 +599,11 @@ function init() {
 
   for (var i = 0; i < 4; i++) {
     
-    var rowSelector = new PositionButton(100,30,15,50,i,34,16 + (buttonRow * (buttonSize + buttonMargin)));
+    var rowSelector = new PositionButton("row",100,30,15,50,i,34,16 + (buttonRow * (buttonSize + buttonMargin)));
     var placeholder = new PlaceholderButton(rowSelector.x,rowSelector.y);
     selectors.addChild(placeholder,rowSelector);
 
-    var colSelector = new PositionButton(30,100,50,15,i,(34 + buttonSize + buttonMargin),16 + (buttonRow * (buttonSize + buttonMargin)));
+    var colSelector = new PositionButton("col",30,100,50,15,i,(34 + buttonSize + buttonMargin),16 + (buttonRow * (buttonSize + buttonMargin)));
     var placeholder = new PlaceholderButton(colSelector.x,colSelector.y);
     selectors.addChild(placeholder,colSelector);
 
@@ -657,12 +633,16 @@ function init() {
   var RCRC = [0,1,0,1]; shapeSelectors.push(RCRC);
   var CRCR = [1,0,1,0]; shapeSelectors.push(CRCR);
 
+  var shuffledShapeSelectors = shuffle(shapeSelectors);
+
   for (var i = 0; i < 8; i++) { // update to random from shapeSelectors.length
 
     if (!(i % 2)) {
-    var shapeSelector = new ShapeButton(shapeSelectors[i][0],shapeSelectors[i][1],shapeSelectors[i][2],shapeSelectors[i][3],372,(16 + (buttonRow * (buttonSize + buttonMargin))));
+    var shapeSelector = new ShapeButton(shuffledShapeSelectors[i][0],shuffledShapeSelectors[i][1],shuffledShapeSelectors[i][2],shuffledShapeSelectors[i][3],372,(16 + (buttonRow * (buttonSize + buttonMargin))));
+    shapeSelector.name = "shape" + i;
     } else {
-    var shapeSelector = new ShapeButton(shapeSelectors[i][0],shapeSelectors[i][1],shapeSelectors[i][2],shapeSelectors[i][3],(372 + buttonSize + buttonMargin),(16 + (buttonRow * (buttonSize + buttonMargin))));
+    var shapeSelector = new ShapeButton(shuffledShapeSelectors[i][0],shuffledShapeSelectors[i][1],shuffledShapeSelectors[i][2],shuffledShapeSelectors[i][3],(372 + buttonSize + buttonMargin),(16 + (buttonRow * (buttonSize + buttonMargin))));
+    shapeSelector.name = "shape" + i;
     buttonRow++;
     }
 
@@ -689,30 +669,40 @@ function init() {
   // transform buttons
   
   var transformTL = new TransformButton(50,50,iconRadius,0,0,0,35,35,34,(16 + buttonSize + buttonMargin));
+  transformTL.name = "transTL";
   var placeholderTL = new PlaceholderButton(transformTL.x,transformTL.y);
   var transformTR = new TransformButton(35,50,0,iconRadius,0,0,50,35,(34 + buttonSize + buttonMargin),(16 + buttonSize + buttonMargin));
+  transformTR.name = "transTR";
   var placeholderTR = new PlaceholderButton(transformTR.x,transformTR.y);
   var transformBR = new TransformButton(35,35,0,0,iconRadius,0,50,50,(34 + buttonSize + buttonMargin),(16 + (buttonSize*2) + (buttonMargin*2)));
+  transformBR.name = "transBR";
   var placeholderBR = new PlaceholderButton(transformBR.x,transformBR.y);
   var transformBL = new TransformButton(50,35,0,0,0,iconRadius,35,50,34,(16 + (buttonSize*2) + (buttonMargin*2)));
+  transformBL.name = "transBL";
   var placeholderBL = new PlaceholderButton(transformBL.x,transformBL.y);
   
   // rotate buttons
 
   var rotate90cc = new RotateButton(90,"cc",34,520);
+  rotate90cc.name = "r90cc";
   var placeholder90cc = new PlaceholderButton(rotate90cc.x,rotate90cc.y);
   var rotate90c = new RotateButton(90,"c",(34 + buttonSize + buttonMargin),520);
+  rotate90c.name = "r90c";
   var placeholder90c = new PlaceholderButton(rotate90c.x,rotate90c.y);
   var rotate180cc = new RotateButton(180,"cc",34,(520 + buttonSize + buttonMargin));
+  rotate180cc.name = "r180cc";
   var placeholder180cc = new PlaceholderButton(rotate180cc.x,rotate180cc.y);
   var rotate180c = new RotateButton(180,"c",(34 + buttonSize + buttonMargin),(520 + buttonSize + buttonMargin));
+  rotate180c.name = "r180c";
   var placeholder180c = new PlaceholderButton(rotate180c.x,rotate180c.y);
 
   // flip buttons
 
   var flipV = new FlipButton(40,30,90,30,65,60,65,70,40,100,90,100,34,886);
+  flipV.name = "fV";
   var placeholderFlipV = new PlaceholderButton(flipV.x,flipV.y);
   var flipH = new FlipButton(30,40,30,90,60,65,70,65,100,40,100,90,(34 + buttonSize + buttonMargin),886);
+  flipH.name = "fH";
   var placeholderFlipH = new PlaceholderButton(flipH.x,flipH.y);
 
   actionsBox.addChild(placeholderTL,placeholderTR,placeholderBR,placeholderBL,placeholder90cc,placeholder90c,placeholder180cc,placeholder180c,placeholderFlipV,placeholderFlipH);
@@ -804,12 +794,17 @@ function init() {
 
   // INTERACTION
 
+  var removedFromSlot = false;
+
   function grabItem(event) {
+
+    // re-opening sequence slot
 
     if (event.currentTarget.parent == sequenceBox) {
       for (var i = 0; i < sequence.length; i++) {
-        if (sequence[i] == event.currentTarget.id) {
+        if (sequence[i] == event.currentTarget.name) {
           sequence[i] = null;
+          removedFromSlot = true;
         }
       }
     }
@@ -852,19 +847,28 @@ function init() {
 
     dragging = false;
 
+    // determine if dragged over a sequence slot, record which one
+
     for (var i = 0; i < stage.getObjectsUnderPoint(event.stageX,event.stageY,0).length; i++) {
       if (stage.getObjectsUnderPoint(event.stageX,event.stageY,0)[i].slot != null) {
       dropPosition = stage.getObjectsUnderPoint(event.stageX,event.stageY,0)[i];
       }
     }
 
-    if (dropPosition != null && sequence[dropPosition] == null) {
+    // if slot is open, drop in (otherwise return to item's original position)
+
+    if (dropPosition != null && sequence[dropPosition.slot] == null) {
       addToSlot(event.currentTarget,dropPosition);
     } else {
-      returnToOrigin(event.currentTarget,event.currentTarget.originParent,event.currentTarget.originX,event.currentTarget.originY);
+      if (event.currentTarget.type == "logic" && removedFromSlot == true) {
+        stage.removeChild(event.currentTarget);
+      } else {
+        returnToOrigin(event.currentTarget,event.currentTarget.originParent,event.currentTarget.originX,event.currentTarget.originY);
+      } 
     }
 
     dropPosition = null;
+    removedFromSlot = false;
     stage.update();
   
   }
@@ -877,7 +881,7 @@ function init() {
         sequenceBox.addChild(item);
         item.x = pos.x; 
         item.y = pos.y;
-        sequence[pos.slot] = item.id;
+        sequence[pos.slot] = item.name;
       } else { 
         returnToOrigin(item,item.originParent,item.originX,item.originY); 
       }
@@ -888,7 +892,15 @@ function init() {
         sequenceBox.addChild(item);
         item.x = pos.x; 
         item.y = pos.y; 
-        sequence[pos.slot] = item.id;
+        sequence[pos.slot] = item.name;
+
+        if (item.name == "AND") {
+          var andLogic = new LogicButton("AND",34,106);
+          logicBox.addChild(andLogic);
+        } else {
+          var orLogic = new LogicButton("OR",(34 + buttonSize + buttonMargin),106);
+          logicBox.addChild(orLogic);
+        }
       } else { 
         returnToOrigin(item,item.originParent,item.originX,item.originY); 
       }
@@ -899,7 +911,7 @@ function init() {
         sequenceBox.addChild(item);
         item.x = pos.x; 
         item.y = pos.y; 
-        sequence[pos.slot] = item.id;
+        sequence[pos.slot] = item.name;
       } else { 
         returnToOrigin(item,item.originParent,item.originX,item.originY); 
       }
@@ -917,6 +929,30 @@ function init() {
     item.y = y;
     stage.update();
 
+  }
+
+  function clearSequence() {
+
+    var toClear = [];
+
+    for (var i = 0; i < sequenceBox.children.length; i++) {
+      if (sequenceBox.children[i].type != null) {
+        toClear.push(sequenceBox.children[i]);
+      }
+    }
+
+    for (var i = 0; i < toClear.length; i++) {
+      if (toClear[i].type != "logic") {
+      returnToOrigin(toClear[i],toClear[i].originParent,toClear[i].originX,toClear[i].originY);
+      } else {
+      sequenceBox.removeChild(toClear[i]);
+      stage.update();
+      } 
+    }
+
+    for (var i = 0; i < sequence.length; i++) {
+      sequence[i] = null;
+    }
   }
 
   function startHighlight(event) {
