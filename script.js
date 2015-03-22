@@ -14,6 +14,7 @@ function init() {
   var pink = "#E01062";
   var white = "#FFF";
   var black = "#333";
+  var gray = "#EAEAEA";
   var lightGray = "#C8B2B2";
   var darkGray = "#AA9696";
   var pink = "#E01062";
@@ -40,8 +41,6 @@ function init() {
   createjs.Ticker.setFPS(60);
   createjs.Ticker.addEventListener("tick", tick);
   createjs.Ticker.setPaused(true);
-
-  var tweening = false;
 
   // BACKGROUND
 
@@ -152,27 +151,41 @@ function init() {
 
   // PLAYER CONTROLS
 
-  var selectorsBox = new createjs.Container();
-  var logicBox = new createjs.Container(); logicBox.name = "logicBox";
-  var sequenceBox = new createjs.Container();
-  var actionsBox = new createjs.Container(); actionsBox.name = "actionsBox";
+  function Box(x,y,w,h,bgColor,color,title,name) {
 
-  var selectorsBG = new createjs.Shape();
-  selectorsBG.graphics.beginFill(white);
-  selectorsBG.graphics.drawRoundRect(0,0,336,750,10);
+    var box = new createjs.Container();
+    if (arguments.length == 8) {
+      box.name = name;
+    }
+
+    var bg = new createjs.Shape();
+    bg.graphics.beginFill(bgColor);
+    bg.graphics.drawRoundRect(0,0,w,h,10);
+
+    var header = new createjs.Shape();
+    header.graphics.beginFill(color);
+    header.graphics.drawRoundRectComplex(0,0,w,76,10,10,0,0);
+    var label = new createjs.Text(title, lightLabelStyle, white);
+    label.textAlign = "center";
+    label.x = w/2;
+    label.y = 20;
+
+    box.addChild(bg,header,label);
+    box.x = x;
+    box.y = y;
+
+    return box;
+  }
+
+  var selectorsBox = new Box(40,940,336,750,white,green,"SELECTORS");
+  var logicBox = new Box(40,1720,336,275,white,blue,"LOGIC","logicBox");
+  var sequenceBox = new Box(416,940,704,1054,"#616060",black,"SEQUENCE");
+  var actionsBox = new Box(1160,940,336,1054,white,yellow,"ACTIONS","actionsBox");
 
   var selectorsMask = new createjs.Shape();
   selectorsMask.graphics.beginFill(white);
   selectorsMask.graphics.drawRoundRect(40,940,336,750,10);
   selectorsBox.mask = selectorsMask;
-
-  var selectorsTitle = new createjs.Shape();
-  selectorsTitle.graphics.beginFill(green);
-  selectorsTitle.graphics.drawRoundRectComplex(0,0,336,76,10,10,0,0);
-  var selectorsText = new createjs.Text("SELECTORS", lightLabelStyle, white);
-  selectorsText.textAlign = "center";
-  selectorsText.x = 168;
-  selectorsText.y = 20;
 
   var positionButton = new createjs.Shape();
   positionButton.graphics.beginFill(white);
@@ -196,47 +209,16 @@ function init() {
   shapeLabel.y = 96;
 
   // switch between selector sets
-
   positionButton.addEventListener("click", loadPositionButtons);
   shapeButton.addEventListener("click", loadShapeButtons);
 
-  selectorsBox.addChild(selectorsBG,selectorsTitle,selectorsText,positionButton,shapeButton,positionLabel,shapeLabel);
-  selectorsBox.x = 40;
-  selectorsBox.y = 940;
-
-  var logicBG = new createjs.Shape();
-  logicBG.graphics.beginFill(white);
-  logicBG.graphics.drawRoundRect(0,0,336,275,10);
-
-  var logicTitle = new createjs.Shape();
-  logicTitle.graphics.beginFill(blue);
-  logicTitle.graphics.drawRoundRectComplex(0,0,336,76,10,10,0,0);
-  var logicText = new createjs.Text("LOGIC", lightLabelStyle, white);
-  logicText.textAlign = "center";
-  logicText.x = 168;
-  logicText.y = 20;
-
-  logicBox.addChild(logicBG,logicTitle,logicText);
-  logicBox.x = 40;
-  logicBox.y = 1720;
-
-  var sequenceBG = new createjs.Shape();
-  sequenceBG.graphics.beginFill("#616060");
-  sequenceBG.graphics.drawRoundRect(0,0,704,1054,10);
-
-  var sequenceTitle = new createjs.Shape();
-  sequenceTitle.graphics.beginFill(black);
-  sequenceTitle.graphics.drawRoundRectComplex(0,0,704,76,10,10,0,0);
-  var sequenceText = new createjs.Text("SEQUENCE", lightLabelStyle, white);
-  sequenceText.textAlign = "center";
-  sequenceText.x = 352;
-  sequenceText.y = 20;
+  selectorsBox.addChild(positionButton,shapeButton,positionLabel,shapeLabel);
 
   var clearButton = new createjs.Shape();
   clearButton.graphics.beginFill("#616060");
   clearButton.graphics.drawRect(0,0,200,100);
   clearButton.x = 56;
-  clearButton.y = 890;
+  clearButton.y = 910;
 
   var clearLabel = new createjs.Text("CLEAR", largeLabelStyle, lightGray);
   clearLabel.textAlign = "center";
@@ -247,7 +229,7 @@ function init() {
   testButton.graphics.beginFill("#616060");
   testButton.graphics.drawRect(0,0,200,100);
   testButton.x = 252;
-  testButton.y = 890;
+  testButton.y = 910;
 
   var testLabel = new createjs.Text("TEST", largeLabelStyle, white);
   testLabel.textAlign = "center";
@@ -255,7 +237,7 @@ function init() {
   testLabel.y = 940;
 
   var playButton = new createjs.Shape();
-  playButton.graphics.beginFill("#EAEAEA");
+  playButton.graphics.beginFill(gray);
   playButton.graphics.drawRoundRect(0,0,180,80,10);
   playButton.x = 458;
   playButton.y = 925;
@@ -265,21 +247,7 @@ function init() {
   playLabel.x = 548;
   playLabel.y = 940;
 
-  sequenceBox.addChild(sequenceBG,sequenceTitle,sequenceText,clearButton,clearLabel,testButton,testLabel,playButton,playLabel);
-  sequenceBox.x = 416;
-  sequenceBox.y = 940;
-
-  var actionsBG = new createjs.Shape();
-  actionsBG.graphics.beginFill(white);
-  actionsBG.graphics.drawRoundRect(0,0,336,1054,10);
-
-  var actionsTitle = new createjs.Shape();
-  actionsTitle.graphics.beginFill(yellow);
-  actionsTitle.graphics.drawRoundRectComplex(0,0,336,76,10,10,0,0);
-  var actionsText = new createjs.Text("ACTIONS", lightLabelStyle, white);
-  actionsText.textAlign = "center";
-  actionsText.x = 168;
-  actionsText.y = 20;
+  sequenceBox.addChild(clearButton,clearLabel,testButton,testLabel,playButton,playLabel);
 
   var transformLabel = new createjs.Text("TRANSFORM", mediumLabelStyle, yellow);
   transformLabel.textAlign = "center";
@@ -296,246 +264,295 @@ function init() {
   flipLabel.x = 168;
   flipLabel.y = 830;
 
-  actionsBox.addChild(actionsBG,actionsTitle,actionsText,transformLabel,rotateLabel,flipLabel);
-  actionsBox.x = 1160;
-  actionsBox.y = 940;
+  actionsBox.addChild(transformLabel,rotateLabel,flipLabel);
 
   stage.addChild(sequenceBox,selectorsBox,logicBox,actionsBox);
   stage.update();
 
   // GENERATE BUTTONS
 
-  function generateGreenButton() {
-    var greenButton = new createjs.Shape();
-    greenButton.graphics.beginFill(green);
-    greenButton.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
-    return greenButton;
+  function PositionButton(axisW,axisH,axisX,axisY,label,x,y) {
+
+    var posButton = new createjs.Container();
+
+    posButton.type = "position";
+    posButton.addEventListener("mousedown",grabItem);
+    posButton.addEventListener("pressmove",dragAndDrop);
+    posButton.addEventListener("pressup",snapTo);
+    posButton.originX = x;
+    posButton.originY = y;
+    posButton.originParent = selectors;
+
+    var button = new createjs.Shape();
+    button.graphics.beginFill(green);
+    button.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
+
+    var axisShape = new createjs.Shape();
+    axisShape.graphics.beginFill(darkGray);
+    axisShape.graphics.drawRect(0,0,axisW,axisH);
+    axisShape.x = axisX;
+    axisShape.y = axisY;
+
+    var axisLabel = new createjs.Text(label, lightLabelStyle, white);
+    axisLabel.x = 65;
+    axisLabel.y = 45;
+    axisLabel.textAlign = "center";
+
+    posButton.addChild(button,axisShape,axisLabel);
+    posButton.x = x;
+    posButton.y = y;
+    posButton.cache(0,0,130,130);
+
+    return posButton;
   }
 
-  function generateBlueButton() {
-    var blueButton = new createjs.Shape();
-    blueButton.graphics.beginFill(blue);
-    blueButton.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
-    return blueButton;
+  function ShapeButton(tl,tr,br,bl,x,y) {
+
+    var shapeButton = new createjs.Container();
+
+    shapeButton.type = "shape";
+    shapeButton.addEventListener("mousedown",grabItem);
+    shapeButton.addEventListener("pressmove",dragAndDrop);
+    shapeButton.addEventListener("pressup",snapTo);
+    shapeButton.originX = x;
+    shapeButton.originY = y;
+    shapeButton.originParent = selectors;
+
+    var button = new createjs.Shape();
+    button.graphics.beginFill(green);
+    button.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
+
+    var TL = new createjs.Shape();
+    var TR = new createjs.Shape();
+    var BR = new createjs.Shape();
+    var BL = new createjs.Shape();
+
+    if (tl == 1) {
+      TL.graphics.beginFill(lightGray);
+      TL.graphics.drawRoundRectComplex(-iconRadius,-iconRadius,iconRadius,iconRadius,iconRadius,0,0,0);
+    } else {
+      TL.graphics.beginFill(darkGray);
+      TL.graphics.drawRect(-iconRadius,-iconRadius,iconRadius,iconRadius);
+    }
+
+    if (tr == 1) {
+      TR.graphics.beginFill(lightGray);
+      TR.graphics.drawRoundRectComplex(0,-iconRadius,iconRadius,iconRadius,0,iconRadius,0,0);
+    } else {
+      TR.graphics.beginFill(darkGray);
+      TR.graphics.drawRect(0,-iconRadius,iconRadius,iconRadius);
+    }
+
+    if (br == 1) {
+      BR.graphics.beginFill(lightGray);
+      BR.graphics.drawRoundRectComplex(0,0,iconRadius,iconRadius,0,0,iconRadius,0);
+    } else {
+      BR.graphics.beginFill(darkGray);
+      BR.graphics.drawRect(0,0,iconRadius,iconRadius);
+    }
+
+    if (bl == 1) {
+      BL.graphics.beginFill(lightGray);
+      BL.graphics.drawRoundRectComplex(-iconRadius,0,iconRadius,iconRadius,0,0,0,iconRadius);
+    } else {
+      BL.graphics.beginFill(darkGray);
+      BL.graphics.drawRect(-iconRadius,0,iconRadius,iconRadius);
+    }
+
+    TL.x = 65;
+    TL.y = 65;
+    TR.x = 65;
+    TR.y = 65;
+    BR.x = 65;
+    BR.y = 65;
+    BL.x = 65;
+    BL.y = 65;
+
+    shapeButton.addChild(button,TL,TR,BR,BL);
+    shapeButton.x = x;
+    shapeButton.y = y;
+    shapeButton.cache(0,0,130,130);
+
+    return shapeButton;
+
   }
 
-  function generateYellowButton() {
-    var yellowButton = new createjs.Shape();
-    yellowButton.graphics.beginFill(yellow);
-    yellowButton.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
-    return yellowButton;
+  function LogicButton(label,x,y) {
+
+    var logicButton = new createjs.Container();
+
+    logicButton.type = "logic";
+    logicButton.addEventListener("mousedown",grabItem);
+    logicButton.addEventListener("pressmove",dragAndDrop);
+    logicButton.addEventListener("pressup",snapTo);
+    logicButton.originX = x;
+    logicButton.originY = y;
+    logicButton.originParent = logicBox;
+
+    var button = new createjs.Shape();
+    button.graphics.beginFill(blue);
+    button.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
+
+    var logicLabel = new createjs.Text(label, mediumLabelStyle, white);
+    logicLabel.x = 65;
+    logicLabel.y = 45;
+    logicLabel.textAlign = "center";
+
+    logicButton.addChild(button,logicLabel);
+    logicButton.x = x;
+    logicButton.y = y;
+    logicButton.cache(0,0,130,130);
+
+    return logicButton;
   }
 
-  function generateRow() {
-    var rowIcon = new createjs.Shape();
-    rowIcon.graphics.beginFill(darkGray);
-    rowIcon.graphics.drawRect(0,0,100,30);
-    rowIcon.x = 15;
-    rowIcon.y = 50;
-    return rowIcon;
+  function TransformButton(rX,rY,c1,c2,c3,c4,cX,cY,x,y) {
+
+    var transformButton = new createjs.Container();
+    transformButton.type = "action";
+    transformButton.addEventListener("mousedown",grabItem);
+    transformButton.addEventListener("pressmove",dragAndDrop);
+    transformButton.addEventListener("pressup",snapTo);
+    transformButton.originX = x;
+    transformButton.originY = y;
+    transformButton.originParent = actionsBox;
+
+    var button = new createjs.Shape();
+    button.graphics.beginFill(yellow);
+    button.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
+
+    var rect = new createjs.Shape();
+    rect.graphics.beginFill(black);
+    rect.graphics.drawRect(0,0,iconRadius,iconRadius);
+    rect.x = rX;
+    rect.y = rY;
+
+    var circle = new createjs.Shape();
+    circle.graphics.beginFill(white);
+    circle.graphics.drawRoundRectComplex(0,0,iconRadius,iconRadius,c1,c2,c3,c4);
+    circle.x = cX;
+    circle.y = cY;
+
+    transformButton.addChild(button,rect,circle);
+    transformButton.x = x;
+    transformButton.y = y;
+    transformButton.cache(0,0,130,130);
+
+    return transformButton;
   }
 
-  function generateCol() {
-    var colIcon = new createjs.Shape();
-    colIcon.graphics.beginFill(darkGray);
-    colIcon.graphics.drawRect(0,0,30,100);
-    colIcon.x = 50;
-    colIcon.y = 15;
-    return colIcon;
+  function RotateButton(type,dir,x,y) {
+
+    var rotateButton = new createjs.Container();
+    rotateButton.type = "action";
+    rotateButton.addEventListener("mousedown",grabItem);
+    rotateButton.addEventListener("pressmove",dragAndDrop);
+    rotateButton.addEventListener("pressup",snapTo);
+    rotateButton.originX = x;
+    rotateButton.originY = y;
+    rotateButton.originParent = actionsBox;
+
+    var button = new createjs.Shape();
+    button.graphics.beginFill(yellow);
+    button.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
+
+    var arc = new createjs.Shape();
+    arc.graphics.beginStroke(pink);
+    arc.graphics.setStrokeStyle(16);
+
+    var arrow = new createjs.Shape();
+    arrow.graphics.beginFill(pink);
+
+    if (type == 90) {
+      if (dir == "cc") {
+        arc.graphics.arc(56,94,40,270*(Math.PI/180),0);
+        arrow.graphics.lineTo(26,56);
+        arrow.graphics.lineTo(56,36);
+        arrow.graphics.lineTo(56,76);
+        
+      } else {
+        arc.graphics.arc(74,94,40,180*(Math.PI/180),270*(Math.PI/180));
+        arrow.graphics.lineTo(104,56);
+        arrow.graphics.lineTo(74,36);
+        arrow.graphics.lineTo(74,76);
+      }
+
+    } else {
+      if (dir == "cc") {
+        arc.graphics.arc(65,68,26,180*(Math.PI/180),0);
+        arrow.graphics.lineTo(39,98);
+        arrow.graphics.lineTo(19,68);
+        arrow.graphics.lineTo(59,68);
+      } else {
+        arc.graphics.arc(65,68,26,180*(Math.PI/180),0);
+        arrow.graphics.lineTo(91,98);
+        arrow.graphics.lineTo(71,68);
+        arrow.graphics.lineTo(111,68);
+      }
+
+      arrow.graphics.closePath();
+
+    }
+
+    rotateButton.addChild(button,arc,arrow);
+    rotateButton.x = x;
+    rotateButton.y = y;
+    rotateButton.cache(0,0,130,130);
+
+    return rotateButton;
   }
 
-  function generateTopLeftC() {
+  function FlipButton(a1,a2,a3,a4,a5,a6,b1,b2,b3,b4,b5,b6,x,y) {
 
-    var topLeftC = new createjs.Shape();
-    topLeftC.graphics.beginFill(lightGray);
-    topLeftC.graphics.drawRoundRectComplex(-iconRadius,-iconRadius,iconRadius,iconRadius,iconRadius,0,0,0);
-    topLeftC.x = 65;
-    topLeftC.y = 65;
-    return topLeftC;
+    var flipButton = new createjs.Container();
+    flipButton.type = "action";
+    flipButton.addEventListener("mousedown",grabItem);
+    flipButton.addEventListener("pressmove",dragAndDrop);
+    flipButton.addEventListener("pressup",snapTo);
+    flipButton.originX = x;
+    flipButton.originY = y;
+    flipButton.originParent = actionsBox;
+
+    var button = new createjs.Shape();
+    button.graphics.beginFill(yellow);
+    button.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
+
+    var arrow1 = new createjs.Shape();
+    arrow1.graphics.beginFill(darkGray);
+    arrow1.graphics.lineTo(a1,a2);
+    arrow1.graphics.lineTo(a3,a4);
+    arrow1.graphics.lineTo(a5,a6);
+    arrow1.graphics.closePath();
+
+    var arrow2 = new createjs.Shape();
+    arrow2.graphics.beginFill(pink);
+    arrow2.graphics.lineTo(b1,b2);
+    arrow2.graphics.lineTo(b3,b4);
+    arrow2.graphics.lineTo(b5,b6);
+    arrow2.graphics.closePath();
+
+    flipButton.addChild(button,arrow1,arrow2);
+    flipButton.x = x;
+    flipButton.y = y;
+    flipButton.cache(0,0,130,130);
+
+    return flipButton;
   }
 
-  function generateTopRightC() {
-
-    var topRightC = new createjs.Shape();
-    topRightC.graphics.beginFill(lightGray);
-    topRightC.graphics.drawRoundRectComplex(0,-iconRadius,iconRadius,iconRadius,0,iconRadius,0,0);
-    topRightC.x = 65;
-    topRightC.y = 65;
-    return topRightC;
-  }
-
-  function generateBottomRightC() {
-
-    var bottomRightC = new createjs.Shape();
-    bottomRightC.graphics.beginFill(lightGray);
-    bottomRightC.graphics.drawRoundRectComplex(0,0,iconRadius,iconRadius,0,0,iconRadius,0);
-    bottomRightC.x = 65;
-    bottomRightC.y = 65;
-    return bottomRightC;
-  }
-
-  function generateBottomLeftC() {
-
-    var bottomLeftC = new createjs.Shape();
-    bottomLeftC.graphics.beginFill(lightGray);
-    bottomLeftC.graphics.drawRoundRectComplex(-iconRadius,0,iconRadius,iconRadius,0,0,0,iconRadius);
-    bottomLeftC.x = 65;
-    bottomLeftC.y = 65;
-    return bottomLeftC;
-  }
-
-  function generateTopLeftR() {
-
-    var topLeftR = new createjs.Shape();
-    topLeftR.graphics.beginFill(darkGray);
-    topLeftR.graphics.drawRect(-iconRadius,-iconRadius,iconRadius,iconRadius);
-    topLeftR.x = 65;
-    topLeftR.y = 65;
-    return topLeftR;
-  }
-
-  function generateTopRightR() {
-
-    var topRightR = new createjs.Shape();
-    topRightR.graphics.beginFill(darkGray);
-    topRightR.graphics.drawRect(0,-iconRadius,iconRadius,iconRadius);
-    topRightR.x = 65;
-    topRightR.y = 65;
-    return topRightR;
-  }
-
-  function generateBottomRightR() {
-
-    var bottomRightR = new createjs.Shape();
-    bottomRightR.graphics.beginFill(darkGray);
-    bottomRightR.graphics.drawRect(0,0,iconRadius,iconRadius);
-    bottomRightR.x = 65;
-    bottomRightR.y = 65;
-    return bottomRightR;
-  }
-
-  function generateBottomLeftR() {
-
-    var bottomLeftR = new createjs.Shape();
-    bottomLeftR.graphics.beginFill(darkGray);
-    bottomLeftR.graphics.drawRect(-iconRadius,0,iconRadius,iconRadius);
-    bottomLeftR.x = 65;
-    bottomLeftR.y = 65;
-    return bottomLeftR;
-  }
-
-  function generateTransformR(x,y) {
-
-    var transformR = new createjs.Shape();
-    transformR.graphics.beginFill(black);
-    transformR.graphics.drawRect(0,0,iconRadius,iconRadius);
-    transformR.x = x;
-    transformR.y = y;
-    return transformR;
-  }
   
   // SELECTOR ITEMS
 
   var selectors = new createjs.Container;
   selectors.name = "selectorsInnerBox";
 
-  var CCRR = new createjs.Container();
-  CCRR.addChild(generateGreenButton(),generateTopLeftC(),generateTopRightC(),generateBottomRightR(),generateBottomLeftR());
-  shapeSelectors.push(CCRR);
-
-  var RRCC = new createjs.Container();
-  RRCC.addChild(generateGreenButton(),generateTopLeftR(),generateTopRightR(),generateBottomRightC(),generateBottomLeftC());
-  shapeSelectors.push(RRCC);
-
-  var CRRC = new createjs.Container();
-  CRRC.addChild(generateGreenButton(),generateTopLeftC(),generateTopRightR(),generateBottomRightR(),generateBottomLeftC());
-  shapeSelectors.push(CRRC);
-
-  var RCCR = new createjs.Container();
-  RCCR.addChild(generateGreenButton(),generateTopLeftR(),generateTopRightC(),generateBottomRightC(),generateBottomLeftR());
-  shapeSelectors.push(RCCR);
-
-  var CRRR = new createjs.Container();
-  CRRR.addChild(generateGreenButton(),generateTopLeftC(),generateTopRightR(),generateBottomRightR(),generateBottomLeftR());
-  shapeSelectors.push(CRRR);
-
-  var RCRR = new createjs.Container();
-  RCRR.addChild(generateGreenButton(),generateTopLeftR(),generateTopRightC(),generateBottomRightR(),generateBottomLeftR());
-  shapeSelectors.push(RCRR);
-
-  var RRRC = new createjs.Container();
-  RRRC.addChild(generateGreenButton(),generateTopLeftR(),generateTopRightR(),generateBottomRightR(),generateBottomLeftC());
-  shapeSelectors.push(RRRC);
-
-  var RRCR = new createjs.Container();
-  RRCR.addChild(generateGreenButton(),generateTopLeftR(),generateTopRightR(),generateBottomRightC(),generateBottomLeftR());
-  shapeSelectors.push(RRCR);
-
-  var CRRR = new createjs.Container();
-  CRRR.addChild(generateGreenButton(),generateTopLeftC(),generateTopRightR(),generateBottomRightR(),generateBottomLeftR());
-  shapeSelectors.push(CRRR);
-
-  var RCRR = new createjs.Container();
-  RCRR.addChild(generateGreenButton(),generateTopLeftR(),generateTopRightC(),generateBottomRightR(),generateBottomLeftR());
-  shapeSelectors.push(RCRR);
-
-  var RRRC = new createjs.Container();
-  RRRC.addChild(generateGreenButton(),generateTopLeftR(),generateTopRightR(),generateBottomRightR(),generateBottomLeftC());
-  shapeSelectors.push(RRRC);
-
-  var RRCR = new createjs.Container();
-  RRCR.addChild(generateGreenButton(),generateTopLeftR(),generateTopRightR(),generateBottomRightC(),generateBottomLeftR());
-  shapeSelectors.push(RRCR);
-
-  var RCRC = new createjs.Container();
-  RCRC.addChild(generateGreenButton(),generateTopLeftR(),generateTopRightC(),generateBottomRightR(),generateBottomLeftC());
-  shapeSelectors.push(RCRC);
-
-  var CRCR = new createjs.Container();
-  CRCR.addChild(generateGreenButton(),generateTopLeftC(),generateTopRightR(),generateBottomRightC(),generateBottomLeftR());
-  shapeSelectors.push(CRCR);
-
+  // positions
 
   for (var i = 0; i < 4; i++) {
-
-    var rowSelector = new createjs.Container();
-    rowSelector.type = "position";
-    rowSelector.addEventListener("mousedown",grabItem);
-    rowSelector.addEventListener("pressmove",dragAndDrop);
-    rowSelector.addEventListener("pressup",snapTo);
-    rowSelector.x = 34;
-    rowSelector.y = 16 + (buttonRow * (buttonSize + buttonMargin));
-    rowSelector.originX = rowSelector.x;
-    rowSelector.originY = rowSelector.y;
-    rowSelector.originParent = selectors;
-
-    var rowLabel = new createjs.Text(i, lightLabelStyle, white);
-    rowLabel.x = 65;
-    rowLabel.y = 45;
-    rowLabel.textAlign = "center";
-
-    rowSelector.addChild(generateGreenButton(),generateRow(),rowLabel);
-    rowSelector.cache(0,0,130,130);
+    
+    var rowSelector = new PositionButton(100,30,15,50,i,34,16 + (buttonRow * (buttonSize + buttonMargin)));
     selectors.addChild(rowSelector);
 
-    var colSelector = new createjs.Container();
-    colSelector.type = "position";
-    colSelector.addEventListener("mousedown",grabItem);
-    colSelector.addEventListener("pressmove",dragAndDrop);
-    colSelector.addEventListener("pressup",snapTo);
-    colSelector.x = 34 + buttonSize + buttonMargin;
-    colSelector.y = 16 + (buttonRow * (buttonSize + buttonMargin));
-    colSelector.originX = colSelector.x;
-    colSelector.originY = colSelector.y;
-    colSelector.originParent = selectors;
-
-    var colLabel = new createjs.Text(i, lightLabelStyle, white);
-    colLabel.x = 65;
-    colLabel.y = 45;
-    colLabel.textAlign = "center";
-
-    colSelector.addChild(generateGreenButton(),generateCol(),colLabel);
-    colSelector.cache(0,0,130,130);
+    var colSelector = new PositionButton(30,100,50,15,i,(34 + buttonSize + buttonMargin),16 + (buttonRow * (buttonSize + buttonMargin)));
     selectors.addChild(colSelector);
 
     selectorsBox.addChild(selectors);
@@ -547,34 +564,34 @@ function init() {
 
   buttonRow = 1;
 
-  // for (var i = 0; i < shapeSelectors.length; i++) {
-  for (var i = 0; i < 8; i++) {
+  // shapes
 
-    shapeSelectors[i].type = "shape";
-    shapeSelectors[i].addEventListener("mousedown",grabItem);
-    shapeSelectors[i].addEventListener("pressmove",dragAndDrop);
-    shapeSelectors[i].addEventListener("pressup",snapTo);
+  var CCRR = [1,1,0,0]; shapeSelectors.push(CCRR);
+  var RRCC = [0,0,1,1]; shapeSelectors.push(RRCC);
+  var CRRC = [1,0,0,1]; shapeSelectors.push(CRRC);
+  var RCCR = [0,1,1,0]; shapeSelectors.push(RCCR);
+  var CRRR = [1,0,0,0]; shapeSelectors.push(CRRR);
+  var RCRR = [0,1,0,0]; shapeSelectors.push(RCRR);
+  var RRRC = [0,0,0,1]; shapeSelectors.push(RRRC);
+  var RRCR = [0,0,1,0]; shapeSelectors.push(RRCR);
+  var RCCC = [1,0,0,0]; shapeSelectors.push(RCCC);
+  var CRCC = [0,1,0,0]; shapeSelectors.push(CRCC);
+  var CCRC = [1,1,1,0]; shapeSelectors.push(CCRC);
+  var CCCR = [1,1,0,1]; shapeSelectors.push(CCCR);
+  var RCRC = [0,1,0,1]; shapeSelectors.push(RCRC);
+  var CRCR = [1,0,1,0]; shapeSelectors.push(CRCR);
+
+  for (var i = 0; i < 8; i++) { // update to random from shapeSelectors.length
 
     if (!(i % 2)) {
-
-    shapeSelectors[i].x = 372;
-    shapeSelectors[i].y = 16 + (buttonRow * (buttonSize + buttonMargin));
-    selectors.addChild(shapeSelectors[i]);
-    selectorsBox.addChild(selectors);
-
+    var shapeSelector = new ShapeButton(shapeSelectors[i][0],shapeSelectors[i][1],shapeSelectors[i][2],shapeSelectors[i][3],372,(16 + (buttonRow * (buttonSize + buttonMargin))));
     } else {
-
-    shapeSelectors[i].x = 372 + buttonSize + buttonMargin;
-    shapeSelectors[i].y = 16 + (buttonRow * (buttonSize + buttonMargin));
-    selectors.addChild(shapeSelectors[i]);
-    selectorsBox.addChild(selectors);
+    var shapeSelector = new ShapeButton(shapeSelectors[i][0],shapeSelectors[i][1],shapeSelectors[i][2],shapeSelectors[i][3],(372 + buttonSize + buttonMargin),(16 + (buttonRow * (buttonSize + buttonMargin))));
     buttonRow++;
     }
 
-    shapeSelectors[i].originX = shapeSelectors[i].x;
-    shapeSelectors[i].originY = shapeSelectors[i].y;
-    shapeSelectors[i].originParent = selectors;
-    //shapeSelectors[i].cache(0,0,130,130);
+    selectors.addChild(shapeSelector);
+    selectorsBox.addChild(selectors);
 
     stage.update();
 
@@ -582,285 +599,35 @@ function init() {
 
   // LOGIC ITEMS
 
-    var andLogic = new createjs.Container();
-    andLogic.type = "logic";
-    andLogic.addEventListener("mousedown",grabItem);
-    andLogic.addEventListener("pressmove",dragAndDrop);
-    andLogic.addEventListener("pressup",snapTo);
-    andLogic.x = 34;
-    andLogic.y = 106;
-    andLogic.originX = andLogic.x;
-    andLogic.originY = andLogic.y;
-    andLogic.originParent = logicBox;
+  var andLogic = new LogicButton("AND",34,106);
+  var orLogic = new LogicButton("OR",(34 + buttonSize + buttonMargin),106);
 
-    var orLogic = new createjs.Container();
-    orLogic.type = "logic";
-    orLogic.addEventListener("mousedown",grabItem);
-    orLogic.addEventListener("pressmove",dragAndDrop);
-    orLogic.addEventListener("pressup",snapTo);
-    orLogic.x = 34 + buttonSize + buttonMargin;
-    orLogic.y = 106;
-    orLogic.originX = orLogic.x;
-    orLogic.originY = orLogic.y;
-    orLogic.originParent = logicBox;
-
-    var andLabel = new createjs.Text("AND", mediumLabelStyle, white);
-    andLabel.x = 65;
-    andLabel.y = 45;
-    andLabel.textAlign = "center";
-
-    var orLabel = new createjs.Text("OR", mediumLabelStyle, white);
-    orLabel.x = 65;
-    orLabel.y = 45;
-    orLabel.textAlign = "center";  
-
-    andLogic.addChild(generateBlueButton(),andLabel);
-    orLogic.addChild(generateBlueButton(),orLabel);
-
-    andLogic.cache(0,0,130,130);
-    orLogic.cache(0,0,130,130);
-
-    logicBox.addChild(andLogic,orLogic);
-    stage.update();
-
+  logicBox.addChild(andLogic,orLogic);
+  stage.update();
 
   // ACTION ITEMS
-  
-  var transformTL = new createjs.Container();
-  transformTL.type = "action";
-  transformTL.addEventListener("mousedown",grabItem);
-  transformTL.addEventListener("pressmove",dragAndDrop);
-  transformTL.addEventListener("pressup",snapTo);
-  var transformTR = new createjs.Container();
-  transformTR.type = "action";
-  transformTR.addEventListener("mousedown",grabItem);
-  transformTR.addEventListener("pressmove",dragAndDrop);
-  transformTR.addEventListener("pressup",snapTo);
-  var transformBR = new createjs.Container();
-  transformBR.type = "action";
-  transformBR.addEventListener("mousedown",grabItem);
-  transformBR.addEventListener("pressmove",dragAndDrop);
-  transformBR.addEventListener("pressup",snapTo);
-  var transformBL = new createjs.Container();
-  transformBL.type = "action";
-  transformBL.addEventListener("mousedown",grabItem);
-  transformBL.addEventListener("pressmove",dragAndDrop);
-  transformBL.addEventListener("pressup",snapTo);
-  var rotate90cc = new createjs.Container();
-  rotate90cc.type = "action";
-  rotate90cc.addEventListener("mousedown",grabItem);
-  rotate90cc.addEventListener("pressmove",dragAndDrop);
-  rotate90cc.addEventListener("pressup",snapTo);
-  var rotate90c = new createjs.Container();
-  rotate90c.type = "action";
-  rotate90c.addEventListener("mousedown",grabItem);
-  rotate90c.addEventListener("pressmove",dragAndDrop);
-  rotate90c.addEventListener("pressup",snapTo);
-  var rotate180cc = new createjs.Container();
-  rotate180cc.type = "action";
-  rotate180cc.addEventListener("mousedown",grabItem);
-  rotate180cc.addEventListener("pressmove",dragAndDrop);
-  rotate180cc.addEventListener("pressup",snapTo);
-  var rotate180c = new createjs.Container();
-  rotate180c.type = "action";
-  rotate180c.addEventListener("mousedown",grabItem);
-  rotate180c.addEventListener("pressmove",dragAndDrop);
-  rotate180c.addEventListener("pressup",snapTo);
-  var flipV = new createjs.Container();
-  flipV.type = "action";
-  flipV.addEventListener("mousedown",grabItem);
-  flipV.addEventListener("pressmove",dragAndDrop);
-  flipV.addEventListener("pressup",snapTo);
-  var flipH = new createjs.Container();
-  flipH.type = "action";
-  flipH.addEventListener("mousedown",grabItem);
-  flipH.addEventListener("pressmove",dragAndDrop);
-  flipH.addEventListener("pressup",snapTo);
 
   // transform buttons
-
-  var transformTLCircle = new createjs.Shape();
-    transformTLCircle.graphics.beginFill(white);
-    transformTLCircle.graphics.drawRoundRectComplex(0,0,iconRadius,iconRadius,iconRadius,0,0,0);
-    transformTLCircle.x = 35;
-    transformTLCircle.y = 35;
-
-  transformTL.addChild(generateYellowButton(),generateTransformR(50,50),transformTLCircle);
-  transformTL.x = 34;
-  transformTL.y = 16 + buttonSize + buttonMargin;
-  transformTL.originX = transformTL.x;
-  transformTL.originY = transformTL.y;
-  transformTL.originParent = actionsBox;
-
-  var transformTRCircle = new createjs.Shape();
-    transformTRCircle.graphics.beginFill(white);
-    transformTRCircle.graphics.drawRoundRectComplex(0,0,iconRadius,iconRadius,0,iconRadius,0,0);
-    transformTRCircle.x = 50;
-    transformTRCircle.y = 35;
-
-  transformTR.addChild(generateYellowButton(),generateTransformR(35,50),transformTRCircle);
-  transformTR.x = 34 + buttonSize + buttonMargin;
-  transformTR.y = 16 + buttonSize + buttonMargin;
-  transformTR.originX = transformTR.x;
-  transformTR.originY = transformTR.y;
-  transformTR.originParent = actionsBox;
-
-  var transformBRCircle = new createjs.Shape();
-    transformBRCircle.graphics.beginFill(white);
-    transformBRCircle.graphics.drawRoundRectComplex(0,0,iconRadius,iconRadius,0,0,iconRadius,0);
-    transformBRCircle.x = 50;
-    transformBRCircle.y = 50;
-
-  transformBR.addChild(generateYellowButton(),generateTransformR(35,35),transformBRCircle);
-  transformBR.x = 34 + buttonSize + buttonMargin;
-  transformBR.y = 16 + (buttonSize*2) + (buttonMargin*2);
-  transformBR.originX = transformBR.x;
-  transformBR.originY = transformBR.y;
-  transformBR.originParent = actionsBox;
-
-  var transformBLCircle = new createjs.Shape();
-    transformBLCircle.graphics.beginFill(white);
-    transformBLCircle.graphics.drawRoundRectComplex(0,0,iconRadius,iconRadius,0,0,0,iconRadius);
-    transformBLCircle.x = 35;
-    transformBLCircle.y = 50;
-
-  transformBL.addChild(generateYellowButton(),generateTransformR(50,35),transformBLCircle);
-  transformBL.x = 34
-  transformBL.y = 16 + (buttonSize*2) + (buttonMargin*2);
-  transformBL.originX = transformBL.x;
-  transformBL.originY = transformBL.y;
-  transformBL.originParent = actionsBox;
-
+  
+  var transformTL = new TransformButton(50,50,iconRadius,0,0,0,35,35,34,(16 + buttonSize + buttonMargin));
+  var transformTR = new TransformButton(35,50,0,iconRadius,0,0,50,35,(34 + buttonSize + buttonMargin),(16 + buttonSize + buttonMargin));
+  var transformBR = new TransformButton(35,35,0,0,iconRadius,0,50,50,(34 + buttonSize + buttonMargin),(16 + (buttonSize*2) + (buttonMargin*2)));
+  var transformBL = new TransformButton(50,35,0,0,0,iconRadius,35,50,34,(16 + (buttonSize*2) + (buttonMargin*2)));
+  
   // rotate buttons
 
-  var counter90Arc = new createjs.Shape();
-    counter90Arc.graphics.beginStroke(pink);
-    counter90Arc.graphics.setStrokeStyle(16);
-    counter90Arc.graphics.arc(56,94,40,270*(Math.PI/180),0);
+  var rotate90cc = new RotateButton(90,"cc",34,520);
+  var rotate90c = new RotateButton(90,"c",(34 + buttonSize + buttonMargin),520);
+  var rotate180cc = new RotateButton(180,"cc",34,(520 + buttonSize + buttonMargin));
+  var rotate180c = new RotateButton(180,"c",(34 + buttonSize + buttonMargin),(520 + buttonSize + buttonMargin));
 
-  var counter90Arrow = new createjs.Shape();
-    counter90Arrow.graphics.beginFill(pink);
-    counter90Arrow.graphics.lineTo(26,56);
-    counter90Arrow.graphics.lineTo(56,36);
-    counter90Arrow.graphics.lineTo(56,76);
-    counter90Arrow.graphics.closePath();
-
-    rotate90cc.addChild(generateYellowButton(),counter90Arc,counter90Arrow);
-    rotate90cc.x = 34;
-    rotate90cc.y = 520;
-    rotate90cc.originX = rotate90cc.x;
-    rotate90cc.originY = rotate90cc.y;
-    rotate90cc.originParent = actionsBox;
-
-  var clock90Arc = new createjs.Shape();
-    clock90Arc.graphics.beginStroke(pink);
-    clock90Arc.graphics.setStrokeStyle(16);
-    clock90Arc.graphics.arc(74,94,40,180*(Math.PI/180),270*(Math.PI/180));
-
-  var clock90Arrow = new createjs.Shape();
-    clock90Arrow.graphics.beginFill(pink);
-    clock90Arrow.graphics.lineTo(104,56);
-    clock90Arrow.graphics.lineTo(74,36);
-    clock90Arrow.graphics.lineTo(74,76);
-    clock90Arrow.graphics.closePath();
-
-    rotate90c.addChild(generateYellowButton(),clock90Arc,clock90Arrow);
-    rotate90c.x = 34 + buttonSize + buttonMargin;
-    rotate90c.y = 520;
-    rotate90c.originX = rotate90c.x;
-    rotate90c.originY = rotate90c.y;
-    rotate90c.originParent = actionsBox;
-
-  var cc180Arc = new createjs.Shape();
-    cc180Arc.graphics.beginStroke(pink);
-    cc180Arc.graphics.setStrokeStyle(16);
-    cc180Arc.graphics.arc(65,68,26,180*(Math.PI/180),0);
-
-  var cc180Arrow = new createjs.Shape();
-    cc180Arrow.graphics.beginFill(pink);
-    cc180Arrow.graphics.lineTo(39,98);
-    cc180Arrow.graphics.lineTo(19,68);
-    cc180Arrow.graphics.lineTo(59,68);
-    cc180Arrow.graphics.closePath();
-
-    rotate180cc.addChild(generateYellowButton(),cc180Arc,cc180Arrow);
-    rotate180cc.x = 34
-    rotate180cc.y = 520 + buttonSize + buttonMargin;
-    rotate180cc.originX = rotate180cc.x;
-    rotate180cc.originY = rotate180cc.y;
-    rotate180cc.originParent = actionsBox;
-
-  var c180Arc = new createjs.Shape();
-    c180Arc.graphics.beginStroke(pink);
-    c180Arc.graphics.setStrokeStyle(16);
-    c180Arc.graphics.arc(65,68,26,180*(Math.PI/180),0);
-
-  var c180Arrow = new createjs.Shape();
-    c180Arrow.graphics.beginFill(pink);
-    c180Arrow.graphics.lineTo(91,98);
-    c180Arrow.graphics.lineTo(71,68);
-    c180Arrow.graphics.lineTo(111,68);
-    c180Arrow.graphics.closePath();
-
-  rotate180c.addChild(generateYellowButton(),c180Arc,c180Arrow);
-  rotate180c.x = 34 + buttonSize + buttonMargin;
-  rotate180c.y = 520 + buttonSize + buttonMargin;
-  rotate180c.originX = rotate180c.x;
-  rotate180c.originY = rotate180c.y;
-  rotate180c.originParent = actionsBox;
-
+ 
   // flip buttons
 
-  var originFlipV = new createjs.Shape();
-    originFlipV.graphics.beginFill(darkGray);
-    originFlipV.graphics.lineTo(40,30);
-    originFlipV.graphics.lineTo(90,30);
-    originFlipV.graphics.lineTo(65,60);
-    originFlipV.graphics.closePath();
-
-  var targetFlipV = new createjs.Shape();
-    targetFlipV.graphics.beginFill(pink);
-    targetFlipV.graphics.lineTo(65,70);
-    targetFlipV.graphics.lineTo(40,100);
-    targetFlipV.graphics.lineTo(90,100);
-    targetFlipV.graphics.closePath();
-
-  flipV.addChild(generateYellowButton(),originFlipV,targetFlipV);
-  flipV.x = 34;
-  flipV.y = 886;
-  flipV.originX = flipV.x;
-  flipV.originY = flipV.y;
-  flipV.originParent = actionsBox;
-
-  var originFlipH = new createjs.Shape();
-    originFlipH.graphics.beginFill(darkGray);
-    originFlipH.graphics.lineTo(30,40);
-    originFlipH.graphics.lineTo(30,90);
-    originFlipH.graphics.lineTo(60,65);
-    originFlipH.graphics.closePath();
-
-  var targetFlipH = new createjs.Shape();
-    targetFlipH.graphics.beginFill(pink);
-    targetFlipH.graphics.lineTo(70,65);
-    targetFlipH.graphics.lineTo(100,40);
-    targetFlipH.graphics.lineTo(100,90);
-    targetFlipH.graphics.closePath();
-
-  flipH.addChild(generateYellowButton(),originFlipH,targetFlipH);
-  flipH.x = 34 + buttonSize + buttonMargin;
-  flipH.y = 886;
-  flipHoriginX = flipH.x;
-  flipH.originY = flipH.y;
-  flipH.originParent = actionsBox;
+  var flipV = new FlipButton(40,30,90,30,65,60,65,70,40,100,90,100,34,886);
+  var flipH = new FlipButton(30,40,30,90,60,65,70,65,100,40,100,90,(34 + buttonSize + buttonMargin),886);
 
   actionsBox.addChild(transformTL,transformTR,transformBR,transformBL,rotate90cc,rotate90c,rotate180cc,rotate180c,flipV,flipH);
-
-  for (var i = 0; i < actionsBox.children.length; i++) {
-    if (actionsBox.children[i].type != null) {
-    actionsBox.children[i].cache(0,0,130,130);
-    }
-  }
-
 
   stage.update();
 
