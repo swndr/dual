@@ -35,6 +35,9 @@ function init() {
   //var logic = [];
   //var actions = [];
 
+  var wScore = 0
+  var bScore = 0;
+
   var stage = new createjs.Stage(canvas);
   createjs.Touch.enable(stage);
   stage.enableMouseOver(20);
@@ -87,6 +90,27 @@ function init() {
       stage.addChild(vLabel);
     }
 
+  stage.update();
+
+  // SCORES
+
+  var whiteIcon = new createjs.Shape();
+  whiteIcon.graphics.beginFill(white).drawCircle(0,0,iconRadius,iconRadius);
+  whiteIcon.x = 80;
+  whiteIcon.y = 448;
+  var whiteScore = new createjs.Text(wScore, largeLabelStyle, white);
+  whiteScore.x = 140;
+  whiteScore.y = 428;
+  whiteScore.textAlign = "left";
+  var blackIcon = new createjs.Shape();
+  blackIcon.graphics.beginFill(black).drawRect(0,0,iconRadius*2,iconRadius*2);
+  blackIcon.x = canvas.width - iconRadius - 80;
+  blackIcon.y = 448 - iconRadius;
+  var blackScore = new createjs.Text(bScore, largeLabelStyle, black);
+  blackScore.x = canvas.width - 140;
+  blackScore.y = 428;
+  blackScore.textAlign = "right";
+  stage.addChild(whiteIcon,whiteScore,blackIcon,blackScore);
   stage.update();
 
   // CONSTRUCT SHAPES
@@ -309,6 +333,19 @@ function init() {
 
   // GENERATE BUTTONS
 
+  function PlaceholderButton(x,y) {
+
+    var button = new createjs.Shape();
+    button.graphics.beginFill(gray);
+    button.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
+
+    button.x = x;
+    button.y = y;
+    button.cache(0,0,buttonSize,buttonSize);
+
+    return button;
+  }
+
   function PositionButton(axisW,axisH,axisX,axisY,label,x,y) {
 
     var posButton = new createjs.Container();
@@ -339,7 +376,7 @@ function init() {
     posButton.addChild(button,axisShape,axisLabel);
     posButton.x = x;
     posButton.y = y;
-    posButton.cache(0,0,130,130);
+    posButton.cache(0,0,buttonSize,buttonSize);
 
     return posButton;
   }
@@ -409,7 +446,7 @@ function init() {
     shapeButton.addChild(button,TL,TR,BR,BL);
     shapeButton.x = x;
     shapeButton.y = y;
-    shapeButton.cache(0,0,130,130);
+    shapeButton.cache(0,0,buttonSize,buttonSize);
 
     return shapeButton;
 
@@ -439,7 +476,7 @@ function init() {
     logicButton.addChild(button,logicLabel);
     logicButton.x = x;
     logicButton.y = y;
-    logicButton.cache(0,0,130,130);
+    logicButton.cache(0,0,buttonSize,buttonSize);
 
     return logicButton;
   }
@@ -474,7 +511,7 @@ function init() {
     transformButton.addChild(button,rect,circle);
     transformButton.x = x;
     transformButton.y = y;
-    transformButton.cache(0,0,130,130);
+    transformButton.cache(0,0,buttonSize,buttonSize);
 
     return transformButton;
   }
@@ -535,7 +572,7 @@ function init() {
     rotateButton.addChild(button,arc,arrow);
     rotateButton.x = x;
     rotateButton.y = y;
-    rotateButton.cache(0,0,130,130);
+    rotateButton.cache(0,0,buttonSize,buttonSize);
 
     return rotateButton;
   }
@@ -572,7 +609,7 @@ function init() {
     flipButton.addChild(button,arrow1,arrow2);
     flipButton.x = x;
     flipButton.y = y;
-    flipButton.cache(0,0,130,130);
+    flipButton.cache(0,0,buttonSize,buttonSize);
 
     return flipButton;
   }
@@ -587,10 +624,12 @@ function init() {
   for (var i = 0; i < 4; i++) {
     
     var rowSelector = new PositionButton(100,30,15,50,i,34,16 + (buttonRow * (buttonSize + buttonMargin)));
-    selectors.addChild(rowSelector);
+    var placeholder = new PlaceholderButton(rowSelector.x,rowSelector.y);
+    selectors.addChild(placeholder,rowSelector);
 
     var colSelector = new PositionButton(30,100,50,15,i,(34 + buttonSize + buttonMargin),16 + (buttonRow * (buttonSize + buttonMargin)));
-    selectors.addChild(colSelector);
+    var placeholder = new PlaceholderButton(colSelector.x,colSelector.y);
+    selectors.addChild(placeholder,colSelector);
 
     selectorsBox.addChild(selectors);
     buttonRow++;
@@ -627,7 +666,8 @@ function init() {
     buttonRow++;
     }
 
-    selectors.addChild(shapeSelector);
+    var placeholder = new PlaceholderButton(shapeSelector.x,shapeSelector.y);
+    selectors.addChild(placeholder,shapeSelector);
     selectorsBox.addChild(selectors);
 
     stage.update();
@@ -637,9 +677,11 @@ function init() {
   // LOGIC ITEMS
 
   var andLogic = new LogicButton("AND",34,106);
+  var andPlaceholder = new PlaceholderButton(andLogic.x,andLogic.y);
   var orLogic = new LogicButton("OR",(34 + buttonSize + buttonMargin),106);
+  var orPlaceholder = new PlaceholderButton(orLogic.x,orLogic.y);
 
-  logicBox.addChild(andLogic,orLogic);
+  logicBox.addChild(andPlaceholder,orPlaceholder,andLogic,orLogic);
   stage.update();
 
   // ACTION ITEMS
@@ -647,23 +689,33 @@ function init() {
   // transform buttons
   
   var transformTL = new TransformButton(50,50,iconRadius,0,0,0,35,35,34,(16 + buttonSize + buttonMargin));
+  var placeholderTL = new PlaceholderButton(transformTL.x,transformTL.y);
   var transformTR = new TransformButton(35,50,0,iconRadius,0,0,50,35,(34 + buttonSize + buttonMargin),(16 + buttonSize + buttonMargin));
+  var placeholderTR = new PlaceholderButton(transformTR.x,transformTR.y);
   var transformBR = new TransformButton(35,35,0,0,iconRadius,0,50,50,(34 + buttonSize + buttonMargin),(16 + (buttonSize*2) + (buttonMargin*2)));
+  var placeholderBR = new PlaceholderButton(transformBR.x,transformBR.y);
   var transformBL = new TransformButton(50,35,0,0,0,iconRadius,35,50,34,(16 + (buttonSize*2) + (buttonMargin*2)));
+  var placeholderBL = new PlaceholderButton(transformBL.x,transformBL.y);
   
   // rotate buttons
 
   var rotate90cc = new RotateButton(90,"cc",34,520);
+  var placeholder90cc = new PlaceholderButton(rotate90cc.x,rotate90cc.y);
   var rotate90c = new RotateButton(90,"c",(34 + buttonSize + buttonMargin),520);
+  var placeholder90c = new PlaceholderButton(rotate90c.x,rotate90c.y);
   var rotate180cc = new RotateButton(180,"cc",34,(520 + buttonSize + buttonMargin));
+  var placeholder180cc = new PlaceholderButton(rotate180cc.x,rotate180cc.y);
   var rotate180c = new RotateButton(180,"c",(34 + buttonSize + buttonMargin),(520 + buttonSize + buttonMargin));
+  var placeholder180c = new PlaceholderButton(rotate180c.x,rotate180c.y);
 
- 
   // flip buttons
 
   var flipV = new FlipButton(40,30,90,30,65,60,65,70,40,100,90,100,34,886);
+  var placeholderFlipV = new PlaceholderButton(flipV.x,flipV.y);
   var flipH = new FlipButton(30,40,30,90,60,65,70,65,100,40,100,90,(34 + buttonSize + buttonMargin),886);
+  var placeholderFlipH = new PlaceholderButton(flipH.x,flipH.y);
 
+  actionsBox.addChild(placeholderTL,placeholderTR,placeholderBR,placeholderBL,placeholder90cc,placeholder90c,placeholder180cc,placeholder180c,placeholderFlipV,placeholderFlipH);
   actionsBox.addChild(transformTL,transformTR,transformBR,transformBL,rotate90cc,rotate90c,rotate180cc,rotate180c,flipV,flipH);
 
   stage.update();
@@ -927,62 +979,70 @@ function init() {
         event.target.graphics
         .clear()
         .beginFill(white)
-        .drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0)
-        stage.update();
-        event.target.round = true;
+        .drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0);
       } else if (event.target.name == "TR") {
         event.target.graphics
         .clear()
         .beginFill(white)
-        .drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0)
-        stage.update();
-        event.target.round = true;
+        .drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0);
       } else if (event.target.name == "BR") {
         event.target.graphics
         .clear()
         .beginFill(white)
-        .drawRoundRectComplex(0,0,radius,radius,0,0,radius,0)
-        stage.update();
-        event.target.round = true;
+        .drawRoundRectComplex(0,0,radius,radius,0,0,radius,0);
       } else {
         event.target.graphics
         .clear()
         .beginFill(white)
-        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius)
-        stage.update();
-        event.target.round = true;
+        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius);
       }
+      event.target.round = true;
     } else {
       if (event.target.name == "TL") {
         event.target.graphics
         .clear()
         .beginFill(black)
-        .drawRoundRectComplex(-radius,-radius,radius,radius,0,0,0,0)
-        stage.update();
-        event.target.round = false;
+        .drawRoundRectComplex(-radius,-radius,radius,radius,0,0,0,0);
       } else if (event.target.name == "TR") {
         event.target.graphics
         .clear()
         .beginFill(black)
-        .drawRoundRectComplex(0,-radius,radius,radius,0,0,0,0)
-        stage.update();
-        event.target.round = false;
+        .drawRoundRectComplex(0,-radius,radius,radius,0,0,0,0);
       } else if (event.target.name == "BR") {
         event.target.graphics
         .clear()
         .beginFill(black)
-        .drawRoundRectComplex(0,0,radius,radius,0,0,0,0)
-        stage.update();
-        event.target.round = false;
+        .drawRoundRectComplex(0,0,radius,radius,0,0,0,0);
       } else {
         event.target.graphics
         .clear()
         .beginFill(black)
-        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,0)
-        stage.update();
-        event.target.round = false;
+        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,0);
       }
+      event.target.round = false;
     }
+
+  var wCount = 0;
+  var bCount = 0;
+
+  for (var i = 0; i < event.target.parent.children.length; i++) {
+    if (event.target.parent.children[i].round == true) {
+      wCount++;
+    } else {
+      bCount++;
+    }
+  } 
+
+  if (wCount == 4) {
+    wScore++;
+    whiteScore.text = wScore;
+  } else if (bCount == 4) {
+    bScore++;
+    blackScore.text = bScore;
+  }
+
+  stage.update();
+
   }
 
   // UTILITIES
