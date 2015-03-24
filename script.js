@@ -129,14 +129,12 @@ function init() {
       TL.graphics.drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0);
       TL.round = true;
       TL.name = "TL";
-      TL.addEventListener("click", shapeClick);
     } else {
       gameObject.tl = 0;
       TL.graphics.beginFill(black);
       TL.graphics.drawRoundRectComplex(-radius,-radius,radius,radius,0,0,0,0);
       TL.round = false;
       TL.name = "TL";
-      TL.addEventListener("click", shapeClick);
     }
 
     if (tr == 1) {
@@ -145,14 +143,12 @@ function init() {
       TR.graphics.drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0);
       TR.round = true;
       TR.name = "TR";
-      TR.addEventListener("click", shapeClick);
     } else {
       gameObject.tr = 0;
       TR.graphics.beginFill(black);
       TR.graphics.drawRoundRectComplex(0,-radius,radius,radius,0,0,0,0);
       TR.round = false;
       TR.name = "TR";
-      TR.addEventListener("click", shapeClick);
     }
 
     if (br == 1) {
@@ -161,14 +157,12 @@ function init() {
       BR.graphics.drawRoundRectComplex(0,0,radius,radius,0,0,radius,0);
       BR.round = true;
       BR.name = "BR";
-      BR.addEventListener("click", shapeClick);
     } else {
       gameObject.br = 0;
       BR.graphics.beginFill(black);
       BR.graphics.drawRoundRectComplex(0,0,radius,radius,0,0,0,0);
       BR.round = false;
       BR.name = "BR";
-      BR.addEventListener("click", shapeClick);
     }
 
     if (bl == 1) {
@@ -177,14 +171,12 @@ function init() {
       BL.graphics.drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius);
       BL.round = true;
       BL.name = "BL";
-      BL.addEventListener("click", shapeClick);
     } else {
       gameObject.bl = 0;
       BL.graphics.beginFill(black);
       BL.graphics.drawRoundRectComplex(-radius,0,radius,radius,0,0,0,0);
       BL.round = false;
       BL.name = "BL";
-      BL.addEventListener("click", shapeClick);
     }
 
     gameObject.addChild(TL,TR,BR,BL);
@@ -695,15 +687,19 @@ function init() {
   
   var transformTL = new TransformButton(50,50,iconRadius,0,0,0,35,35,34,(16 + buttonSize + buttonMargin));
   transformTL.name = "transTL";
+  transformTL.func = transTL;
   var placeholderTL = new PlaceholderButton(transformTL.x,transformTL.y);
   var transformTR = new TransformButton(35,50,0,iconRadius,0,0,50,35,(34 + buttonSize + buttonMargin),(16 + buttonSize + buttonMargin));
   transformTR.name = "transTR";
+  transformTR.func = transTR;
   var placeholderTR = new PlaceholderButton(transformTR.x,transformTR.y);
   var transformBR = new TransformButton(35,35,0,0,iconRadius,0,50,50,(34 + buttonSize + buttonMargin),(16 + (buttonSize*2) + (buttonMargin*2)));
   transformBR.name = "transBR";
+  transformBR.func = transBR;
   var placeholderBR = new PlaceholderButton(transformBR.x,transformBR.y);
   var transformBL = new TransformButton(50,35,0,0,0,iconRadius,35,50,34,(16 + (buttonSize*2) + (buttonMargin*2)));
   transformBL.name = "transBL";
+  transformBL.func = transBL;
   var placeholderBL = new PlaceholderButton(transformBL.x,transformBL.y);
   
   // rotate buttons
@@ -746,30 +742,34 @@ function init() {
 
   var trays = new createjs.Container();
 
-  for (var i = 0; i < 4; i++) {
-    var sequenceTray = new createjs.Shape();
-    sequenceTray.graphics.beginStroke(green).setStrokeStyle(8).beginFill(black);
-    sequenceTray.graphics.drawRoundRect(0,0,442,154,5);
-    sequenceTray.x = 36;
-    sequenceTray.y = 120 + (i*200);
-    sequenceTray.tray = i;
-    sequenceTray.type = "selectors";
+  for (var i = 0; i < 8; i++) {
 
-    trays.addChild(sequenceTray);
-    sequenceTray.cache(-4,-4,450,162);
-  }
+    if (!(i % 2)) {
+      var sequenceTray = new createjs.Shape();
+      sequenceTray.graphics.beginStroke(green).setStrokeStyle(8).beginFill(black);
+      sequenceTray.graphics.drawRoundRect(0,0,442,154,5);
+      sequenceTray.x = 36;
+      sequenceTray.y = 120 + ((i/2)*200);
+      sequenceTray.tray = i;
+      sequenceTray.type = "selectors";
 
-  for (var i = 0; i < 4; i++) {
+      trays.addChild(sequenceTray);
+      sequenceTray.cache(-4,-4,450,162);
+    
+  } else {
+
     var actionTray = new createjs.Shape();
     actionTray.graphics.beginStroke(yellow).setStrokeStyle(8).beginFill(black);
     actionTray.graphics.drawRoundRect(0,0,160,154,5);
     actionTray.x = 508;
-    actionTray.y = 120 + (i*200);
+    actionTray.y = 20 + (i*100);
     actionTray.tray = i;
     actionTray.type = "action";
 
     trays.addChild(actionTray);
     actionTray.cache(-4,-4,168,162);
+
+    }
   }
 
   var dropZoneRow = 1;
@@ -1040,9 +1040,17 @@ function init() {
 
     highlightSequenceBox(playCount);
 
-    deliverAction(targetGameObjects(playCount));
+    if (!(playCount % 2)) {
+      targetGameObjects(playCount);
+      console.log("target " + playCount);
+    } else {
+      deliverAction(targetGameObjects(playCount-1),playCount);
+      console.log("action " + playCount);
+    }
 
-    if (playCount < 3) { playCount++ };
+    updateScores();
+
+    if (playCount < 7) { playCount++ };
 
   }
 
@@ -1071,7 +1079,6 @@ function init() {
 
   }
 
-
   function targetGameObjects(step) {
 
     var ruleSet = [];
@@ -1088,7 +1095,7 @@ function init() {
         }
       }
 
-    } else if (step == 1) {
+    } else if (step == 2) {
 
       for (var i = 4; i < 7; i++) {
         if (sequence[i] != null) {
@@ -1097,7 +1104,7 @@ function init() {
         }
       }
 
-    } else if (step == 2) {
+    } else if (step == 4) {
 
       for (var i = 8; i < 11; i++) {
         if (sequence[i] != null) {
@@ -1106,7 +1113,7 @@ function init() {
         }
       }
 
-    } else {
+    } else if (step == 6) {
 
       for (var i = 12; i < 15; i++) {
         if (sequence[i] != null) {
@@ -1123,13 +1130,13 @@ function init() {
       if (ruleSet.length == 3) {
 
         if (ruleSet[1](ruleSet[0](objectsInPlay[i]),ruleSet[2](objectsInPlay[i]))) {
-          targets.push(objectsInPlay[i].id);
+          targets.push(objectsInPlay[i]);
         }
    
       } else if (ruleSet.length == 1) {
 
         if (ruleSet[0](objectsInPlay[i])) {
-          targets.push(objectsInPlay[i].id);
+          targets.push(objectsInPlay[i]);
         }
 
       } else {
@@ -1183,18 +1190,146 @@ function init() {
   
 
 
-  function deliverAction(targets) {
+  function deliverAction(targets,step) {
 
     for (i in targets) {
-
+      if (step == 1) {
+        sequence[3].func(targets[i]);
+      } else if (step == 3) {
+        sequence[7].func(targets[i]);
+      } else if (step == 5) {
+        sequence[11].func(targets[i]);
+      } else {
+        sequence[15].func(targets[i]);
+      }
     }
-
-
   }
 
 
 
+  function transTL(obj) {
 
+    //createjs.Ticker.setPaused(false); 
+
+    var o = obj.getChildByName("TL");
+
+     if (obj.tl == 0) {
+        o.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0);
+        obj.tl = 1;
+      } else {
+        o.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(-radius,-radius,radius,radius,0,0,0,0);
+        obj.tl = 0;
+      }
+
+      stage.update();
+
+      //createjs.Tween.get(o, {override:true}).to({scaleX:0.8,scaleY:0.8}, 100, createjs.Ease.cubicIn).to({scaleX:1,scaleY:1}, 200, createjs.Ease.cubicOut).call(endTween);
+  }
+
+  function transTR(obj) {
+
+    //createjs.Ticker.setPaused(false); 
+
+    var o = obj.getChildByName("TR");
+
+     if (obj.tr == 0) {
+        o.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0);
+        obj.tr = 1;
+      } else {
+        o.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(0,-radius,radius,radius,0,0,0,0);
+        obj.tr = 0;
+      }
+
+      stage.update();
+
+      //createjs.Tween.get(o, {override:true}).to({scaleX:0.8,scaleY:0.8}, 100, createjs.Ease.cubicIn).to({scaleX:1,scaleY:1}, 200, createjs.Ease.cubicOut).call(endTween);
+  }
+
+  function transBR(obj) {
+
+    //createjs.Ticker.setPaused(false); 
+
+    var o = obj.getChildByName("BR");
+
+     if (obj.br == 0) {
+        o.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(0,0,radius,radius,0,0,radius,0);
+        obj.br = 1;
+      } else {
+        o.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(0,0,radius,radius,0,0,0,0);
+        obj.br = 0;
+      }
+
+      stage.update();
+
+      //createjs.Tween.get(o, {override:true}).to({scaleX:0.8,scaleY:0.8}, 100, createjs.Ease.cubicIn).to({scaleX:1,scaleY:1}, 200, createjs.Ease.cubicOut).call(endTween);
+  }
+
+  function transBL(obj) {
+
+    //createjs.Ticker.setPaused(false); 
+
+    var o = obj.getChildByName("BL");
+
+     if (obj.bl == 0) {
+        o.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius);
+        obj.bl = 1;
+      } else {
+        o.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,0);
+        obj.bl = 0;
+      }
+
+      stage.update();
+
+      //createjs.Tween.get(o, {override:true}).to({scaleX:0.8,scaleY:0.8}, 100, createjs.Ease.cubicIn).to({scaleX:1,scaleY:1}, 200, createjs.Ease.cubicOut).call(endTween);
+  }
+
+
+  // SCORES
+
+  function updateScores() {
+
+  var wScore = 0;
+  var bScore = 0;
+
+  for (var i = 0; i < objectsInPlay.length; i++) {
+    if (objectsInPlay[i].tl == 0 && objectsInPlay[i].tr == 0 && objectsInPlay[i].br == 0 && objectsInPlay[i].bl == 0) {
+      bScore++;
+    } else if (objectsInPlay[i].tl == 1 && objectsInPlay[i].tr == 1 && objectsInPlay[i].br == 1 && objectsInPlay[i].bl == 1) {
+      wScore++;
+    }
+  } 
+    blackScore.text = bScore;
+    whiteScore.text = wScore;
+    stage.update();
+
+  } 
+
+
+/*
   // TOGGLE GAME OBJECTS
 
   function shapeClick(event) {
@@ -1289,6 +1424,7 @@ function init() {
   createjs.Tween.get(event.target, {override:true}).to({scaleX:0.8,scaleY:0.8}, 100, createjs.Ease.cubicIn).to({scaleX:1,scaleY:1}, 200, createjs.Ease.cubicOut).call(endTween);
 
   }
+  */
 
   // UTILITIES
 
