@@ -31,8 +31,8 @@ function init() {
 
   var positionSelectors = [];
   var shapeSelectors = [];
-  //var logic = [];
-  //var actions = [];
+  var andCount = 4;
+  var orCount = 4;
 
   var wScore = 0
   var bScore = 0;
@@ -215,6 +215,7 @@ function init() {
     var bg = new createjs.Shape();
     bg.graphics.beginFill(bgColor);
     bg.graphics.drawRoundRect(0,0,w,h,10);
+    if (bgColor == white) { bg.alpha = .7; }
 
     var header = new createjs.Shape();
     header.graphics.beginFill(color);
@@ -231,29 +232,30 @@ function init() {
     return box;
   }
 
-  var selectorsBox = new Box(40,920,336,750,white,green,"SELECTORS");
-  var logicBox = new Box(40,1700,336,275,white,blue,"LOGIC","logicBox");
+  var selectorsBox = new Box(40,920,336,1054,white,green,"SELECTORS");
   var sequenceBox = new Box(416,920,704,1054,"#616060",black,"SEQUENCE");
   var actionsBox = new Box(1160,920,336,1054,white,yellow,"ACTIONS","actionsBox");
 
   var selectorsMask = new createjs.Shape();
-  selectorsMask.graphics.beginFill(white).drawRoundRect(40,920,336,750,10);
+  selectorsMask.graphics.beginFill(white).drawRoundRect(40,920,336,1054,10);
   selectorsBox.mask = selectorsMask;
 
-  var positionLabelButton = new createjs.Shape().set({x:0,y:76});
-  positionLabelButton.graphics.beginFill(white).drawRect(0,0,168,70);
-  var positionLabel = new createjs.Text("POSITION", mediumLabelStyle, green).set({x:102,y:96});
+  var positionLabel = new createjs.Text("POSITION", mediumLabelStyle, green).set({x:168,y:96});
   positionLabel.textAlign = "center";
 
-  var shapeLabelButton = new createjs.Shape().set({x:168,y:76});
-  shapeLabelButton.graphics.beginFill(white).drawRect(0,0,168,70);
-  var shapeLabel = new createjs.Text("SHAPE", mediumLabelStyle, darkGray).set({x:252,y:96});
+  var shapeLabel = new createjs.Text("SHAPE", mediumLabelStyle, green).set({x:168,y:452});
   shapeLabel.textAlign = "center";
 
-  positionLabelButton.addEventListener("click", loadPositionButtons); // switch between selector sets
-  shapeLabelButton.addEventListener("click", loadShapeButtons); // switch between selector sets
+  var logicLabel = new createjs.Text("LOGIC", mediumLabelStyle, blue).set({x:168,y:820});
+  logicLabel.textAlign = "center";
 
-  selectorsBox.addChild(positionLabelButton,shapeLabelButton,positionLabel,shapeLabel);
+  var andCountLabel = new createjs.Text(andCount, "bold 25px AvenirHeavy", blue).set({x:99,y:1010});
+  andCountLabel.textAlign = "center";
+
+  var orCountLabel = new createjs.Text(andCount, "bold 25px AvenirHeavy", blue).set({x:237,y:1010});
+  orCountLabel.textAlign = "center";
+
+  selectorsBox.addChild(positionLabel,shapeLabel,logicLabel,andCountLabel,orCountLabel);
 
   var clearButton = new createjs.Shape().set({x:56,y:910});
   clearButton.graphics.beginFill("#616060").drawRect(0,0,200,100);
@@ -276,15 +278,15 @@ function init() {
   var transformLabel = new createjs.Text("TRANSFORM", mediumLabelStyle, yellow).set({x:168,y:96});
   transformLabel.textAlign = "center";
 
-  var rotateLabel = new createjs.Text("ROTATE", mediumLabelStyle, yellow).set({x:168,y:462});
+  var rotateLabel = new createjs.Text("ROTATE", mediumLabelStyle, yellow).set({x:168,y:452});
   rotateLabel.textAlign = "center";
 
-  var flipLabel = new createjs.Text("FLIP", mediumLabelStyle, yellow).set({x:168,y:830});
+  var flipLabel = new createjs.Text("FLIP", mediumLabelStyle, yellow).set({x:168,y:820});
   flipLabel.textAlign = "center";
 
   actionsBox.addChild(transformLabel,rotateLabel,flipLabel);
 
-  stage.addChild(sequenceBox,selectorsBox,logicBox,actionsBox);
+  stage.addChild(sequenceBox,selectorsBox,actionsBox);
   stage.update();
 
   // GENERATE BUTTONS
@@ -312,7 +314,7 @@ function init() {
     posButton.addEventListener("pressup",snapTo);
     posButton.originX = x;
     posButton.originY = y;
-    posButton.originParent = selectors;
+    posButton.originParent = selectorsBox;
 
     var button = new createjs.Shape();
     button.graphics.beginFill(green);
@@ -348,7 +350,7 @@ function init() {
     shapeButton.addEventListener("pressup",snapTo);
     shapeButton.originX = x;
     shapeButton.originY = y;
-    shapeButton.originParent = selectors;
+    shapeButton.originParent = selectorsBox;
 
     var button = new createjs.Shape();
     button.graphics.beginFill(green);
@@ -419,7 +421,7 @@ function init() {
     logicButton.addEventListener("pressup",snapTo);
     logicButton.originX = x;
     logicButton.originY = y;
-    logicButton.originParent = logicBox;
+    logicButton.originParent = selectorsBox;
 
     var button = new createjs.Shape();
     button.graphics.beginFill(blue);
@@ -574,23 +576,36 @@ function init() {
   
   // SELECTOR ITEMS
 
-  var selectors = new createjs.Container;
-  selectors.name = "selectorsInnerBox";
-
   // positions
 
   for (var i = 0; i < 4; i++) {
     
-    var rowSelector = new PositionButton("row",100,30,15,50,i,34,16 + (buttonRow * (buttonSize + buttonMargin)));
-    var placeholder = new PlaceholderButton(rowSelector.x,rowSelector.y);
-    selectors.addChild(placeholder,rowSelector);
+    var rowSelector = new PositionButton("row",100,30,15,50,i,34,0);
+    positionSelectors.push(rowSelector);
+    var colSelector = new PositionButton("col",30,100,50,15,i,(34 + buttonSize + buttonMargin),0);
+    positionSelectors.push(colSelector);
 
-    var colSelector = new PositionButton("col",30,100,50,15,i,(34 + buttonSize + buttonMargin),16 + (buttonRow * (buttonSize + buttonMargin)));
-    var placeholder = new PlaceholderButton(colSelector.x,colSelector.y);
-    selectors.addChild(placeholder,colSelector);
+  }
 
-    selectorsBox.addChild(selectors);
-    buttonRow++;
+  var shuffledPositionSelectors = shuffle(positionSelectors); // randomize shape selectors
+
+  for (var i = 0; i < 4; i++) { // load first 4 from randomized array
+    
+    if (!(i % 2)) {
+      shuffledPositionSelectors[i].x = 34;
+      shuffledPositionSelectors[i].y = 16 + (buttonRow * (buttonSize + buttonMargin));
+      shuffledPositionSelectors[i].originX = shuffledPositionSelectors[i].x
+      shuffledPositionSelectors[i].originY = shuffledPositionSelectors[i].y
+    } else {
+      shuffledPositionSelectors[i].x = (34 + buttonSize + buttonMargin);
+      shuffledPositionSelectors[i].y = 16 + (buttonRow * (buttonSize + buttonMargin));
+      shuffledPositionSelectors[i].originX = shuffledPositionSelectors[i].x
+      shuffledPositionSelectors[i].originY = shuffledPositionSelectors[i].y
+      buttonRow++;
+    }
+
+    var placeholder = new PlaceholderButton(shuffledPositionSelectors[i].x,shuffledPositionSelectors[i].y);
+    selectorsBox.addChild(placeholder,shuffledPositionSelectors[i]);
 
     stage.update();
 
@@ -617,20 +632,19 @@ function init() {
 
   var shuffledShapeSelectors = shuffle(shapeSelectors); // randomize shape selectors
 
-  for (var i = 0; i < 8; i++) { // load first 8 from randomized array
+  for (var i = 0; i < 4; i++) { // load first 4 from randomized array
 
     if (!(i % 2)) {
-    var shapeSelector = new ShapeButton(shuffledShapeSelectors[i][0],shuffledShapeSelectors[i][1],shuffledShapeSelectors[i][2],shuffledShapeSelectors[i][3],372,(16 + (buttonRow * (buttonSize + buttonMargin))));
+    var shapeSelector = new ShapeButton(shuffledShapeSelectors[i][0],shuffledShapeSelectors[i][1],shuffledShapeSelectors[i][2],shuffledShapeSelectors[i][3],34,(372 + (buttonRow * (buttonSize + buttonMargin))));
     shapeSelector.name = "shape" + i;
     } else {
-    var shapeSelector = new ShapeButton(shuffledShapeSelectors[i][0],shuffledShapeSelectors[i][1],shuffledShapeSelectors[i][2],shuffledShapeSelectors[i][3],(372 + buttonSize + buttonMargin),(16 + (buttonRow * (buttonSize + buttonMargin))));
+    var shapeSelector = new ShapeButton(shuffledShapeSelectors[i][0],shuffledShapeSelectors[i][1],shuffledShapeSelectors[i][2],shuffledShapeSelectors[i][3],(34 + buttonSize + buttonMargin),(372 + (buttonRow * (buttonSize + buttonMargin))));
     shapeSelector.name = "shape" + i;
     buttonRow++;
     }
 
     var placeholder = new PlaceholderButton(shapeSelector.x,shapeSelector.y);
-    selectors.addChild(placeholder,shapeSelector);
-    selectorsBox.addChild(selectors);
+    selectorsBox.addChild(placeholder,shapeSelector);
 
     stage.update();
 
@@ -638,12 +652,16 @@ function init() {
 
   // LOGIC ITEMS
 
-  var andLogic = new LogicButton("AND",34,106);
-  var andPlaceholder = new PlaceholderButton(andLogic.x,andLogic.y);
-  var orLogic = new LogicButton("OR",(34 + buttonSize + buttonMargin),106);
-  var orPlaceholder = new PlaceholderButton(orLogic.x,orLogic.y);
+  var andPlaceholder = new PlaceholderButton(34,876);
+  var orPlaceholder = new PlaceholderButton((34 + buttonSize + buttonMargin),876);
+  selectorsBox.addChild(andPlaceholder,orPlaceholder);
 
-  logicBox.addChild(andPlaceholder,orPlaceholder,andLogic,orLogic);
+  for (var i = 0; i < 4; i++) {
+      var andLogic = new LogicButton("AND",34,876);
+      var orLogic = new LogicButton("OR",(34 + buttonSize + buttonMargin),876);
+      selectorsBox.addChild(andLogic,orLogic);
+  }
+
   stage.update();
 
   // ACTION ITEMS
@@ -665,25 +683,25 @@ function init() {
   
   // rotate buttons
 
-  var rotate90cc = new RotateButton(90,"cc",34,520);
+  var rotate90cc = new RotateButton(90,"cc",34,510);
   rotate90cc.name = "r90cc";
   var placeholder90cc = new PlaceholderButton(rotate90cc.x,rotate90cc.y);
-  var rotate90c = new RotateButton(90,"c",(34 + buttonSize + buttonMargin),520);
+  var rotate90c = new RotateButton(90,"c",(34 + buttonSize + buttonMargin),510);
   rotate90c.name = "r90c";
   var placeholder90c = new PlaceholderButton(rotate90c.x,rotate90c.y);
-  var rotate180cc = new RotateButton(180,"cc",34,(520 + buttonSize + buttonMargin));
+  var rotate180cc = new RotateButton(180,"cc",34,(510 + buttonSize + buttonMargin));
   rotate180cc.name = "r180cc";
   var placeholder180cc = new PlaceholderButton(rotate180cc.x,rotate180cc.y);
-  var rotate180c = new RotateButton(180,"c",(34 + buttonSize + buttonMargin),(520 + buttonSize + buttonMargin));
+  var rotate180c = new RotateButton(180,"c",(34 + buttonSize + buttonMargin),(510 + buttonSize + buttonMargin));
   rotate180c.name = "r180c";
   var placeholder180c = new PlaceholderButton(rotate180c.x,rotate180c.y);
 
   // flip buttons
 
-  var flipV = new FlipButton(40,30,90,30,65,60,65,70,40,100,90,100,34,886);
+  var flipV = new FlipButton(40,30,90,30,65,60,65,70,40,100,90,100,34,876);
   flipV.name = "fV";
   var placeholderFlipV = new PlaceholderButton(flipV.x,flipV.y);
-  var flipH = new FlipButton(30,40,30,90,60,65,70,65,100,40,100,90,(34 + buttonSize + buttonMargin),886);
+  var flipH = new FlipButton(30,40,30,90,60,65,70,65,100,40,100,90,(34 + buttonSize + buttonMargin),876);
   flipH.name = "fH";
   var placeholderFlipH = new PlaceholderButton(flipH.x,flipH.y);
 
@@ -773,8 +791,6 @@ function init() {
 
   // INTERACTION
 
-  var removedFromSlot = false;
-
   function grabItem(event) {
 
     // re-opening sequence slot
@@ -782,7 +798,14 @@ function init() {
     if (event.currentTarget.parent == sequenceBox) {
         sequence[event.currentTarget.inSlot] = null;
         event.currentTarget.inSlot = false;
-        removedFromSlot = true;
+      } else {
+          if (event.currentTarget.name == "AND") {
+            andCount--;
+            andCountLabel.text = andCount;
+        } else if (event.currentTarget.name == "OR") {
+            orCount--;
+            orCountLabel.text = orCount;
+         }
       }
 
     // translate local to global, re-parent to stage
@@ -848,12 +871,8 @@ function init() {
     if (dropPosition != null && sequence[dropPosition.slot] == null) {
       addToSlot(event.currentTarget,dropPosition);
     } else {
-      if (event.currentTarget.type == "logic" && removedFromSlot == true) {
-        stage.removeChild(event.currentTarget); // logic is removed, as new ones spawn
-      } else {
-        returnToOrigin(event.currentTarget,event.currentTarget.originParent,event.currentTarget.originX,event.currentTarget.originY);
-      } 
-    }
+      returnToOrigin(event.currentTarget,event.currentTarget.originParent,event.currentTarget.originX,event.currentTarget.originY);
+    } 
 
     // unhighlight slots
 
@@ -865,7 +884,6 @@ function init() {
 
     stage.update();
     dropPosition = null;
-    removedFromSlot = false;
 
   
   }
@@ -892,14 +910,6 @@ function init() {
         item.y = pos.y; 
         item.inSlot = pos.slot;
         sequence[pos.slot] = item.name;
-
-        if (item.name == "AND") {
-          var andLogic = new LogicButton("AND",34,106); // generate new AND button
-          logicBox.addChild(andLogic);
-        } else {
-          var orLogic = new LogicButton("OR",(34 + buttonSize + buttonMargin),106); // generate new OR button
-          logicBox.addChild(orLogic);
-        }
       } else { 
         returnToOrigin(item,item.originParent,item.originX,item.originY); 
       }
@@ -927,7 +937,16 @@ function init() {
     parent.addChild(item);
     item.x = x;
     item.y = y;
-    item.inSlot = false;;
+    item.inSlot = false;
+
+    if (item.name == "AND") {
+      andCount++;
+      andCountLabel.text = andCount;
+    } else if (item.name == "OR") {
+      orCount++;
+      orCountLabel.text = orCount;
+    }
+
     stage.update();
 
   }
@@ -943,39 +962,13 @@ function init() {
     }
 
     for (var i = 0; i < toClear.length; i++) {
-      if (toClear[i].type != "logic") {
       returnToOrigin(toClear[i],toClear[i].originParent,toClear[i].originX,toClear[i].originY);
-      } else {
-      sequenceBox.removeChild(toClear[i]);
       stage.update();
-      } 
     }
 
     for (var i = 0; i < sequence.length; i++) {
       sequence[i] = null;
     }
-  }
-
-  function loadPositionButtons(event) {
-
-    createjs.Ticker.setPaused(false);
-
-    positionLabel.color = green;
-    shapeLabel.color = darkGray;
-    stage.update();
-
-    createjs.Tween.get(selectors, {override:true}).to({x:0}, 400, createjs.Ease.cubicOut).call(endTween);
-  }
-  
-  function loadShapeButtons(event) {
-
-    createjs.Ticker.setPaused(false);
-
-    positionLabel.color = darkGray;
-    shapeLabel.color = green;
-    stage.update();
-
-    createjs.Tween.get(selectors, {override:true}).to({x:-336}, 400, createjs.Ease.cubicOut).call(endTween);
   }
 
   function tick(event) {
