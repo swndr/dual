@@ -49,7 +49,7 @@ function init() {
 
   var bg = new createjs.Shape();
   bg.graphics.beginFill("#AAA5A5");
-  bg.graphics.rect(0,0,canvas.width,896);
+  bg.graphics.rect(0,0,canvas.width,890);
 
   // BUILD GRID
 
@@ -58,7 +58,7 @@ function init() {
     var gridSize = 4;
     var gridSpacing = 180;
     var gridLeft = ((canvas.width - ((gridSize-1) * gridSpacing))/2);
-    var gridTop = ((896 - ((gridSize-1) * gridSpacing))/2);
+    var gridTop = ((890 - ((gridSize-1) * gridSpacing))/2);
 
     grid.graphics.beginStroke(white);
     grid.graphics.setStrokeStyle(2);
@@ -66,15 +66,15 @@ function init() {
     
     for (var i = 0; i < gridSize; i++) {
       grid.graphics.moveTo(gridLeft+(i*gridSpacing),0);
-      grid.graphics.lineTo(gridLeft+(i*gridSpacing),896);
+      grid.graphics.lineTo(gridLeft+(i*gridSpacing),890);
       grid.graphics.moveTo(0,(gridTop+(i*gridSpacing)));
       grid.graphics.lineTo(canvas.width,(gridTop+(i*gridSpacing)));
     }
 
   stage.addChild(bg);
-  bg.cache(0,0,canvas.width,896);
+  bg.cache(0,0,canvas.width,890);
   stage.addChild(grid);
-  grid.cache(0,0,canvas.width,896);
+  grid.cache(0,0,canvas.width,890);
 
     for (var i = 0; i < gridSize; i++) {
         var hLabel = new createjs.Text(i, "100 25px Avenir", "#E01062");
@@ -93,13 +93,13 @@ function init() {
 
   // SCORES
 
-  var whiteIcon = new createjs.Shape().set({x:80,y:448});
+  var whiteIcon = new createjs.Shape().set({x:80,y:445});
   whiteIcon.graphics.beginFill(white).drawCircle(0,0,iconRadius,iconRadius);
-  var whiteScore = new createjs.Text(wScore, largeLabelStyle, white).set({x:140,y:428});
+  var whiteScore = new createjs.Text(wScore, largeLabelStyle, white).set({x:140,y:425});
   whiteScore.textAlign = "left";
-  var blackIcon = new createjs.Shape().set({x:(canvas.width - iconRadius - 80),y:(448 - iconRadius)});
+  var blackIcon = new createjs.Shape().set({x:(canvas.width - iconRadius - 80),y:(445 - iconRadius)});
   blackIcon.graphics.beginFill(black).drawRect(0,0,iconRadius*2,iconRadius*2);
-  var blackScore = new createjs.Text(bScore, largeLabelStyle, black).set({x:(canvas.width - 140),y:428});
+  var blackScore = new createjs.Text(bScore, largeLabelStyle, black).set({x:(canvas.width - 140),y:425});
   blackScore.textAlign = "right";
   stage.addChild(whiteIcon,whiteScore,blackIcon,blackScore);
   stage.update();
@@ -231,13 +231,13 @@ function init() {
     return box;
   }
 
-  var selectorsBox = new Box(40,940,336,750,white,green,"SELECTORS");
-  var logicBox = new Box(40,1720,336,275,white,blue,"LOGIC","logicBox");
-  var sequenceBox = new Box(416,940,704,1054,"#616060",black,"SEQUENCE");
-  var actionsBox = new Box(1160,940,336,1054,white,yellow,"ACTIONS","actionsBox");
+  var selectorsBox = new Box(40,920,336,750,white,green,"SELECTORS");
+  var logicBox = new Box(40,1700,336,275,white,blue,"LOGIC","logicBox");
+  var sequenceBox = new Box(416,920,704,1054,"#616060",black,"SEQUENCE");
+  var actionsBox = new Box(1160,920,336,1054,white,yellow,"ACTIONS","actionsBox");
 
   var selectorsMask = new createjs.Shape();
-  selectorsMask.graphics.beginFill(white).drawRoundRect(40,940,336,750,10);
+  selectorsMask.graphics.beginFill(white).drawRoundRect(40,920,336,750,10);
   selectorsBox.mask = selectorsMask;
 
   var positionLabelButton = new createjs.Shape().set({x:0,y:76});
@@ -606,12 +606,12 @@ function init() {
   var RCCR = [0,1,1,0]; shapeSelectors.push(RCCR);
   var CRRR = [1,0,0,0]; shapeSelectors.push(CRRR);
   var RCRR = [0,1,0,0]; shapeSelectors.push(RCRR);
-  var RRRC = [0,0,0,1]; shapeSelectors.push(RRRC);
   var RRCR = [0,0,1,0]; shapeSelectors.push(RRCR);
-  var RCCC = [1,0,0,0]; shapeSelectors.push(RCCC);
-  var CRCC = [0,1,0,0]; shapeSelectors.push(CRCC);
-  var CCRC = [1,1,1,0]; shapeSelectors.push(CCRC);
-  var CCCR = [1,1,0,1]; shapeSelectors.push(CCCR);
+  var RRRC = [0,0,0,1]; shapeSelectors.push(RRRC);
+  var RCCC = [0,1,1,1]; shapeSelectors.push(RCCC);
+  var CRCC = [1,0,1,1]; shapeSelectors.push(CRCC);
+  var CCRC = [1,1,0,1]; shapeSelectors.push(CCRC);
+  var CCCR = [1,1,1,0]; shapeSelectors.push(CCCR);
   var RCRC = [0,1,0,1]; shapeSelectors.push(RCRC);
   var CRCR = [1,0,1,0]; shapeSelectors.push(CRCR);
 
@@ -780,23 +780,17 @@ function init() {
     // re-opening sequence slot
 
     if (event.currentTarget.parent == sequenceBox) {
-      for (var i = 0; i < sequence.length; i++) {
-        if (sequence[i] == event.currentTarget.name) {
-          sequence[i] = null;
-          removedFromSlot = true;
-        }
+        sequence[event.currentTarget.inSlot] = null;
+        event.currentTarget.inSlot = false;
+        removedFromSlot = true;
       }
-    }
 
     // translate local to global, re-parent to stage
 
-    if (event.currentTarget.parent.parent != null) {
       var pt = event.currentTarget.localToGlobal(event.currentTarget.x,event.currentTarget.y);
       event.currentTarget.x = (pt.x - event.currentTarget.x);
       event.currentTarget.y = (pt.y - event.currentTarget.y);
       stage.addChild(event.currentTarget);
-      stage.update();
-    }
 
     // slot highlighting
 
@@ -869,9 +863,10 @@ function init() {
       }
     }
 
+    stage.update();
     dropPosition = null;
     removedFromSlot = false;
-    stage.update();
+
   
   }
 
@@ -883,6 +878,7 @@ function init() {
         sequenceBox.addChild(item);
         item.x = pos.x; 
         item.y = pos.y;
+        item.inSlot = pos.slot;
         sequence[pos.slot] = item.name;
       } else { 
         returnToOrigin(item,item.originParent,item.originX,item.originY); 
@@ -894,6 +890,7 @@ function init() {
         sequenceBox.addChild(item);
         item.x = pos.x; 
         item.y = pos.y; 
+        item.inSlot = pos.slot;
         sequence[pos.slot] = item.name;
 
         if (item.name == "AND") {
@@ -913,6 +910,7 @@ function init() {
         sequenceBox.addChild(item);
         item.x = pos.x; 
         item.y = pos.y; 
+        item.inSlot = pos.slot;
         sequence[pos.slot] = item.name;
       } else { 
         returnToOrigin(item,item.originParent,item.originX,item.originY); 
@@ -929,6 +927,7 @@ function init() {
     parent.addChild(item);
     item.x = x;
     item.y = y;
+    item.inSlot = false;;
     stage.update();
 
   }
@@ -994,7 +993,7 @@ function init() {
   function shapeClick(event) {
 
     // transform corners
-    
+
     if (event.target.round == false) {
       if (event.target.name == "TL") {
         event.target.graphics
