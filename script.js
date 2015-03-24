@@ -28,9 +28,11 @@ function init() {
   var dropPosition = null;
 
   var sequence = [];
+  var playCount = 0;
 
   var positionSelectors = [];
   var shapeSelectors = [];
+  var setOfShapes = [];
   var andCount = 4;
   var orCount = 4;
 
@@ -119,12 +121,14 @@ function init() {
     var BL = new createjs.Shape();
 
     if (tl == 1) {
+      gameObject.tl = true;
       TL.graphics.beginFill(white);
       TL.graphics.drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0);
       TL.round = true;
       TL.name = "TL";
       TL.addEventListener("click", shapeClick);
     } else {
+      gameObject.tl = false;
       TL.graphics.beginFill(black);
       TL.graphics.drawRoundRectComplex(-radius,-radius,radius,radius,0,0,0,0);
       TL.round = false;
@@ -133,12 +137,14 @@ function init() {
     }
 
     if (tr == 1) {
+      gameObject.tr = true;
       TR.graphics.beginFill(white);
       TR.graphics.drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0);
       TR.round = true;
       TR.name = "TR";
       TR.addEventListener("click", shapeClick);
     } else {
+      gameObject.tr = false;
       TR.graphics.beginFill(black);
       TR.graphics.drawRoundRectComplex(0,-radius,radius,radius,0,0,0,0);
       TR.round = false;
@@ -147,12 +153,14 @@ function init() {
     }
 
     if (br == 1) {
+      gameObject.br = true;
       BR.graphics.beginFill(white);
       BR.graphics.drawRoundRectComplex(0,0,radius,radius,0,0,radius,0);
       BR.round = true;
       BR.name = "BR";
       BR.addEventListener("click", shapeClick);
     } else {
+      gameObject.br = false;
       BR.graphics.beginFill(black);
       BR.graphics.drawRoundRectComplex(0,0,radius,radius,0,0,0,0);
       BR.round = false;
@@ -161,12 +169,14 @@ function init() {
     }
 
     if (bl == 1) {
+      gameObject.bl = true;
       BL.graphics.beginFill(white);
       BL.graphics.drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius);
       BL.round = true;
       BL.name = "BL";
       BL.addEventListener("click", shapeClick);
     } else {
+      gameObject.bl = false;
       BL.graphics.beginFill(black);
       BL.graphics.drawRoundRectComplex(-radius,0,radius,radius,0,0,0,0);
       BL.round = false;
@@ -270,6 +280,7 @@ function init() {
 
   var playButton = new createjs.Shape().set({x:458,y:925});
   playButton.graphics.beginFill(gray).drawRoundRect(0,0,180,80,10);
+  //playButton.addEventListener("click",play);
   var playLabel = new createjs.Text("PLAY", largeLabelStyle, pink).set({x:548,y:940});
   playLabel.textAlign = "center";
 
@@ -619,18 +630,26 @@ function init() {
   var RRCC = [0,0,1,1]; shapeSelectors.push(RRCC);
   var CRRC = [1,0,0,1]; shapeSelectors.push(CRRC);
   var RCCR = [0,1,1,0]; shapeSelectors.push(RCCR);
+
   var CRRR = [1,0,0,0]; shapeSelectors.push(CRRR);
   var RCRR = [0,1,0,0]; shapeSelectors.push(RCRR);
   var RRCR = [0,0,1,0]; shapeSelectors.push(RRCR);
   var RRRC = [0,0,0,1]; shapeSelectors.push(RRRC);
+
   var RCCC = [0,1,1,1]; shapeSelectors.push(RCCC);
   var CRCC = [1,0,1,1]; shapeSelectors.push(CRCC);
   var CCRC = [1,1,0,1]; shapeSelectors.push(CCRC);
   var CCCR = [1,1,1,0]; shapeSelectors.push(CCCR);
+
   var RCRC = [0,1,0,1]; shapeSelectors.push(RCRC);
   var CRCR = [1,0,1,0]; shapeSelectors.push(CRCR);
 
-  var shuffledShapeSelectors = shuffle(shapeSelectors); // randomize shape selectors
+  setOfShapes.push(shapeSelectors[getRandomInt(0, 3)]);
+  setOfShapes.push(shapeSelectors[getRandomInt(4, 7)]);
+  setOfShapes.push(shapeSelectors[getRandomInt(8, 11)]);
+  setOfShapes.push(shapeSelectors[getRandomInt(12, 13)]);
+
+  var shuffledShapeSelectors = shuffle(setOfShapes); // randomize shape selectors
 
   for (var i = 0; i < 4; i++) { // load first 4 from randomized array
 
@@ -722,26 +741,29 @@ function init() {
   for (var i = 0; i < 4; i++) {
     var sequenceTray = new createjs.Shape();
     sequenceTray.graphics.beginStroke(green).setStrokeStyle(8).beginFill(black);
-    sequenceTray.graphics.drawRoundRect(0,0,442,150,5);
+    sequenceTray.graphics.drawRoundRect(0,0,442,154,5);
     sequenceTray.x = 36;
-    sequenceTray.y = 122 + (i*200);
+    sequenceTray.y = 120 + (i*200);
+    sequenceTray.tray = i;
 
     sequenceBox.addChild(sequenceTray);
-    sequenceTray.cache(-4,-4,450,158);
+    sequenceTray.cache(-4,-4,450,162);
   }
 
   for (var i = 0; i < 4; i++) {
     var actionTray = new createjs.Shape();
     actionTray.graphics.beginStroke(yellow).setStrokeStyle(8).beginFill(black);
-    actionTray.graphics.drawRoundRect(0,0,160,150,5);
+    actionTray.graphics.drawRoundRect(0,0,160,154,5);
     actionTray.x = 508;
-    actionTray.y = 122 + (i*200);
+    actionTray.y = 120 + (i*200);
+    actionTray.tray = i;
 
     sequenceBox.addChild(actionTray);
-    actionTray.cache(-4,-4,168,158);
+    actionTray.cache(-4,-4,168,162);
   }
 
   var dropZoneRow = 1;
+  var dropZoneContainer = new createjs.Container();
 
   for (var i = 0; i < 16; i++) {
 
@@ -784,9 +806,10 @@ function init() {
     }
 
     dropZone.slot = i; // to determine which slot items dropped in
-    sequenceBox.addChild(dropZone);
+    dropZoneContainer.addChild(dropZone);
   }
 
+  sequenceBox.addChild(dropZoneContainer);
   stage.update();
 
   // INTERACTION
@@ -819,25 +842,25 @@ function init() {
 
     if (event.currentTarget.type == "logic") {
 
-      for (var i = 0; i < sequenceBox.children.length; i++) {
-        if (sequenceBox.children[i].slot == 1 || sequenceBox.children[i].slot == 5 || sequenceBox.children[i].slot == 9 || sequenceBox.children[i].slot == 13) {
-          sequenceBox.children[i].alpha = .5;
+      for (var i = 0; i < dropZoneContainer.children.length; i++) {
+        if (dropZoneContainer.children[i].slot == 1 || dropZoneContainer.children[i].slot == 5 || dropZoneContainer.children[i].slot == 9 || dropZoneContainer.children[i].slot == 13) {
+          dropZoneContainer.children[i].alpha = .5;
         }
       }
 
     } else if (event.currentTarget.type == "action") {
 
-      for (var i = 0; i < sequenceBox.children.length; i++) {
-        if (sequenceBox.children[i].slot == 3 || sequenceBox.children[i].slot == 7 || sequenceBox.children[i].slot == 11 || sequenceBox.children[i].slot == 15) {
-          sequenceBox.children[i].alpha = .5;
+      for (var i = 0; i < dropZoneContainer.children.length; i++) {
+        if (dropZoneContainer.children[i].slot == 3 || dropZoneContainer.children[i].slot == 7 || dropZoneContainer.children[i].slot == 11 || dropZoneContainer.children[i].slot == 15) {
+          dropZoneContainer.children[i].alpha = .5;
         }
       }
     
     } else {
 
-      for (var i = 0; i < sequenceBox.children.length; i++) {
-        if ((sequenceBox.children[i].slot % 2) == 0) {
-          sequenceBox.children[i].alpha = .5;
+      for (var i = 0; i < dropZoneContainer.children.length; i++) {
+        if ((dropZoneContainer.children[i].slot % 2) == 0) {
+          dropZoneContainer.children[i].alpha = .5;
         }
       }      
     }
@@ -858,11 +881,14 @@ function init() {
 
   function snapTo(event) {
 
+    var pt = dropZoneContainer.globalToLocal(event.stageX,event.stageY);
+
     // determine if dragged over a sequence slot, record which one
 
-    for (var i = 0; i < stage.getObjectsUnderPoint(event.stageX,event.stageY,0).length; i++) {
-      if (stage.getObjectsUnderPoint(event.stageX,event.stageY,0)[i].slot != null) {
-      dropPosition = stage.getObjectsUnderPoint(event.stageX,event.stageY,0)[i];
+    for (var i = 0; i < dropZoneContainer.getObjectsUnderPoint(pt.x,pt.y,0).length; i++) {
+      if (dropZoneContainer.getObjectsUnderPoint(pt.x,pt.y,0)[i].slot != null) {
+      dropPosition = dropZoneContainer.getObjectsUnderPoint(pt.x,pt.y,0)[i];
+      console.log(dropPosition.slot);
       }
     }
 
@@ -876,9 +902,9 @@ function init() {
 
     // unhighlight slots
 
-    for (var i = 0; i < sequenceBox.children.length; i++) {
-      if (sequenceBox.children[i].slot != null) {
-        sequenceBox.children[i].alpha = .25;
+    for (var i = 0; i < dropZoneContainer.children.length; i++) {
+      if (dropZoneContainer.children[i].slot != null) {
+        dropZoneContainer.children[i].alpha = .25;
       }
     }
 
@@ -969,6 +995,8 @@ function init() {
     for (var i = 0; i < sequence.length; i++) {
       sequence[i] = null;
     }
+
+    playCount = 0;
   }
 
   function tick(event) {
@@ -987,28 +1015,37 @@ function init() {
 
     // transform corners
 
+    createjs.Ticker.setPaused(false);
+
     if (event.target.round == false) {
+
       if (event.target.name == "TL") {
         event.target.graphics
         .clear()
         .beginFill(white)
         .drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0);
+        stage.update();
+        event.target.parent.tl = true;
       } else if (event.target.name == "TR") {
         event.target.graphics
         .clear()
         .beginFill(white)
         .drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0);
+        event.target.parent.tr = true;
       } else if (event.target.name == "BR") {
         event.target.graphics
         .clear()
         .beginFill(white)
         .drawRoundRectComplex(0,0,radius,radius,0,0,radius,0);
+        event.target.parent.br = true;
       } else {
         event.target.graphics
         .clear()
         .beginFill(white)
         .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius);
+        event.target.parent.bl = true;
       }
+      console.log(event.target.parent);
       event.target.round = true;
     } else {
       if (event.target.name == "TL") {
@@ -1016,23 +1053,28 @@ function init() {
         .clear()
         .beginFill(black)
         .drawRoundRectComplex(-radius,-radius,radius,radius,0,0,0,0);
+        event.target.parent.tl = false;
       } else if (event.target.name == "TR") {
         event.target.graphics
         .clear()
         .beginFill(black)
         .drawRoundRectComplex(0,-radius,radius,radius,0,0,0,0);
+        event.target.parent.tr = false;
       } else if (event.target.name == "BR") {
         event.target.graphics
         .clear()
         .beginFill(black)
         .drawRoundRectComplex(0,0,radius,radius,0,0,0,0);
+        event.target.parent.br = false;
       } else {
         event.target.graphics
         .clear()
         .beginFill(black)
         .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,0);
+        event.target.parent.bl = false;
       }
       event.target.round = false;
+      console.log(event.target.parent);
     }
 
   // update scores
@@ -1057,6 +1099,8 @@ function init() {
   }
 
   stage.update();
+
+  createjs.Tween.get(event.target, {override:true}).to({scaleX:0.8,scaleY:0.8}, 100, createjs.Ease.cubicIn).to({scaleX:1,scaleY:1}, 200, createjs.Ease.cubicOut).call(endTween);
 
   }
 
