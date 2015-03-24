@@ -18,6 +18,7 @@ function init() {
   var lightGray = "#C8B2B2";
   var darkGray = "#AA9696";
   var pink = "#E01062";
+  var purple = "#A106D0";
 
   var radius = 75;
   var iconRadius = 40;
@@ -35,6 +36,8 @@ function init() {
   var setOfShapes = [];
   var andCount = 4;
   var orCount = 4;
+
+  var objectsInPlay = [];
 
   var wScore = 0
   var bScore = 0;
@@ -121,14 +124,14 @@ function init() {
     var BL = new createjs.Shape();
 
     if (tl == 1) {
-      gameObject.tl = true;
+      gameObject.tl = 1;
       TL.graphics.beginFill(white);
       TL.graphics.drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0);
       TL.round = true;
       TL.name = "TL";
       TL.addEventListener("click", shapeClick);
     } else {
-      gameObject.tl = false;
+      gameObject.tl = 0;
       TL.graphics.beginFill(black);
       TL.graphics.drawRoundRectComplex(-radius,-radius,radius,radius,0,0,0,0);
       TL.round = false;
@@ -137,14 +140,14 @@ function init() {
     }
 
     if (tr == 1) {
-      gameObject.tr = true;
+      gameObject.tr = 1;
       TR.graphics.beginFill(white);
       TR.graphics.drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0);
       TR.round = true;
       TR.name = "TR";
       TR.addEventListener("click", shapeClick);
     } else {
-      gameObject.tr = false;
+      gameObject.tr = 0;
       TR.graphics.beginFill(black);
       TR.graphics.drawRoundRectComplex(0,-radius,radius,radius,0,0,0,0);
       TR.round = false;
@@ -153,14 +156,14 @@ function init() {
     }
 
     if (br == 1) {
-      gameObject.br = true;
+      gameObject.br = 1;
       BR.graphics.beginFill(white);
       BR.graphics.drawRoundRectComplex(0,0,radius,radius,0,0,radius,0);
       BR.round = true;
       BR.name = "BR";
       BR.addEventListener("click", shapeClick);
     } else {
-      gameObject.br = false;
+      gameObject.br = 0;
       BR.graphics.beginFill(black);
       BR.graphics.drawRoundRectComplex(0,0,radius,radius,0,0,0,0);
       BR.round = false;
@@ -169,14 +172,14 @@ function init() {
     }
 
     if (bl == 1) {
-      gameObject.bl = true;
+      gameObject.bl = 1;
       BL.graphics.beginFill(white);
       BL.graphics.drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius);
       BL.round = true;
       BL.name = "BL";
       BL.addEventListener("click", shapeClick);
     } else {
-      gameObject.bl = false;
+      gameObject.bl = 0;
       BL.graphics.beginFill(black);
       BL.graphics.drawRoundRectComplex(-radius,0,radius,radius,0,0,0,0);
       BL.round = false;
@@ -204,7 +207,9 @@ function init() {
     var fourm = new GameObject(startObjects[i][0],startObjects[i][1],startObjects[i][2],startObjects[i][3]);
     fourm.x = colVal(column);
     fourm.y = rowVal(row);
+    fourm.id = i;
 
+    objectsInPlay.push(fourm);
     stage.addChild(fourm);
 
     column++;
@@ -280,7 +285,7 @@ function init() {
 
   var playButton = new createjs.Shape().set({x:458,y:925});
   playButton.graphics.beginFill(gray).drawRoundRect(0,0,180,80,10);
-  //playButton.addEventListener("click",play);
+  playButton.addEventListener("click",play);
   var playLabel = new createjs.Text("PLAY", largeLabelStyle, pink).set({x:548,y:940});
   playLabel.textAlign = "center";
 
@@ -345,7 +350,8 @@ function init() {
     posButton.addChild(button,axisShape,axisLabel);
     posButton.x = x;
     posButton.y = y;
-    posButton.name = axis + label;
+    posButton.name = axis;
+    posButton.val = label;
     posButton.cache(0,0,buttonSize,buttonSize);
 
     return posButton;
@@ -416,6 +422,7 @@ function init() {
     shapeButton.addChild(button,TL,TR,BR,BL);
     shapeButton.x = x;
     shapeButton.y = y;
+    shapeButton.val = [tl,tr,br,bl];
     shapeButton.cache(0,0,buttonSize,buttonSize);
 
     return shapeButton;
@@ -655,10 +662,9 @@ function init() {
 
     if (!(i % 2)) {
     var shapeSelector = new ShapeButton(shuffledShapeSelectors[i][0],shuffledShapeSelectors[i][1],shuffledShapeSelectors[i][2],shuffledShapeSelectors[i][3],34,(372 + (buttonRow * (buttonSize + buttonMargin))));
-    shapeSelector.name = "shape" + i;
     } else {
     var shapeSelector = new ShapeButton(shuffledShapeSelectors[i][0],shuffledShapeSelectors[i][1],shuffledShapeSelectors[i][2],shuffledShapeSelectors[i][3],(34 + buttonSize + buttonMargin),(372 + (buttonRow * (buttonSize + buttonMargin))));
-    shapeSelector.name = "shape" + i;
+    //shapeSelector.name = "shape" + i;
     buttonRow++;
     }
 
@@ -738,6 +744,8 @@ function init() {
     sequence[i] = null;
   }
 
+  var trays = new createjs.Container();
+
   for (var i = 0; i < 4; i++) {
     var sequenceTray = new createjs.Shape();
     sequenceTray.graphics.beginStroke(green).setStrokeStyle(8).beginFill(black);
@@ -745,8 +753,9 @@ function init() {
     sequenceTray.x = 36;
     sequenceTray.y = 120 + (i*200);
     sequenceTray.tray = i;
+    sequenceTray.type = "selectors";
 
-    sequenceBox.addChild(sequenceTray);
+    trays.addChild(sequenceTray);
     sequenceTray.cache(-4,-4,450,162);
   }
 
@@ -757,8 +766,9 @@ function init() {
     actionTray.x = 508;
     actionTray.y = 120 + (i*200);
     actionTray.tray = i;
+    actionTray.type = "action";
 
-    sequenceBox.addChild(actionTray);
+    trays.addChild(actionTray);
     actionTray.cache(-4,-4,168,162);
   }
 
@@ -809,7 +819,7 @@ function init() {
     dropZoneContainer.addChild(dropZone);
   }
 
-  sequenceBox.addChild(dropZoneContainer);
+  sequenceBox.addChild(trays,dropZoneContainer);
   stage.update();
 
   // INTERACTION
@@ -888,7 +898,6 @@ function init() {
     for (var i = 0; i < dropZoneContainer.getObjectsUnderPoint(pt.x,pt.y,0).length; i++) {
       if (dropZoneContainer.getObjectsUnderPoint(pt.x,pt.y,0)[i].slot != null) {
       dropPosition = dropZoneContainer.getObjectsUnderPoint(pt.x,pt.y,0)[i];
-      console.log(dropPosition.slot);
       }
     }
 
@@ -923,7 +932,7 @@ function init() {
         item.x = pos.x; 
         item.y = pos.y;
         item.inSlot = pos.slot;
-        sequence[pos.slot] = item.name;
+        sequence[pos.slot] = item;
       } else { 
         returnToOrigin(item,item.originParent,item.originX,item.originY); 
       }
@@ -935,7 +944,7 @@ function init() {
         item.x = pos.x; 
         item.y = pos.y; 
         item.inSlot = pos.slot;
-        sequence[pos.slot] = item.name;
+        sequence[pos.slot] = item;
       } else { 
         returnToOrigin(item,item.originParent,item.originX,item.originY); 
       }
@@ -947,7 +956,7 @@ function init() {
         item.x = pos.x; 
         item.y = pos.y; 
         item.inSlot = pos.slot;
-        sequence[pos.slot] = item.name;
+        sequence[pos.slot] = item;
       } else { 
         returnToOrigin(item,item.originParent,item.originX,item.originY); 
       }
@@ -989,14 +998,30 @@ function init() {
 
     for (var i = 0; i < toClear.length; i++) {
       returnToOrigin(toClear[i],toClear[i].originParent,toClear[i].originX,toClear[i].originY);
-      stage.update();
     }
 
     for (var i = 0; i < sequence.length; i++) {
       sequence[i] = null;
     }
 
+    for (var i = 0; i < trays.children.length; i++) {
+        if (trays.children[i].type == "selectors") {
+          trays.children[i].graphics
+          .clear()
+          .beginStroke(green).setStrokeStyle(8).beginFill(black)
+          .drawRoundRect(0,0,442,154,5);
+          trays.children[i].updateCache();
+       } else {
+          trays.children[i].graphics
+          .clear()
+          .beginStroke(yellow).setStrokeStyle(8).beginFill(black)
+          .drawRoundRect(0,0,160,154,5);
+          trays.children[i].updateCache();
+        }
+    }
+
     playCount = 0;
+    stage.update();
   }
 
   function tick(event) {
@@ -1008,6 +1033,167 @@ function init() {
   function endTween() {
     createjs.Ticker.setPaused(true);
   }
+
+  // PLAY SEQUENCE
+
+  function play() {
+
+    highlightSequenceBox(playCount);
+
+    deliverAction(targetGameObjects(playCount));
+
+    if (playCount < 3) { playCount++ };
+
+  }
+
+
+  function highlightSequenceBox(step) {
+
+      for (var i = 0; i < trays.children.length; i++) {
+          if (trays.children[i].tray == step) {
+            if (trays.children[i].type == "selectors") {
+              trays.children[i].graphics
+              .clear()
+              .beginStroke(pink).setStrokeStyle(8).beginFill(black)
+              .drawRoundRect(0,0,442,154,5);
+              trays.children[i].updateCache();
+           } else {
+              trays.children[i].graphics
+              .clear()
+              .beginStroke(pink).setStrokeStyle(8).beginFill(black)
+              .drawRoundRect(0,0,160,154,5);
+              trays.children[i].updateCache();
+            }
+          }
+        }
+
+    stage.update();
+
+  }
+
+
+  function targetGameObjects(step) {
+
+    var ruleSet = [];
+    var targets = [];
+
+    // get items from trays
+
+    if (step == 0) {
+
+      for (var i = 0; i < 3; i++) {
+        if (sequence[i] != null) {
+        var rule = extractRule(sequence[i]);
+        ruleSet.push(rule);
+        }
+      }
+
+    } else if (step == 1) {
+
+      for (var i = 4; i < 7; i++) {
+        if (sequence[i] != null) {
+        var rule = extractRule(sequence[i]);
+        ruleSet.push(rule);
+        }
+      }
+
+    } else if (step == 2) {
+
+      for (var i = 8; i < 11; i++) {
+        if (sequence[i] != null) {
+        var rule = extractRule(sequence[i]);
+        ruleSet.push(rule);
+        }
+      }
+
+    } else {
+
+      for (var i = 12; i < 15; i++) {
+        if (sequence[i] != null) {
+        var rule = extractRule(sequence[i]);
+        ruleSet.push(rule);
+        }
+      }
+    }
+
+    // loop through objects and test for matches
+
+    for (i in objectsInPlay) {
+
+      if (ruleSet.length == 3) {
+
+        if (ruleSet[1](ruleSet[0](objectsInPlay[i]),ruleSet[2](objectsInPlay[i]))) {
+          targets.push(objectsInPlay[i].id);
+        }
+   
+      } else if (ruleSet.length == 1) {
+
+        if (ruleSet[0](objectsInPlay[i])) {
+          targets.push(objectsInPlay[i].id);
+        }
+
+      } else {
+        console.log("Incomplete rule set");
+      }
+    }
+
+    console.log(targets);
+
+    return targets;
+
+  }
+
+  // build consistent functions to test game objects for matches
+
+  function extractRule(rule) {
+
+    var ruleComponents;
+
+    if (rule.type == "position") {
+
+      if (rule.name == "col") {
+        ruleComponents = function(obj) {
+          if (obj.x == colVal(rule.val)) {return true;}
+        }
+      } else {
+        ruleComponents = function(obj) {
+        if (obj.y == rowVal(rule.val)) {return true;}
+        }
+      }
+
+    } else if (rule.type == "shape") {
+
+        ruleComponents = function(obj) {
+          var shape = [obj.tl,obj.tr,obj.br,obj.bl];
+          if (arraysEqual(shape,rule.val)) {return true;}
+        }
+
+    } else if (rule.type == "logic") {
+
+        if (rule.name == "AND") {
+          ruleComponents = function(a,b) {if (a && b) {return true;}}
+        } else {
+          ruleComponents = function(a,b) {if (a || b) {return true;}}
+        }
+    }
+
+    return ruleComponents;
+
+  }
+  
+
+
+  function deliverAction(targets) {
+
+    for (i in targets) {
+
+    }
+
+
+  }
+
+
+
 
   // TOGGLE GAME OBJECTS
 
@@ -1025,25 +1211,25 @@ function init() {
         .beginFill(white)
         .drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0);
         stage.update();
-        event.target.parent.tl = true;
+        event.target.parent.tl = 1;
       } else if (event.target.name == "TR") {
         event.target.graphics
         .clear()
         .beginFill(white)
         .drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0);
-        event.target.parent.tr = true;
+        event.target.parent.tr = 1;
       } else if (event.target.name == "BR") {
         event.target.graphics
         .clear()
         .beginFill(white)
         .drawRoundRectComplex(0,0,radius,radius,0,0,radius,0);
-        event.target.parent.br = true;
+        event.target.parent.br = 1;
       } else {
         event.target.graphics
         .clear()
         .beginFill(white)
         .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius);
-        event.target.parent.bl = true;
+        event.target.parent.bl = 1;
       }
       console.log(event.target.parent);
       event.target.round = true;
@@ -1053,25 +1239,25 @@ function init() {
         .clear()
         .beginFill(black)
         .drawRoundRectComplex(-radius,-radius,radius,radius,0,0,0,0);
-        event.target.parent.tl = false;
+        event.target.parent.tl = 0;
       } else if (event.target.name == "TR") {
         event.target.graphics
         .clear()
         .beginFill(black)
         .drawRoundRectComplex(0,-radius,radius,radius,0,0,0,0);
-        event.target.parent.tr = false;
+        event.target.parent.tr = 0;
       } else if (event.target.name == "BR") {
         event.target.graphics
         .clear()
         .beginFill(black)
         .drawRoundRectComplex(0,0,radius,radius,0,0,0,0);
-        event.target.parent.br = false;
+        event.target.parent.br = 0;
       } else {
         event.target.graphics
         .clear()
         .beginFill(black)
         .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,0);
-        event.target.parent.bl = false;
+        event.target.parent.bl = 0;
       }
       event.target.round = false;
       console.log(event.target.parent);
@@ -1123,6 +1309,17 @@ function init() {
     }
 
     return array;
+  }
+
+  function arraysEqual(a, b) {
+    if (a === b) return true;
+    if (a == null || b == null) return false;
+    if (a.length != b.length) return false;
+
+    for (var i = 0; i < a.length; ++i) {
+      if (a[i] !== b[i]) return false;
+    }
+    return true;
   }
 
   function getRandomInt(min, max) {
