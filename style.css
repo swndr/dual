@@ -1,5 +1,5 @@
 
-@font-face {
+/*@font-face {
 font-family: Avenir;
 src: url("fonts/Avenir-Medium.otf") format("opentype");
 }
@@ -7,7 +7,7 @@ src: url("fonts/Avenir-Medium.otf") format("opentype");
 @font-face {
 font-family: AvenirHeavy;
 src: url("fonts/Avenir-Heavy.otf") format("opentype");
-}
+}*/
 
 html, body {
 	background: 444;

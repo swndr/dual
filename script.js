@@ -5,9 +5,9 @@ function init() {
   centerX = canvas.width/2,
   centerY = canvas.height/2;
 
-  var lightLabelStyle = "100 30px Avenir";
-  var mediumLabelStyle =  "bold 30px AvenirHeavy";
-  var largeLabelStyle =  "bold 40px AvenirHeavy";
+  var lightLabelStyle = "100 30px Avenir-Book";
+  var mediumLabelStyle =  "bold 30px Avenir-Heavy";
+  var largeLabelStyle =  "bold 40px Avenir-Heavy";
   var green = "#00CA9D";
   var blue = "#4BCAFF";
   var yellow = "#F6D034";
@@ -25,13 +25,15 @@ function init() {
   var buttonSize = 130;
   var buttonRow = 1;
   var buttonMargin = 8;
+  var spawnOffset = 13;
 
   var dropPosition = null;
 
   var sequence = [];
   var playCount = 0;
 
-  var positionSelectors = [];
+  var rowSelectors = [];
+  var colSelectors = [];
   var shapeSelectors = [];
   var setOfShapes = [];
   var andCount = 4;
@@ -82,11 +84,11 @@ function init() {
   grid.cache(0,0,canvas.width,890);
 
     for (var i = 0; i < gridSize; i++) {
-        var hLabel = new createjs.Text(i, "100 25px Avenir", "#E01062");
+        var hLabel = new createjs.Text(i, "100 25px Avenir-Book", "#E01062");
         hLabel.x = (gridLeft-7) + (i*gridSpacing);
         hLabel.y = gridTop - 130;
         hLabel.alpha = .5;
-      var vLabel = new createjs.Text(i, "100 25px Avenir", "#E01062");
+      var vLabel = new createjs.Text(i, "100 25px Avenir-Book", "#E01062");
         vLabel.x = gridLeft - 130;
         vLabel.y = (gridTop-16) + (i*gridSpacing);
         vLabel.alpha = .5;
@@ -96,17 +98,39 @@ function init() {
 
   stage.update();
 
-  // SCORES
+  // GAME MGMT & SCORES
 
+  var newGameButton = new createjs.Shape().set({x:50,y:30});
+  newGameButton.graphics.beginFill("#AAA5A5").drawRect(0,0,240,100);
+  newGameButton.addEventListener("click",newGame);
+  newGameButton.name = "new";
+  var newGameLabel = new createjs.Text("NEW GAME", largeLabelStyle, white).set({x:170,y:55});
+  newGameLabel.textAlign = "center";
+
+  var nextTurnButton = new createjs.Shape().set({x:canvas.width-290,y:30});
+  nextTurnButton.graphics.beginFill("#AAA5A5").drawRect(0,0,240,100);
+  nextTurnButton.addEventListener("click",nextTurn);
+  nextTurnButton.name = "next";
+  var nextTurnLabel = new createjs.Text("NEXT TURN", largeLabelStyle, pink).set({x:canvas.width-170,y:55});
+  nextTurnLabel.textAlign = "center";
+
+  var whiteTurn = new createjs.Shape().set({x:0,y:(445-iconRadius)});
+  whiteTurn.graphics.beginFill(pink).drawRect(0,0,25,iconRadius*2);
+  whiteTurn.visible = true;
   var whiteIcon = new createjs.Shape().set({x:80,y:445});
   whiteIcon.graphics.beginFill(white).drawCircle(0,0,iconRadius,iconRadius);
-  var whiteScore = new createjs.Text(wScore, largeLabelStyle, white).set({x:140,y:425});
+  var whiteScore = new createjs.Text(wScore, largeLabelStyle, white).set({x:160,y:425});
   whiteScore.textAlign = "left";
+
+  var blackTurn = new createjs.Shape().set({x:(canvas.width - 25),y:(445 - iconRadius)});
+  blackTurn.graphics.beginFill(pink).drawRect(0,0,25,iconRadius*2);
+  blackTurn.visible = false;
   var blackIcon = new createjs.Shape().set({x:(canvas.width - iconRadius - 80),y:(445 - iconRadius)});
   blackIcon.graphics.beginFill(black).drawRect(0,0,iconRadius*2,iconRadius*2);
-  var blackScore = new createjs.Text(bScore, largeLabelStyle, black).set({x:(canvas.width - 140),y:425});
+  var blackScore = new createjs.Text(bScore, largeLabelStyle, black).set({x:(canvas.width - 160),y:425});
   blackScore.textAlign = "right";
-  stage.addChild(whiteIcon,whiteScore,blackIcon,blackScore);
+
+  stage.addChild(newGameButton,newGameLabel,nextTurnButton,nextTurnLabel,whiteTurn,whiteIcon,whiteScore,blackTurn,blackIcon,blackScore);
   stage.update();
 
   // CONSTRUCT SHAPES
@@ -179,28 +203,33 @@ function init() {
 
   // ADD START OBJECTS TO BOARD
 
-  var row = 0;
-  var column = 0;
+  function loadGameObjects() {
 
-  var startObjects = shuffle([[0,0,1,1],[0,0,1,1],[0,1,1,0],[0,1,1,0],[1,1,0,0],[1,1,0,0],[1,0,0,1],[1,0,0,1],[1,0,1,1],[0,1,1,1],[0,1,0,0],[1,0,0,0],[1,0,1,0],[1,0,1,0],[0,1,0,1],[0,1,0,1]]);
+    var row = 0;
+    var column = 0;
 
-  for (var i = 0; i < (gridSize*gridSize); i++) {
+    var startObjects = shuffle([[0,0,1,1],[0,0,1,1],[0,1,1,0],[0,1,1,0],[1,1,0,0],[1,1,0,0],[1,0,0,1],[1,0,0,1],[1,0,1,1],[0,1,1,1],[0,1,0,0],[1,0,0,0],[1,0,1,0],[1,0,1,0],[0,1,0,1],[0,1,0,1]]);
 
-    if (i/(row+1) == gridSize) { row++; column = 0; }
+    for (var i = 0; i < (gridSize*gridSize); i++) {
 
-    var fourm = new GameObject(startObjects[i][0],startObjects[i][1],startObjects[i][2],startObjects[i][3]);
-    fourm.x = colVal(column);
-    fourm.y = rowVal(row);
-    fourm.id = i;
+      if (i/(row+1) == gridSize) { row++; column = 0; }
 
-    objectsInPlay.push(fourm);
-    stage.addChild(fourm);
+      var fourm = new GameObject(startObjects[i][0],startObjects[i][1],startObjects[i][2],startObjects[i][3]);
+      fourm.x = colVal(column);
+      fourm.y = rowVal(row);
+      fourm.id = i;
 
-    column++;
+      objectsInPlay.push(fourm);
+      stage.addChild(fourm);
 
+      column++;
+
+    }
+
+    stage.update();
   }
 
-  stage.update();
+  loadGameObjects();
 
   // PLAYER CONTROLS
 
@@ -235,10 +264,6 @@ function init() {
   var sequenceBox = new Box(416,920,704,1054,"#616060",black,"SEQUENCE");
   var actionsBox = new Box(1160,920,336,1054,white,yellow,"ACTIONS","actionsBox");
 
-  var selectorsMask = new createjs.Shape();
-  selectorsMask.graphics.beginFill(white).drawRoundRect(40,920,336,1054,10);
-  selectorsBox.mask = selectorsMask;
-
   var positionLabel = new createjs.Text("POSITION", mediumLabelStyle, green).set({x:168,y:96});
   positionLabel.textAlign = "center";
 
@@ -248,10 +273,10 @@ function init() {
   var logicLabel = new createjs.Text("LOGIC", mediumLabelStyle, blue).set({x:168,y:820});
   logicLabel.textAlign = "center";
 
-  var andCountLabel = new createjs.Text(andCount, "bold 25px AvenirHeavy", blue).set({x:99,y:1010});
+  var andCountLabel = new createjs.Text(andCount, "bold 25px Avenir-Heavy", blue).set({x:99,y:1010});
   andCountLabel.textAlign = "center";
 
-  var orCountLabel = new createjs.Text(andCount, "bold 25px AvenirHeavy", blue).set({x:237,y:1010});
+  var orCountLabel = new createjs.Text(andCount, "bold 25px Avenir-Heavy", blue).set({x:237,y:1010});
   orCountLabel.textAlign = "center";
 
   selectorsBox.addChild(positionLabel,shapeLabel,logicLabel,andCountLabel,orCountLabel);
@@ -259,6 +284,7 @@ function init() {
   var clearButton = new createjs.Shape().set({x:56,y:910});
   clearButton.graphics.beginFill("#616060").drawRect(0,0,200,100);
   clearButton.addEventListener("click",clearSequence);
+  clearButton.name = "clear";
   var clearLabel = new createjs.Text("CLEAR", largeLabelStyle, lightGray).set({x:156,y:940});
   clearLabel.textAlign = "center";
 
@@ -583,37 +609,42 @@ function init() {
   for (var i = 0; i < 4; i++) {
     
     var rowSelector = new PositionButton("row",100,30,15,50,i,34,0);
-    positionSelectors.push(rowSelector);
+    rowSelectors.push(rowSelector);
     var colSelector = new PositionButton("col",30,100,50,15,i,(34 + buttonSize + buttonMargin),0);
-    positionSelectors.push(colSelector);
+    colSelectors.push(colSelector);
 
   }
 
-  var shuffledPositionSelectors = shuffle(positionSelectors); // randomize shape selectors
+  function loadPositionSelectors() {
 
-  for (var i = 0; i < 4; i++) { // load first 4 from randomized array
-    
-    if (!(i % 2)) {
-      shuffledPositionSelectors[i].x = 34;
-      shuffledPositionSelectors[i].y = 16 + (buttonRow * (buttonSize + buttonMargin));
-      shuffledPositionSelectors[i].originX = shuffledPositionSelectors[i].x
-      shuffledPositionSelectors[i].originY = shuffledPositionSelectors[i].y
-    } else {
-      shuffledPositionSelectors[i].x = (34 + buttonSize + buttonMargin);
-      shuffledPositionSelectors[i].y = 16 + (buttonRow * (buttonSize + buttonMargin));
-      shuffledPositionSelectors[i].originX = shuffledPositionSelectors[i].x
-      shuffledPositionSelectors[i].originY = shuffledPositionSelectors[i].y
-      buttonRow++;
-    }
+  var shuffledRowSelectors = shuffle(rowSelectors); // randomize shape selectors
+  var shuffledColSelectors = shuffle(colSelectors); // randomize shape selectors
 
-    var placeholder = new PlaceholderButton(shuffledPositionSelectors[i].x,shuffledPositionSelectors[i].y);
-    selectorsBox.addChild(placeholder,shuffledPositionSelectors[i]);
+  for (var i = 0; i < 2; i++) { // load first 4 from randomized array
 
+    shuffledRowSelectors[i].x = 34;
+    shuffledRowSelectors[i].y = 16 + (buttonRow * (buttonSize + buttonMargin));
+    shuffledRowSelectors[i].originX = shuffledRowSelectors[i].x
+    shuffledRowSelectors[i].originY = shuffledRowSelectors[i].y
+
+    shuffledColSelectors[i].x = (34 + buttonSize + buttonMargin);
+    shuffledColSelectors[i].y = 16 + (buttonRow * (buttonSize + buttonMargin));
+    shuffledColSelectors[i].originX = shuffledColSelectors[i].x
+    shuffledColSelectors[i].originY = shuffledColSelectors[i].y
+    buttonRow++;
+
+    var placeholderLeft = new PlaceholderButton(shuffledRowSelectors[i].x,shuffledRowSelectors[i].y);
+    var placeholderRight = new PlaceholderButton(shuffledColSelectors[i].x,shuffledColSelectors[i].y);
+
+    selectorsBox.addChild(placeholderLeft,placeholderRight,shuffledRowSelectors[i],shuffledColSelectors[i]);
     stage.update();
 
+    }
+
+    buttonRow = 1;
   }
 
-  buttonRow = 1;
+  loadPositionSelectors();
 
   // shapes
 
@@ -635,6 +666,8 @@ function init() {
   var RCRC = [0,1,0,1]; shapeSelectors.push(RCRC);
   var CRCR = [1,0,1,0]; shapeSelectors.push(CRCR);
 
+  function loadShapeSelectors() {
+
   setOfShapes.push(shapeSelectors[getRandomInt(0, 3)]);
   setOfShapes.push(shapeSelectors[getRandomInt(4, 7)]);
   setOfShapes.push(shapeSelectors[getRandomInt(8, 11)]);
@@ -653,10 +686,13 @@ function init() {
 
     var placeholder = new PlaceholderButton(shapeSelector.x,shapeSelector.y);
     selectorsBox.addChild(placeholder,shapeSelector);
-
     stage.update();
+   }
 
+    buttonRow = 1;
   }
+
+  loadShapeSelectors();
 
   // LOGIC ITEMS
 
@@ -768,6 +804,7 @@ function init() {
 
     }
   }
+
 
   var dropZoneRow = 1;
   var dropZoneContainer = new createjs.Container();
@@ -983,7 +1020,7 @@ function init() {
 
   }
 
-  function clearSequence() {
+  function clearSequence(event) {
 
     var toClear = [];
 
@@ -994,7 +1031,15 @@ function init() {
     }
 
     for (var i = 0; i < toClear.length; i++) {
-      returnToOrigin(toClear[i],toClear[i].originParent,toClear[i].originX,toClear[i].originY);
+      if (event.currentTarget.name == "clear") {
+        returnToOrigin(toClear[i],toClear[i].originParent,toClear[i].originX,toClear[i].originY);
+      } else if (event.currentTarget.name == "next" || event.currentTarget.name == "new") {
+        if (toClear[i].type == "logic" || toClear[i].type == "action") {
+          returnToOrigin(toClear[i],toClear[i].originParent,toClear[i].originX,toClear[i].originY);
+        } else {
+          sequenceBox.removeChild(toClear[i]);
+        }
+      }
     }
 
     for (var i = 0; i < sequence.length; i++) {
@@ -1186,7 +1231,6 @@ function init() {
   }
   
 
-
   function deliverAction(targets,step) {
 
     for (i in targets) {
@@ -1206,169 +1250,95 @@ function init() {
 
   function transTL(obj) {
 
-    //createjs.Ticker.setPaused(false); 
-
-    var o = obj.getChildByName("TL");
+    var tl = obj.getChildByName("TL");
 
      if (obj.tl == 0) {
-        o.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0);
+        morph(tl,white,-radius,-radius,radius,0,0,0);
         obj.tl = 1;
       } else {
-        o.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(-radius,-radius,radius,radius,0,0,0,0);
+        morph(tl,black,-radius,-radius,0,0,0,0);
         obj.tl = 0;
       }
-
-      stage.update();
-
-      //createjs.Tween.get(o, {override:true}).to({scaleX:0.8,scaleY:0.8}, 100, createjs.Ease.cubicIn).to({scaleX:1,scaleY:1}, 200, createjs.Ease.cubicOut).call(endTween);
   }
 
   function transTR(obj) {
 
-    //createjs.Ticker.setPaused(false); 
-
-    var o = obj.getChildByName("TR");
+    var tr = obj.getChildByName("TR");
 
      if (obj.tr == 0) {
-        o.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0);
+        morph(tr,white,0,-radius,0,radius,0,0);
         obj.tr = 1;
       } else {
-        o.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(0,-radius,radius,radius,0,0,0,0);
+        morph(tr,black,0,-radius,0,0,0,0);
         obj.tr = 0;
       }
-
-      stage.update();
-
-      //createjs.Tween.get(o, {override:true}).to({scaleX:0.8,scaleY:0.8}, 100, createjs.Ease.cubicIn).to({scaleX:1,scaleY:1}, 200, createjs.Ease.cubicOut).call(endTween);
   }
 
   function transBR(obj) {
 
-    //createjs.Ticker.setPaused(false); 
-
-    var o = obj.getChildByName("BR");
+    var br = obj.getChildByName("BR");
 
      if (obj.br == 0) {
-        o.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(0,0,radius,radius,0,0,radius,0);
+        morph(br,white,0,0,0,0,radius,0);
         obj.br = 1;
       } else {
-        o.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(0,0,radius,radius,0,0,0,0);
+        morph(br,black,0,0,0,0,0,0);
         obj.br = 0;
       }
-
-      stage.update();
-
-      //createjs.Tween.get(o, {override:true}).to({scaleX:0.8,scaleY:0.8}, 100, createjs.Ease.cubicIn).to({scaleX:1,scaleY:1}, 200, createjs.Ease.cubicOut).call(endTween);
   }
 
   function transBL(obj) {
 
-    //createjs.Ticker.setPaused(false); 
-
-    var o = obj.getChildByName("BL");
+    var bl = obj.getChildByName("BL");
 
      if (obj.bl == 0) {
-        o.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius);
+        morph(bl,white,-radius,0,0,0,0,radius);
         obj.bl = 1;
       } else {
-        o.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,0);
+        morph(bl,black,-radius,0,0,0,0,0);
         obj.bl = 0;
       }
-
-      stage.update();
-
-      //createjs.Tween.get(o, {override:true}).to({scaleX:0.8,scaleY:0.8}, 100, createjs.Ease.cubicIn).to({scaleX:1,scaleY:1}, 200, createjs.Ease.cubicOut).call(endTween);
   }
 
   function rt90cc(obj) {
 
     //createjs.Ticker.setPaused(false); 
-
     //createjs.Tween.get(obj, {override:true}).to({rotation:-90,}, 200, createjs.Ease.cubicIn).wait(500).call(endTween);
 
-    //obj.rotation = 0;
     var tl = obj.getChildByName("TL");
     var tr = obj.getChildByName("TR");
     var br = obj.getChildByName("BR");
     var bl = obj.getChildByName("BL");
 
     if (obj.tl == 0) {
-        bl.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,0);
+        morph(bl,black,-radius,0,0,0,0,0);
         var tempBL = 0;
-      } else if (obj.tl == 1) {
-        bl.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius);
+      } else {
+        morph(bl,white,-radius,0,0,0,0,radius);
         var tempBL = 1;
       }
 
     if (obj.tr == 0) {
-        tl.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(-radius,-radius,radius,radius,0,0,0,0);
+        morph(tl,black,-radius,-radius,0,0,0,0);
         var tempTL = 0;
-      } else if (obj.tr == 1) {
-        tl.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0);
+      } else {
+        morph(tl,white,-radius,-radius,radius,0,0,0);
         var tempTL = 1;
       }
 
      if (obj.br == 0) {
-        tr.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(0,-radius,radius,radius,0,0,0,0);
+        morph(tr,black,0,-radius,0,0,0,0);
         var tempTR = 0;
-      } else if (obj.br == 1) {
-        tr.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0);
+      } else {
+        morph(tr,white,0,-radius,0,radius,0,0);
         var tempTR = 1;
       }
 
       if (obj.bl == 0) {
-        br.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(0,0,radius,radius,0,0,0,0);
+        morph(br,black,0,0,0,0,0,0);
         var tempBR = 0;
-      } else if (obj.bl == 1) {
-        br.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(0,0,radius,radius,0,0,radius,0);
+      } else {
+        morph(br,white,0,0,0,0,radius,0);
         var tempBR = 1;
       }
 
@@ -1376,9 +1346,6 @@ function init() {
       obj.tr = tempTR;
       obj.br = tempBR;
       obj.bl = tempBL;
-
-      stage.update();
-
   }
 
   function rt90c(obj) {
@@ -1389,58 +1356,34 @@ function init() {
     var bl = obj.getChildByName("BL");
 
     if (obj.tl == 0) {
-        tr.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(0,-radius,radius,radius,0,0,0,0);
+        morph(tr,black,0,-radius,0,0,0,0);
         var tempTR = 0;
-      } else if (obj.tl == 1) {
-        tr.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0);
-        var tempTR = 1;
+      } else {
+        morph(tr,white,0,-radius,0,radius,0,0);
+        var tempTR = 0;
       }
 
     if (obj.tr == 0) {
-        br.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(0,0,radius,radius,0,0,0,0);
+        morph(br,black,0,0,0,0,0,0);
         var tempBR = 0;
-      } else if (obj.tr == 1) {
-        br.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(0,0,radius,radius,0,0,radius,0);
+      } else {
+        morph(br,white,0,0,0,0,radius,0);
         var tempBR = 1;
       }
 
      if (obj.br == 0) {
-        bl.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,0);
+        morph(bl,black,-radius,0,0,0,0,0);
         var tempBL = 0;
-      } else if (obj.br == 1) {
-        bl.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius);
+      } else {
+        morph(bl,white,-radius,0,0,0,0,radius);
         var tempBL = 1;
       }
 
       if (obj.bl == 0) {
-        tl.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(-radius,-radius,radius,radius,0,0,0,0);
+        morph(tl,black,-radius,-radius,0,0,0,0);
         var tempTL = 0;
-      } else if (obj.bl == 1) {
-        tl.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0);
+      } else {
+        morph(tl,white,-radius,-radius,radius,0,0,0);
         var tempTL = 1;
       }
 
@@ -1448,9 +1391,6 @@ function init() {
       obj.tr = tempTR;
       obj.br = tempBR;
       obj.bl = tempBL;
-
-      stage.update();
-
   }
 
   function rt180cc(obj) {
@@ -1460,59 +1400,35 @@ function init() {
     var br = obj.getChildByName("BR");
     var bl = obj.getChildByName("BL");
 
-    if (obj.tl == 0) {
-        br.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(0,0,radius,radius,0,0,0,0);
+      if (obj.tl == 0) {
+        morph(br,black,0,0,0,0,0,0);
         var tempBR = 0;
-      } else if (obj.tl == 1) {
-        br.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(0,0,radius,radius,0,0,radius,0);
+      } else {
+        morph(br,white,0,0,0,0,radius,0);
         var tempBR = 1;
       }
 
     if (obj.tr == 0) {
-         bl.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,0);
+         morph(bl,black,-radius,0,0,0,0,0);
         var tempBL = 0;
-      } else if (obj.tr == 1) {
-        bl.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius);
+      } else {
+        morph(bl,white,-radius,0,0,0,0,radius);
         var tempBL = 1;
       }
 
      if (obj.br == 0) {
-        tl.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(-radius,-radius,radius,radius,0,0,0,0);
+        morph(tl,black,-radius,-radius,0,0,0,0);
         var tempTL = 0;
-      } else if (obj.br == 1) {
-        tl.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0);
+      } else {
+        morph(tl,white,-radius,-radius,radius,0,0,0);
         var tempTL = 1;
       }
 
       if (obj.bl == 0) {
-        tr.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(0,-radius,radius,radius,0,0,0,0);
+        morph(tr,black,0,-radius,0,0,0,0);
         var tempTR = 0;
-      } else if (obj.bl == 1) {
-        tr.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0);
+      } else {
+        morph(tr,white,0,-radius,0,radius,0,0);
         var tempTR = 1;
       }
 
@@ -1520,9 +1436,6 @@ function init() {
       obj.tr = tempTR;
       obj.br = tempBR;
       obj.bl = tempBL;
-
-      stage.update();
-
   }
 
   function rt180c(obj) {
@@ -1533,58 +1446,34 @@ function init() {
     var bl = obj.getChildByName("BL");
 
     if (obj.tl == 0) {
-        br.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(0,0,radius,radius,0,0,0,0);
+        morph(br,black,0,0,0,0,0,0);
         var tempBR = 0;
-      } else if (obj.tl == 1) {
-        br.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(0,0,radius,radius,0,0,radius,0);
+      } else {
+        morph(br,white,0,0,0,0,radius,0);
         var tempBR = 1;
       }
 
     if (obj.tr == 0) {
-         bl.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,0);
+         morph(bl,black,-radius,0,0,0,0,0);
         var tempBL = 0;
-      } else if (obj.tr == 1) {
-        bl.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius);
+      } else {
+        morph(bl,white,-radius,0,0,0,0,radius);
         var tempBL = 1;
       }
 
      if (obj.br == 0) {
-        tl.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(-radius,-radius,radius,radius,0,0,0,0);
+        morph(tl,black,-radius,-radius,0,0,0,0);
         var tempTL = 0;
-      } else if (obj.br == 1) {
-        tl.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0);
+      } else {
+        morph(tl,white,-radius,-radius,radius,0,0,0);
         var tempTL = 1;
       }
 
       if (obj.bl == 0) {
-        tr.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(0,-radius,radius,radius,0,0,0,0);
+        morph(tr,black,0,-radius,0,0,0,0);
         var tempTR = 0;
-      } else if (obj.bl == 1) {
-        tr.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0);
+      } else {
+        morph(tr,white,0,-radius,0,radius,0,0);
         var tempTR = 1;
       }
 
@@ -1592,9 +1481,6 @@ function init() {
       obj.tr = tempTR;
       obj.br = tempBR;
       obj.bl = tempBL;
-
-      stage.update();
-
   }
 
   function flipHorizontal(obj) {
@@ -1605,58 +1491,34 @@ function init() {
     var bl = obj.getChildByName("BL");
 
     if (obj.tl == 0) {
-        tr.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(0,-radius,radius,radius,0,0,0,0);
+        morph(tr,black,0,-radius,0,0,0,0);
         var tempTR = 0;
-      } else if (obj.tl == 1) {
-        tr.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0);
+      } else {
+        morph(tr,white,0,-radius,0,radius,0,0);
         var tempTR = 1;
       }
 
     if (obj.tr == 0) {
-        tl.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(-radius,-radius,radius,radius,0,0,0,0);
+        morph(tl,black,-radius,-radius,0,0,0,0);
         var tempTL = 0;
-      } else if (obj.tr == 1) {
-        tl.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0);
+      } else {
+        morph(tl,white,-radius,-radius,radius,0,0,0);
         var tempTL = 1;
       }
 
      if (obj.br == 0) {
-        bl.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,0);
+        morph(bl,black,-radius,0,0,0,0,0);
         var tempBL = 0;
-      } else if (obj.br == 1) {
-        bl.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius);
+      } else {
+        morph(bl,white,-radius,0,0,0,0,radius);
         var tempBL = 1;
       }
 
       if (obj.bl == 0) {
-        br.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(0,0,radius,radius,0,0,0,0);
+        morph(br,black,0,0,0,0,0,0);
         var tempBR = 0;
-      } else if (obj.bl == 1) {
-        br.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(0,0,radius,radius,0,0,radius,0);
+      } else {
+        morph(br,white,0,0,0,0,radius,0);
         var tempBR = 1;
       }
 
@@ -1664,9 +1526,6 @@ function init() {
       obj.tr = tempTR;
       obj.br = tempBR;
       obj.bl = tempBL;
-
-      stage.update();
-
   }
 
   function flipVertical(obj) {
@@ -1677,58 +1536,34 @@ function init() {
     var bl = obj.getChildByName("BL");
 
     if (obj.tl == 0) {
-        bl.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,0);
+        morph(bl,black,-radius,0,0,0,0,0);
         var tempBL = 0;
-      } else if (obj.tl == 1) {
-        bl.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius);
+      } else {
+        morph(bl,white,-radius,0,0,0,0,radius);
         var tempBL = 1;
       }
 
     if (obj.tr == 0) {
-        br.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(0,0,radius,radius,0,0,0,0);
+        morph(br,black,0,0,0,0,0,0);
         var tempBR = 0;
-      } else if (obj.tr == 1) {
-        br.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(0,0,radius,radius,0,0,radius,0);
+      } else {
+        morph(br,white,0,0,0,0,radius,0);
         var tempBR = 1;
       }
 
      if (obj.br == 0) {
-        tr.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(0,-radius,radius,radius,0,0,0,0);
+        morph(tr,black,0,-radius,0,0,0,0);
         var tempTR = 0;
-      } else if (obj.br == 1) {
-        tr.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0);
-        var tempTR = 1;
+      } else {
+        morph(tr,white,0,-radius,0,radius,0,0);
+        var tempTR = 0;
       }
 
       if (obj.bl == 0) {
-        tl.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(-radius,-radius,radius,radius,0,0,0,0);
+        morph(tl,black,-radius,-radius,0,0,0,0);
         var tempTL = 0;
-      } else if (obj.bl == 1) {
-        tl.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0);
+      } else {
+        morph(tl,white,-radius,-radius,radius,0,0,0);
         var tempTL = 1;
       }
 
@@ -1736,13 +1571,19 @@ function init() {
       obj.tr = tempTR;
       obj.br = tempBR;
       obj.bl = tempBL;
-
-      stage.update();
-
   }
 
+  function morph(corner,color,x,y,tl,tr,br,bl) {
 
-
+    //createjs.Ticker.setPaused(false); 
+    //createjs.Tween.get(o, {override:true}).to({scaleX:0.8,scaleY:0.8}, 100, createjs.Ease.cubicIn).to({scaleX:1,scaleY:1}, 200, createjs.Ease.cubicOut).call(endTween);
+        
+        corner.graphics
+        .clear()
+        .beginFill(color)
+        .drawRoundRectComplex(x,y,radius,radius,tl,tr,br,bl);
+        stage.update();
+  }
 
   // SCORES
 
@@ -1763,6 +1604,47 @@ function init() {
     stage.update();
 
   } 
+
+  // GAME MGMT
+
+  function nextTurn(event) {
+
+    clearSequence(event);
+    loadPositionSelectors();
+    loadShapeSelectors();
+
+    if (whiteTurn.visible == true) {
+      whiteTurn.visible = false;
+      blackTurn.visible = true;
+    } else {
+      whiteTurn.visible = true;
+      blackTurn.visible = false;
+    }
+
+    stage.update();
+  }
+
+  function newGame(event) {
+
+    for (var i in objectsInPlay) {
+      stage.removeChild(objectsInPlay[i]);
+    }
+
+    for (var i in objectsInPlay) {
+      objectsInPlay.pop(objectsInPlay[i]);
+    }
+
+    clearSequence(event);
+    loadGameObjects();
+    loadPositionSelectors();
+    loadShapeSelectors();
+    updateScores();
+
+    whiteTurn.visible = true;
+    blackTurn.visible = false;
+
+    stage.update();
+  }
 
   // UTILITIES
 
