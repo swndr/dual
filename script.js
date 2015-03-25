@@ -127,13 +127,11 @@ function init() {
       gameObject.tl = 1;
       TL.graphics.beginFill(white);
       TL.graphics.drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0);
-      TL.round = true;
       TL.name = "TL";
     } else {
       gameObject.tl = 0;
       TL.graphics.beginFill(black);
       TL.graphics.drawRoundRectComplex(-radius,-radius,radius,radius,0,0,0,0);
-      TL.round = false;
       TL.name = "TL";
     }
 
@@ -141,13 +139,11 @@ function init() {
       gameObject.tr = 1;
       TR.graphics.beginFill(white);
       TR.graphics.drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0);
-      TR.round = true;
       TR.name = "TR";
     } else {
       gameObject.tr = 0;
       TR.graphics.beginFill(black);
       TR.graphics.drawRoundRectComplex(0,-radius,radius,radius,0,0,0,0);
-      TR.round = false;
       TR.name = "TR";
     }
 
@@ -155,13 +151,11 @@ function init() {
       gameObject.br = 1;
       BR.graphics.beginFill(white);
       BR.graphics.drawRoundRectComplex(0,0,radius,radius,0,0,radius,0);
-      BR.round = true;
       BR.name = "BR";
     } else {
       gameObject.br = 0;
       BR.graphics.beginFill(black);
       BR.graphics.drawRoundRectComplex(0,0,radius,radius,0,0,0,0);
-      BR.round = false;
       BR.name = "BR";
     }
 
@@ -169,13 +163,11 @@ function init() {
       gameObject.bl = 1;
       BL.graphics.beginFill(white);
       BL.graphics.drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius);
-      BL.round = true;
       BL.name = "BL";
     } else {
       gameObject.bl = 0;
       BL.graphics.beginFill(black);
       BL.graphics.drawRoundRectComplex(-radius,0,radius,radius,0,0,0,0);
-      BL.round = false;
       BL.name = "BL";
     }
 
@@ -656,7 +648,6 @@ function init() {
     var shapeSelector = new ShapeButton(shuffledShapeSelectors[i][0],shuffledShapeSelectors[i][1],shuffledShapeSelectors[i][2],shuffledShapeSelectors[i][3],34,(372 + (buttonRow * (buttonSize + buttonMargin))));
     } else {
     var shapeSelector = new ShapeButton(shuffledShapeSelectors[i][0],shuffledShapeSelectors[i][1],shuffledShapeSelectors[i][2],shuffledShapeSelectors[i][3],(34 + buttonSize + buttonMargin),(372 + (buttonRow * (buttonSize + buttonMargin))));
-    //shapeSelector.name = "shape" + i;
     buttonRow++;
     }
 
@@ -706,24 +697,30 @@ function init() {
 
   var rotate90cc = new RotateButton(90,"cc",34,510);
   rotate90cc.name = "r90cc";
+  rotate90cc.func = rt90cc;
   var placeholder90cc = new PlaceholderButton(rotate90cc.x,rotate90cc.y);
   var rotate90c = new RotateButton(90,"c",(34 + buttonSize + buttonMargin),510);
   rotate90c.name = "r90c";
+  rotate90c.func = rt90c;
   var placeholder90c = new PlaceholderButton(rotate90c.x,rotate90c.y);
   var rotate180cc = new RotateButton(180,"cc",34,(510 + buttonSize + buttonMargin));
   rotate180cc.name = "r180cc";
+  rotate180cc.func = rt180cc;
   var placeholder180cc = new PlaceholderButton(rotate180cc.x,rotate180cc.y);
   var rotate180c = new RotateButton(180,"c",(34 + buttonSize + buttonMargin),(510 + buttonSize + buttonMargin));
   rotate180c.name = "r180c";
+  rotate180c.func = rt180c;
   var placeholder180c = new PlaceholderButton(rotate180c.x,rotate180c.y);
 
   // flip buttons
 
   var flipV = new FlipButton(40,30,90,30,65,60,65,70,40,100,90,100,34,876);
   flipV.name = "fV";
+  flipV.func = flipVertical;
   var placeholderFlipV = new PlaceholderButton(flipV.x,flipV.y);
   var flipH = new FlipButton(30,40,30,90,60,65,70,65,100,40,100,90,(34 + buttonSize + buttonMargin),876);
   flipH.name = "fH";
+  flipH.func = flipHorizontal;
   var placeholderFlipH = new PlaceholderButton(flipH.x,flipH.y);
 
   actionsBox.addChild(placeholderTL,placeholderTR,placeholderBR,placeholderBL,placeholder90cc,placeholder90c,placeholder180cc,placeholder180c,placeholderFlipV,placeholderFlipH);
@@ -1205,7 +1202,7 @@ function init() {
     }
   }
 
-
+  // ACTION FUNCTIONS
 
   function transTL(obj) {
 
@@ -1307,6 +1304,445 @@ function init() {
       //createjs.Tween.get(o, {override:true}).to({scaleX:0.8,scaleY:0.8}, 100, createjs.Ease.cubicIn).to({scaleX:1,scaleY:1}, 200, createjs.Ease.cubicOut).call(endTween);
   }
 
+  function rt90cc(obj) {
+
+    //createjs.Ticker.setPaused(false); 
+
+    //createjs.Tween.get(obj, {override:true}).to({rotation:-90,}, 200, createjs.Ease.cubicIn).wait(500).call(endTween);
+
+    //obj.rotation = 0;
+    var tl = obj.getChildByName("TL");
+    var tr = obj.getChildByName("TR");
+    var br = obj.getChildByName("BR");
+    var bl = obj.getChildByName("BL");
+
+    if (obj.tl == 0) {
+        bl.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,0);
+        var tempBL = 0;
+      } else if (obj.tl == 1) {
+        bl.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius);
+        var tempBL = 1;
+      }
+
+    if (obj.tr == 0) {
+        tl.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(-radius,-radius,radius,radius,0,0,0,0);
+        var tempTL = 0;
+      } else if (obj.tr == 1) {
+        tl.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0);
+        var tempTL = 1;
+      }
+
+     if (obj.br == 0) {
+        tr.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(0,-radius,radius,radius,0,0,0,0);
+        var tempTR = 0;
+      } else if (obj.br == 1) {
+        tr.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0);
+        var tempTR = 1;
+      }
+
+      if (obj.bl == 0) {
+        br.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(0,0,radius,radius,0,0,0,0);
+        var tempBR = 0;
+      } else if (obj.bl == 1) {
+        br.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(0,0,radius,radius,0,0,radius,0);
+        var tempBR = 1;
+      }
+
+      obj.tl = tempTL;
+      obj.tr = tempTR;
+      obj.br = tempBR;
+      obj.bl = tempBL;
+
+      stage.update();
+
+  }
+
+  function rt90c(obj) {
+
+    var tl = obj.getChildByName("TL");
+    var tr = obj.getChildByName("TR");
+    var br = obj.getChildByName("BR");
+    var bl = obj.getChildByName("BL");
+
+    if (obj.tl == 0) {
+        tr.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(0,-radius,radius,radius,0,0,0,0);
+        var tempTR = 0;
+      } else if (obj.tl == 1) {
+        tr.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0);
+        var tempTR = 1;
+      }
+
+    if (obj.tr == 0) {
+        br.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(0,0,radius,radius,0,0,0,0);
+        var tempBR = 0;
+      } else if (obj.tr == 1) {
+        br.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(0,0,radius,radius,0,0,radius,0);
+        var tempBR = 1;
+      }
+
+     if (obj.br == 0) {
+        bl.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,0);
+        var tempBL = 0;
+      } else if (obj.br == 1) {
+        bl.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius);
+        var tempBL = 1;
+      }
+
+      if (obj.bl == 0) {
+        tl.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(-radius,-radius,radius,radius,0,0,0,0);
+        var tempTL = 0;
+      } else if (obj.bl == 1) {
+        tl.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0);
+        var tempTL = 1;
+      }
+
+      obj.tl = tempTL;
+      obj.tr = tempTR;
+      obj.br = tempBR;
+      obj.bl = tempBL;
+
+      stage.update();
+
+  }
+
+  function rt180cc(obj) {
+
+    var tl = obj.getChildByName("TL");
+    var tr = obj.getChildByName("TR");
+    var br = obj.getChildByName("BR");
+    var bl = obj.getChildByName("BL");
+
+    if (obj.tl == 0) {
+        br.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(0,0,radius,radius,0,0,0,0);
+        var tempBR = 0;
+      } else if (obj.tl == 1) {
+        br.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(0,0,radius,radius,0,0,radius,0);
+        var tempBR = 1;
+      }
+
+    if (obj.tr == 0) {
+         bl.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,0);
+        var tempBL = 0;
+      } else if (obj.tr == 1) {
+        bl.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius);
+        var tempBL = 1;
+      }
+
+     if (obj.br == 0) {
+        tl.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(-radius,-radius,radius,radius,0,0,0,0);
+        var tempTL = 0;
+      } else if (obj.br == 1) {
+        tl.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0);
+        var tempTL = 1;
+      }
+
+      if (obj.bl == 0) {
+        tr.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(0,-radius,radius,radius,0,0,0,0);
+        var tempTR = 0;
+      } else if (obj.bl == 1) {
+        tr.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0);
+        var tempTR = 1;
+      }
+
+      obj.tl = tempTL;
+      obj.tr = tempTR;
+      obj.br = tempBR;
+      obj.bl = tempBL;
+
+      stage.update();
+
+  }
+
+  function rt180c(obj) {
+
+    var tl = obj.getChildByName("TL");
+    var tr = obj.getChildByName("TR");
+    var br = obj.getChildByName("BR");
+    var bl = obj.getChildByName("BL");
+
+    if (obj.tl == 0) {
+        br.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(0,0,radius,radius,0,0,0,0);
+        var tempBR = 0;
+      } else if (obj.tl == 1) {
+        br.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(0,0,radius,radius,0,0,radius,0);
+        var tempBR = 1;
+      }
+
+    if (obj.tr == 0) {
+         bl.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,0);
+        var tempBL = 0;
+      } else if (obj.tr == 1) {
+        bl.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius);
+        var tempBL = 1;
+      }
+
+     if (obj.br == 0) {
+        tl.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(-radius,-radius,radius,radius,0,0,0,0);
+        var tempTL = 0;
+      } else if (obj.br == 1) {
+        tl.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0);
+        var tempTL = 1;
+      }
+
+      if (obj.bl == 0) {
+        tr.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(0,-radius,radius,radius,0,0,0,0);
+        var tempTR = 0;
+      } else if (obj.bl == 1) {
+        tr.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0);
+        var tempTR = 1;
+      }
+
+      obj.tl = tempTL;
+      obj.tr = tempTR;
+      obj.br = tempBR;
+      obj.bl = tempBL;
+
+      stage.update();
+
+  }
+
+  function flipHorizontal(obj) {
+
+    var tl = obj.getChildByName("TL");
+    var tr = obj.getChildByName("TR");
+    var br = obj.getChildByName("BR");
+    var bl = obj.getChildByName("BL");
+
+    if (obj.tl == 0) {
+        tr.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(0,-radius,radius,radius,0,0,0,0);
+        var tempTR = 0;
+      } else if (obj.tl == 1) {
+        tr.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0);
+        var tempTR = 1;
+      }
+
+    if (obj.tr == 0) {
+        tl.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(-radius,-radius,radius,radius,0,0,0,0);
+        var tempTL = 0;
+      } else if (obj.tr == 1) {
+        tl.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0);
+        var tempTL = 1;
+      }
+
+     if (obj.br == 0) {
+        bl.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,0);
+        var tempBL = 0;
+      } else if (obj.br == 1) {
+        bl.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius);
+        var tempBL = 1;
+      }
+
+      if (obj.bl == 0) {
+        br.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(0,0,radius,radius,0,0,0,0);
+        var tempBR = 0;
+      } else if (obj.bl == 1) {
+        br.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(0,0,radius,radius,0,0,radius,0);
+        var tempBR = 1;
+      }
+
+      obj.tl = tempTL;
+      obj.tr = tempTR;
+      obj.br = tempBR;
+      obj.bl = tempBL;
+
+      stage.update();
+
+  }
+
+  function flipVertical(obj) {
+
+    var tl = obj.getChildByName("TL");
+    var tr = obj.getChildByName("TR");
+    var br = obj.getChildByName("BR");
+    var bl = obj.getChildByName("BL");
+
+    if (obj.tl == 0) {
+        bl.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,0);
+        var tempBL = 0;
+      } else if (obj.tl == 1) {
+        bl.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius);
+        var tempBL = 1;
+      }
+
+    if (obj.tr == 0) {
+        br.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(0,0,radius,radius,0,0,0,0);
+        var tempBR = 0;
+      } else if (obj.tr == 1) {
+        br.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(0,0,radius,radius,0,0,radius,0);
+        var tempBR = 1;
+      }
+
+     if (obj.br == 0) {
+        tr.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(0,-radius,radius,radius,0,0,0,0);
+        var tempTR = 0;
+      } else if (obj.br == 1) {
+        tr.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0);
+        var tempTR = 1;
+      }
+
+      if (obj.bl == 0) {
+        tl.graphics
+        .clear()
+        .beginFill(black)
+        .drawRoundRectComplex(-radius,-radius,radius,radius,0,0,0,0);
+        var tempTL = 0;
+      } else if (obj.bl == 1) {
+        tl.graphics
+        .clear()
+        .beginFill(white)
+        .drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0);
+        var tempTL = 1;
+      }
+
+      obj.tl = tempTL;
+      obj.tr = tempTR;
+      obj.br = tempBR;
+      obj.bl = tempBL;
+
+      stage.update();
+
+  }
+
+
+
 
   // SCORES
 
@@ -1327,104 +1763,6 @@ function init() {
     stage.update();
 
   } 
-
-
-/*
-  // TOGGLE GAME OBJECTS
-
-  function shapeClick(event) {
-
-    // transform corners
-
-    createjs.Ticker.setPaused(false);
-
-    if (event.target.round == false) {
-
-      if (event.target.name == "TL") {
-        event.target.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(-radius,-radius,radius,radius,radius,0,0,0);
-        stage.update();
-        event.target.parent.tl = 1;
-      } else if (event.target.name == "TR") {
-        event.target.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(0,-radius,radius,radius,0,radius,0,0);
-        event.target.parent.tr = 1;
-      } else if (event.target.name == "BR") {
-        event.target.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(0,0,radius,radius,0,0,radius,0);
-        event.target.parent.br = 1;
-      } else {
-        event.target.graphics
-        .clear()
-        .beginFill(white)
-        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,radius);
-        event.target.parent.bl = 1;
-      }
-      console.log(event.target.parent);
-      event.target.round = true;
-    } else {
-      if (event.target.name == "TL") {
-        event.target.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(-radius,-radius,radius,radius,0,0,0,0);
-        event.target.parent.tl = 0;
-      } else if (event.target.name == "TR") {
-        event.target.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(0,-radius,radius,radius,0,0,0,0);
-        event.target.parent.tr = 0;
-      } else if (event.target.name == "BR") {
-        event.target.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(0,0,radius,radius,0,0,0,0);
-        event.target.parent.br = 0;
-      } else {
-        event.target.graphics
-        .clear()
-        .beginFill(black)
-        .drawRoundRectComplex(-radius,0,radius,radius,0,0,0,0);
-        event.target.parent.bl = 0;
-      }
-      event.target.round = false;
-      console.log(event.target.parent);
-    }
-
-  // update scores
-
-  var wCount = 0;
-  var bCount = 0;
-
-  for (var i = 0; i < event.target.parent.children.length; i++) {
-    if (event.target.parent.children[i].round == true) {
-      wCount++;
-    } else {
-      bCount++;
-    }
-  } 
-
-  if (wCount == 4) {
-    wScore++;
-    whiteScore.text = wScore;
-  } else if (bCount == 4) {
-    bScore++;
-    blackScore.text = bScore;
-  }
-
-  stage.update();
-
-  createjs.Tween.get(event.target, {override:true}).to({scaleX:0.8,scaleY:0.8}, 100, createjs.Ease.cubicIn).to({scaleX:1,scaleY:1}, 200, createjs.Ease.cubicOut).call(endTween);
-
-  }
-  */
 
   // UTILITIES
 
