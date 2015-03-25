@@ -668,6 +668,8 @@ function init() {
 
   function loadShapeSelectors() {
 
+  setOfShapes = [];
+
   setOfShapes.push(shapeSelectors[getRandomInt(0, 3)]);
   setOfShapes.push(shapeSelectors[getRandomInt(4, 7)]);
   setOfShapes.push(shapeSelectors[getRandomInt(8, 11)]);
@@ -1123,6 +1125,8 @@ function init() {
 
   function targetGameObjects(step) {
 
+    createjs.Ticker.setPaused(false);
+
     var ruleSet = [];
     var targets = [];
 
@@ -1173,12 +1177,18 @@ function init() {
 
         if (ruleSet[1](ruleSet[0](objectsInPlay[i]),ruleSet[2](objectsInPlay[i]))) {
           targets.push(objectsInPlay[i]);
+          createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:1,}, 200, createjs.Ease.cubicIn);
+        } else {
+          createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:.8,}, 200, createjs.Ease.cubicIn);
         }
    
       } else if (ruleSet.length == 1) {
 
         if (ruleSet[0](objectsInPlay[i])) {
           targets.push(objectsInPlay[i]);
+          createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:1,}, 200, createjs.Ease.cubicIn);
+        } else {
+          createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:.8,}, 200, createjs.Ease.cubicIn);
         }
 
       } else {
@@ -1234,6 +1244,7 @@ function init() {
   function deliverAction(targets,step) {
 
     for (i in targets) {
+
       if (step == 1) {
         sequence[3].func(targets[i]);
       } else if (step == 3) {
@@ -1244,6 +1255,7 @@ function init() {
         sequence[15].func(targets[i]);
       }
     }
+       endTween();
   }
 
   // ACTION FUNCTIONS
@@ -1608,6 +1620,13 @@ function init() {
   // GAME MGMT
 
   function nextTurn(event) {
+
+    createjs.Ticker.setPaused(false);
+
+    for (i in objectsInPlay) {
+      createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:1,}, 200, createjs.Ease.cubicIn);
+      if (i == objectsInPlay.length) {endTween();}
+    }
 
     clearSequence(event);
     loadPositionSelectors();
