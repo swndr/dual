@@ -41,7 +41,7 @@ function init() {
 
   var objectsInPlay = [];
 
-  var wScore = 0
+  var wScore = 0;
   var bScore = 0;
 
   var stage = new createjs.Stage(canvas);
@@ -260,15 +260,15 @@ function init() {
     return box;
   }
 
-  var selectorsBox = new Box(40,920,336,1054,white,green,"SELECTORS");
+  var selectorsBox = new Box(40,920,336,1054,white,green,"CONDITIONS");
   var sequenceBox = new Box(416,920,704,1054,"#616060",black,"SEQUENCE");
   var actionsBox = new Box(1160,920,336,1054,white,yellow,"ACTIONS","actionsBox");
 
-  var positionLabel = new createjs.Text("POSITION", mediumLabelStyle, green).set({x:168,y:96});
-  positionLabel.textAlign = "center";
+  // var positionLabel = new createjs.Text("POSITION", mediumLabelStyle, green).set({x:168,y:96});
+  // positionLabel.textAlign = "center";
 
-  var shapeLabel = new createjs.Text("SHAPE", mediumLabelStyle, green).set({x:168,y:452});
-  shapeLabel.textAlign = "center";
+  // var shapeLabel = new createjs.Text("SHAPE", mediumLabelStyle, green).set({x:168,y:452});
+  // shapeLabel.textAlign = "center";
 
   var logicLabel = new createjs.Text("LOGIC", mediumLabelStyle, blue).set({x:168,y:820});
   logicLabel.textAlign = "center";
@@ -279,7 +279,7 @@ function init() {
   var orCountLabel = new createjs.Text(andCount, "bold 25px Avenir-Heavy", blue).set({x:237,y:1010});
   orCountLabel.textAlign = "center";
 
-  selectorsBox.addChild(positionLabel,shapeLabel,logicLabel,andCountLabel,orCountLabel);
+  selectorsBox.addChild(logicLabel,andCountLabel,orCountLabel);
 
   var clearButton = new createjs.Shape().set({x:56,y:910});
   clearButton.graphics.beginFill("#616060").drawRect(0,0,200,100);
@@ -623,12 +623,12 @@ function init() {
   for (var i = 0; i < 2; i++) { // load first 4 from randomized array
 
     shuffledRowSelectors[i].x = 34;
-    shuffledRowSelectors[i].y = 16 + (buttonRow * (buttonSize + buttonMargin));
+    shuffledRowSelectors[i].y = -26 + (buttonRow * (buttonSize + buttonMargin));
     shuffledRowSelectors[i].originX = shuffledRowSelectors[i].x
     shuffledRowSelectors[i].originY = shuffledRowSelectors[i].y
 
     shuffledColSelectors[i].x = (34 + buttonSize + buttonMargin);
-    shuffledColSelectors[i].y = 16 + (buttonRow * (buttonSize + buttonMargin));
+    shuffledColSelectors[i].y = -26 + (buttonRow * (buttonSize + buttonMargin));
     shuffledColSelectors[i].originX = shuffledColSelectors[i].x
     shuffledColSelectors[i].originY = shuffledColSelectors[i].y
     buttonRow++;
@@ -674,15 +674,17 @@ function init() {
   setOfShapes.push(shapeSelectors[getRandomInt(4, 7)]);
   setOfShapes.push(shapeSelectors[getRandomInt(8, 11)]);
   setOfShapes.push(shapeSelectors[getRandomInt(12, 13)]);
+  setOfShapes.push(shapeSelectors[getRandomInt(0, 13)]);
+  setOfShapes.push(shapeSelectors[getRandomInt(0, 13)]);
 
   var shuffledShapeSelectors = shuffle(setOfShapes); // randomize shape selectors
 
-  for (var i = 0; i < 4; i++) { // load first 4 from randomized array
+  for (var i = 0; i < 6; i++) { // load first 4 from randomized array
 
     if (!(i % 2)) {
-    var shapeSelector = new ShapeButton(shuffledShapeSelectors[i][0],shuffledShapeSelectors[i][1],shuffledShapeSelectors[i][2],shuffledShapeSelectors[i][3],34,(372 + (buttonRow * (buttonSize + buttonMargin))));
+    var shapeSelector = new ShapeButton(shuffledShapeSelectors[i][0],shuffledShapeSelectors[i][1],shuffledShapeSelectors[i][2],shuffledShapeSelectors[i][3],34,(250 + (buttonRow * (buttonSize + buttonMargin))));
     } else {
-    var shapeSelector = new ShapeButton(shuffledShapeSelectors[i][0],shuffledShapeSelectors[i][1],shuffledShapeSelectors[i][2],shuffledShapeSelectors[i][3],(34 + buttonSize + buttonMargin),(372 + (buttonRow * (buttonSize + buttonMargin))));
+    var shapeSelector = new ShapeButton(shuffledShapeSelectors[i][0],shuffledShapeSelectors[i][1],shuffledShapeSelectors[i][2],shuffledShapeSelectors[i][3],(34 + buttonSize + buttonMargin),(250 + (buttonRow * (buttonSize + buttonMargin))));
     buttonRow++;
     }
 
@@ -1033,6 +1035,18 @@ function init() {
     }
 
     for (var i = 0; i < toClear.length; i++) {
+      if (arguments.length == 1) {
+        returnToOrigin(toClear[i],toClear[i].originParent,toClear[i].originX,toClear[i].originY);
+      } else {
+        if (toClear[i].type == "logic" || toClear[i].type == "action") {
+          returnToOrigin(toClear[i],toClear[i].originParent,toClear[i].originX,toClear[i].originY);
+        } else {
+          sequenceBox.removeChild(toClear[i]);
+        }
+      }
+    }
+
+   /* for (var i = 0; i < toClear.length; i++) {
       if (event.currentTarget.name == "clear") {
         returnToOrigin(toClear[i],toClear[i].originParent,toClear[i].originX,toClear[i].originY);
       } else if (event.currentTarget.name == "next" || event.currentTarget.name == "new") {
@@ -1042,7 +1056,7 @@ function init() {
           sequenceBox.removeChild(toClear[i]);
         }
       }
-    }
+    }*/
 
     for (var i = 0; i < sequence.length; i++) {
       sequence[i] = null;
@@ -1080,22 +1094,34 @@ function init() {
 
   // PLAY SEQUENCE
 
+
+
   function play() {
 
-    highlightSequenceBox(playCount);
+    playSequence();
+    var playing = window.setInterval(playSequence,1000);
 
-    if (!(playCount % 2)) {
-      targetGameObjects(playCount);
-      console.log("target " + playCount);
-    } else {
-      deliverAction(targetGameObjects(playCount-1),playCount);
-      console.log("action " + playCount);
+    function playSequence() {
+
+      highlightSequenceBox(playCount);
+
+      if (!(playCount % 2)) {
+        targetGameObjects(playCount);
+        console.log("target " + playCount);
+      } else {
+        deliverAction(targetGameObjects(playCount-1),playCount);
+        console.log("action " + playCount);
+      }
+
+      // updateScores();
+
+      if (playCount < 8) { 
+        playCount++; 
+      } else {
+        clearInterval(playing);
+        nextTurn();
+      }
     }
-
-    updateScores();
-
-    if (playCount < 7) { playCount++ };
-
   }
 
 
@@ -1179,7 +1205,7 @@ function init() {
           targets.push(objectsInPlay[i]);
           createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:1,}, 200, createjs.Ease.cubicIn);
         } else {
-          createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:.8,}, 200, createjs.Ease.cubicIn);
+          createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:.2,}, 200, createjs.Ease.cubicIn);
         }
    
       } else if (ruleSet.length == 1) {
@@ -1188,7 +1214,7 @@ function init() {
           targets.push(objectsInPlay[i]);
           createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:1,}, 200, createjs.Ease.cubicIn);
         } else {
-          createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:.8,}, 200, createjs.Ease.cubicIn);
+          createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:.2,}, 200, createjs.Ease.cubicIn);
         }
 
       } else {
@@ -1255,7 +1281,8 @@ function init() {
         sequence[15].func(targets[i]);
       }
     }
-       endTween();
+      updateScores();
+      endTween();
   }
 
   // ACTION FUNCTIONS
@@ -1601,8 +1628,8 @@ function init() {
 
   function updateScores() {
 
-  var wScore = 0;
-  var bScore = 0;
+  bScore = 0;
+  wScore = 0;
 
   for (var i = 0; i < objectsInPlay.length; i++) {
     if (objectsInPlay[i].tl == 0 && objectsInPlay[i].tr == 0 && objectsInPlay[i].br == 0 && objectsInPlay[i].bl == 0) {
@@ -1619,7 +1646,7 @@ function init() {
 
   // GAME MGMT
 
-  function nextTurn(event) {
+  function nextTurn() {
 
     createjs.Ticker.setPaused(false);
 
@@ -1628,7 +1655,7 @@ function init() {
       if (i == objectsInPlay.length) {endTween();}
     }
 
-    clearSequence(event);
+    clearSequence();
     loadPositionSelectors();
     loadShapeSelectors();
 
@@ -1643,7 +1670,7 @@ function init() {
     stage.update();
   }
 
-  function newGame(event) {
+  function newGame() {
 
     for (var i in objectsInPlay) {
       stage.removeChild(objectsInPlay[i]);
@@ -1653,7 +1680,7 @@ function init() {
       objectsInPlay.pop(objectsInPlay[i]);
     }
 
-    clearSequence(event);
+    clearSequence();
     loadGameObjects();
     loadPositionSelectors();
     loadShapeSelectors();
