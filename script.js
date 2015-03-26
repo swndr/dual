@@ -31,6 +31,7 @@ function init() {
 
   var sequence = [];
   var playCount = 0;
+  var playReady = false;
 
   var rowSelectors = [];
   var colSelectors = [];
@@ -295,9 +296,11 @@ function init() {
 
   var playButton = new createjs.Shape().set({x:458,y:925});
   playButton.graphics.beginFill(gray).drawRoundRect(0,0,180,80,10);
-  playButton.addEventListener("click",play);
+  playButton.alpha = .5;
+  // playButton.addEventListener("click",play);
   var playLabel = new createjs.Text("PLAY", largeLabelStyle, pink).set({x:548,y:940});
   playLabel.textAlign = "center";
+  playLabel.alpha = .5;
 
   sequenceBox.addChild(clearButton,clearLabel,testButton,testLabel,playButton,playLabel);
 
@@ -773,7 +776,7 @@ function init() {
 
   // fill sequence array with null
 
-  for (var i = 0; i < 15; i++) {
+  for (var i = 0; i < 16; i++) {
     sequence[i] = null;
   }
 
@@ -957,8 +960,7 @@ function init() {
 
     stage.update();
     dropPosition = null;
-
-  
+    sequenceReady();
   }
 
   function addToSlot(item,pos) {
@@ -1046,18 +1048,6 @@ function init() {
       }
     }
 
-   /* for (var i = 0; i < toClear.length; i++) {
-      if (event.currentTarget.name == "clear") {
-        returnToOrigin(toClear[i],toClear[i].originParent,toClear[i].originX,toClear[i].originY);
-      } else if (event.currentTarget.name == "next" || event.currentTarget.name == "new") {
-        if (toClear[i].type == "logic" || toClear[i].type == "action") {
-          returnToOrigin(toClear[i],toClear[i].originParent,toClear[i].originX,toClear[i].originY);
-        } else {
-          sequenceBox.removeChild(toClear[i]);
-        }
-      }
-    }*/
-
     for (var i = 0; i < sequence.length; i++) {
       sequence[i] = null;
     }
@@ -1094,12 +1084,38 @@ function init() {
 
   // PLAY SEQUENCE
 
+  function sequenceReady() {
 
+    playReady = false;
+
+    for (var i = 0; i < 16; i+=4) {
+
+      if ((sequence[i] != null || sequence[i+1] != null || sequence[i+2] != null) && sequence[i+3] != null) {
+        playReady = true;
+      }
+    }
+
+    if (playReady == true) {
+      playButton.addEventListener("click",play);
+      playButton.alpha = 1;
+      playLabel.alpha = 1;
+    } else {
+      playButton.removeEventListener("click",play);
+      playButton.alpha = .5;
+      playLabel.alpha = .5;
+    }
+
+    stage.update();
+  }
 
   function play() {
 
+    //if (sequenceReady()) {
+
     playSequence();
     var playing = window.setInterval(playSequence,1000);
+
+    //}
 
     function playSequence() {
 
@@ -1122,6 +1138,7 @@ function init() {
         nextTurn();
       }
     }
+
   }
 
 
@@ -1132,13 +1149,13 @@ function init() {
             if (trays.children[i].type == "selectors") {
               trays.children[i].graphics
               .clear()
-              .beginStroke(pink).setStrokeStyle(8).beginFill(black)
+              .beginStroke(black).setStrokeStyle(8).beginFill(black)
               .drawRoundRect(0,0,442,154,5);
               trays.children[i].updateCache();
            } else {
               trays.children[i].graphics
               .clear()
-              .beginStroke(pink).setStrokeStyle(8).beginFill(black)
+              .beginStroke(black).setStrokeStyle(8).beginFill(black)
               .drawRoundRect(0,0,160,154,5);
               trays.children[i].updateCache();
             }
