@@ -101,18 +101,18 @@ function init() {
 
   // GAME MGMT & SCORES
 
-  var newGameButton = new createjs.Shape().set({x:50,y:30});
-  newGameButton.graphics.beginFill("#AAA5A5").drawRect(0,0,240,100);
+  var newGameButton = new createjs.Shape().set({x:60,y:35});
+  newGameButton.graphics.beginFill("#AAA5A5").drawRect(0,0,300,100);
   newGameButton.addEventListener("click",newGame);
   newGameButton.name = "new";
-  var newGameLabel = new createjs.Text("NEW GAME", largeLabelStyle, white).set({x:170,y:55});
+  var newGameLabel = new createjs.Text("NEW GAME", mediumLabelStyle, white).set({x:206,y:65});
   newGameLabel.textAlign = "center";
 
-  var nextTurnButton = new createjs.Shape().set({x:canvas.width-290,y:30});
-  nextTurnButton.graphics.beginFill("#AAA5A5").drawRect(0,0,240,100);
+  var nextTurnButton = new createjs.Shape().set({x:canvas.width-360,y:35});
+  nextTurnButton.graphics.beginFill("#AAA5A5").drawRect(0,0,300,100);
   nextTurnButton.addEventListener("click",nextTurn);
   nextTurnButton.name = "next";
-  var nextTurnLabel = new createjs.Text("NEXT TURN", largeLabelStyle, pink).set({x:canvas.width-170,y:55});
+  var nextTurnLabel = new createjs.Text("SWITCH PLAYER", mediumLabelStyle, pink).set({x:canvas.width-210,y:65});
   nextTurnLabel.textAlign = "center";
 
   var whiteTurn = new createjs.Shape().set({x:0,y:(445-iconRadius)});
@@ -1087,15 +1087,21 @@ function init() {
   function sequenceReady() {
 
     playReady = false;
+    var falseCheck = 0;
 
     for (var i = 0; i < 16; i+=4) {
 
       if ((sequence[i] != null || sequence[i+1] != null || sequence[i+2] != null) && sequence[i+3] != null) {
         playReady = true;
+      } else if ((sequence[i] != null || sequence[i+1] != null || sequence[i+2] != null) && sequence[i+3] == null) {
+        falseCheck++;
+      } else if ((sequence[i] == null || sequence[i+1] == null || sequence[i+2] == null) && sequence[i+3] != null) {
+        falseCheck++;
       }
+
     }
 
-    if (playReady == true) {
+    if (playReady == true && falseCheck == 0) {
       playButton.addEventListener("click",play);
       playButton.alpha = 1;
       playLabel.alpha = 1;
@@ -1110,12 +1116,8 @@ function init() {
 
   function play() {
 
-    //if (sequenceReady()) {
-
     playSequence();
     var playing = window.setInterval(playSequence,1000);
-
-    //}
 
     function playSequence() {
 
@@ -1128,8 +1130,6 @@ function init() {
         deliverAction(targetGameObjects(playCount-1),playCount);
         console.log("action " + playCount);
       }
-
-      // updateScores();
 
       if (playCount < 8) { 
         playCount++; 
@@ -1358,6 +1358,11 @@ function init() {
 
   function rt90cc(obj) {
 
+    var tempTL;
+    var tempTR;
+    var tempBR;
+    var tempBL;
+
     //createjs.Ticker.setPaused(false); 
     //createjs.Tween.get(obj, {override:true}).to({rotation:-90,}, 200, createjs.Ease.cubicIn).wait(500).call(endTween);
 
@@ -1368,34 +1373,34 @@ function init() {
 
     if (obj.tl == 0) {
         morph(bl,black,-radius,0,0,0,0,0);
-        var tempBL = 0;
+        tempBL = 0;
       } else {
         morph(bl,white,-radius,0,0,0,0,radius);
-        var tempBL = 1;
+        tempBL = 1;
       }
 
     if (obj.tr == 0) {
         morph(tl,black,-radius,-radius,0,0,0,0);
-        var tempTL = 0;
+        tempTL = 0;
       } else {
         morph(tl,white,-radius,-radius,radius,0,0,0);
-        var tempTL = 1;
+        tempTL = 1;
       }
 
      if (obj.br == 0) {
         morph(tr,black,0,-radius,0,0,0,0);
-        var tempTR = 0;
+        tempTR = 0;
       } else {
         morph(tr,white,0,-radius,0,radius,0,0);
-        var tempTR = 1;
+        tempTR = 1;
       }
 
       if (obj.bl == 0) {
         morph(br,black,0,0,0,0,0,0);
-        var tempBR = 0;
+        tempBR = 0;
       } else {
         morph(br,white,0,0,0,0,radius,0);
-        var tempBR = 1;
+        tempBR = 1;
       }
 
       obj.tl = tempTL;
@@ -1406,6 +1411,11 @@ function init() {
 
   function rt90c(obj) {
 
+    var tempTL;
+    var tempTR;
+    var tempBR;
+    var tempBL;
+
     var tl = obj.getChildByName("TL");
     var tr = obj.getChildByName("TR");
     var br = obj.getChildByName("BR");
@@ -1413,34 +1423,34 @@ function init() {
 
     if (obj.tl == 0) {
         morph(tr,black,0,-radius,0,0,0,0);
-        var tempTR = 0;
+        tempTR = 0;
       } else {
         morph(tr,white,0,-radius,0,radius,0,0);
-        var tempTR = 0;
+        tempTR = 1;
       }
 
     if (obj.tr == 0) {
         morph(br,black,0,0,0,0,0,0);
-        var tempBR = 0;
+        tempBR = 0;
       } else {
         morph(br,white,0,0,0,0,radius,0);
-        var tempBR = 1;
+        tempBR = 1;
       }
 
      if (obj.br == 0) {
         morph(bl,black,-radius,0,0,0,0,0);
-        var tempBL = 0;
+        tempBL = 0;
       } else {
         morph(bl,white,-radius,0,0,0,0,radius);
-        var tempBL = 1;
+        tempBL = 1;
       }
 
       if (obj.bl == 0) {
         morph(tl,black,-radius,-radius,0,0,0,0);
-        var tempTL = 0;
+        tempTL = 0;
       } else {
         morph(tl,white,-radius,-radius,radius,0,0,0);
-        var tempTL = 1;
+        tempTL = 1;
       }
 
       obj.tl = tempTL;
@@ -1451,6 +1461,11 @@ function init() {
 
   function rt180cc(obj) {
 
+    var tempTL;
+    var tempTR;
+    var tempBR;
+    var tempBL;
+
     var tl = obj.getChildByName("TL");
     var tr = obj.getChildByName("TR");
     var br = obj.getChildByName("BR");
@@ -1458,34 +1473,34 @@ function init() {
 
       if (obj.tl == 0) {
         morph(br,black,0,0,0,0,0,0);
-        var tempBR = 0;
+        tempBR = 0;
       } else {
         morph(br,white,0,0,0,0,radius,0);
-        var tempBR = 1;
+        tempBR = 1;
       }
 
     if (obj.tr == 0) {
          morph(bl,black,-radius,0,0,0,0,0);
-        var tempBL = 0;
+        tempBL = 0;
       } else {
         morph(bl,white,-radius,0,0,0,0,radius);
-        var tempBL = 1;
+        tempBL = 1;
       }
 
      if (obj.br == 0) {
         morph(tl,black,-radius,-radius,0,0,0,0);
-        var tempTL = 0;
+        tempTL = 0;
       } else {
         morph(tl,white,-radius,-radius,radius,0,0,0);
-        var tempTL = 1;
+        tempTL = 1;
       }
 
       if (obj.bl == 0) {
         morph(tr,black,0,-radius,0,0,0,0);
-        var tempTR = 0;
+        tempTR = 0;
       } else {
         morph(tr,white,0,-radius,0,radius,0,0);
-        var tempTR = 1;
+        tempTR = 1;
       }
 
       obj.tl = tempTL;
@@ -1496,6 +1511,11 @@ function init() {
 
   function rt180c(obj) {
 
+    var tempTL;
+    var tempTR;
+    var tempBR;
+    var tempBL;
+
     var tl = obj.getChildByName("TL");
     var tr = obj.getChildByName("TR");
     var br = obj.getChildByName("BR");
@@ -1503,34 +1523,34 @@ function init() {
 
     if (obj.tl == 0) {
         morph(br,black,0,0,0,0,0,0);
-        var tempBR = 0;
+        tempBR = 0;
       } else {
         morph(br,white,0,0,0,0,radius,0);
-        var tempBR = 1;
+        tempBR = 1;
       }
 
     if (obj.tr == 0) {
          morph(bl,black,-radius,0,0,0,0,0);
-        var tempBL = 0;
+        tempBL = 0;
       } else {
         morph(bl,white,-radius,0,0,0,0,radius);
-        var tempBL = 1;
+        tempBL = 1;
       }
 
      if (obj.br == 0) {
         morph(tl,black,-radius,-radius,0,0,0,0);
-        var tempTL = 0;
+        tempTL = 0;
       } else {
         morph(tl,white,-radius,-radius,radius,0,0,0);
-        var tempTL = 1;
+        tempTL = 1;
       }
 
       if (obj.bl == 0) {
         morph(tr,black,0,-radius,0,0,0,0);
-        var tempTR = 0;
+        tempTR = 0;
       } else {
         morph(tr,white,0,-radius,0,radius,0,0);
-        var tempTR = 1;
+        tempTR = 1;
       }
 
       obj.tl = tempTL;
@@ -1541,6 +1561,11 @@ function init() {
 
   function flipHorizontal(obj) {
 
+    var tempTL;
+    var tempTR;
+    var tempBR;
+    var tempBL;
+
     var tl = obj.getChildByName("TL");
     var tr = obj.getChildByName("TR");
     var br = obj.getChildByName("BR");
@@ -1548,34 +1573,34 @@ function init() {
 
     if (obj.tl == 0) {
         morph(tr,black,0,-radius,0,0,0,0);
-        var tempTR = 0;
+        tempTR = 0;
       } else {
         morph(tr,white,0,-radius,0,radius,0,0);
-        var tempTR = 1;
+        tempTR = 1;
       }
 
     if (obj.tr == 0) {
         morph(tl,black,-radius,-radius,0,0,0,0);
-        var tempTL = 0;
+        tempTL = 0;
       } else {
         morph(tl,white,-radius,-radius,radius,0,0,0);
-        var tempTL = 1;
+        tempTL = 1;
       }
 
      if (obj.br == 0) {
         morph(bl,black,-radius,0,0,0,0,0);
-        var tempBL = 0;
+        tempBL = 0;
       } else {
         morph(bl,white,-radius,0,0,0,0,radius);
-        var tempBL = 1;
+        tempBL = 1;
       }
 
       if (obj.bl == 0) {
         morph(br,black,0,0,0,0,0,0);
-        var tempBR = 0;
+        tempBR = 0;
       } else {
         morph(br,white,0,0,0,0,radius,0);
-        var tempBR = 1;
+        tempBR = 1;
       }
 
       obj.tl = tempTL;
@@ -1586,6 +1611,11 @@ function init() {
 
   function flipVertical(obj) {
 
+    var tempTL;
+    var tempTR;
+    var tempBR;
+    var tempBL;
+
     var tl = obj.getChildByName("TL");
     var tr = obj.getChildByName("TR");
     var br = obj.getChildByName("BR");
@@ -1593,34 +1623,34 @@ function init() {
 
     if (obj.tl == 0) {
         morph(bl,black,-radius,0,0,0,0,0);
-        var tempBL = 0;
+        tempBL = 0;
       } else {
         morph(bl,white,-radius,0,0,0,0,radius);
-        var tempBL = 1;
+        tempBL = 1;
       }
 
     if (obj.tr == 0) {
         morph(br,black,0,0,0,0,0,0);
-        var tempBR = 0;
+        tempBR = 0;
       } else {
         morph(br,white,0,0,0,0,radius,0);
-        var tempBR = 1;
+        tempBR = 1;
       }
 
      if (obj.br == 0) {
         morph(tr,black,0,-radius,0,0,0,0);
-        var tempTR = 0;
+        tempTR = 0;
       } else {
         morph(tr,white,0,-radius,0,radius,0,0);
-        var tempTR = 0;
+        tempTR = 0;
       }
 
       if (obj.bl == 0) {
         morph(tl,black,-radius,-radius,0,0,0,0);
-        var tempTL = 0;
+        tempTL = 0;
       } else {
         morph(tl,white,-radius,-radius,radius,0,0,0);
-        var tempTL = 1;
+        tempTL = 1;
       }
 
       obj.tl = tempTL;
