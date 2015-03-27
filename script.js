@@ -85,13 +85,13 @@ function init() {
   grid.cache(0,0,canvas.width,890);
 
     for (var i = 0; i < gridSize; i++) {
-        var hLabel = new createjs.Text(i, "100 25px Avenir-Book", "#E01062");
-        hLabel.x = (gridLeft-7) + (i*gridSpacing);
-        hLabel.y = gridTop - 130;
+        var hLabel = new createjs.Text(i, lightLabelStyle, pink);
+        hLabel.x = (gridLeft-8) + (i*gridSpacing);
+        hLabel.y = gridTop - 150;
         hLabel.alpha = .5;
-      var vLabel = new createjs.Text(i, "100 25px Avenir-Book", "#E01062");
-        vLabel.x = gridLeft - 130;
-        vLabel.y = (gridTop-16) + (i*gridSpacing);
+      var vLabel = new createjs.Text(i, lightLabelStyle, pink);
+        vLabel.x = gridLeft - 150;
+        vLabel.y = (gridTop-18) + (i*gridSpacing);
         vLabel.alpha = .5;
       stage.addChild(hLabel);
       stage.addChild(vLabel);
@@ -282,27 +282,28 @@ function init() {
 
   selectorsBox.addChild(logicLabel,andCountLabel,orCountLabel);
 
-  var clearButton = new createjs.Shape().set({x:56,y:910});
-  clearButton.graphics.beginFill("#616060").drawRect(0,0,200,100);
-  clearButton.addEventListener("click",clearSequence);
+  var clearButton = new createjs.Shape().set({x:96,y:928});
+  clearButton.graphics.beginFill("#616060").beginStroke(lightGray).setStrokeStyle(4).drawRoundRect(0,0,246,76,10);
+  clearButton.addEventListener("mousedown",clearHighlight);
+  clearButton.addEventListener("pressup",clearSequence);
   clearButton.name = "clear";
-  var clearLabel = new createjs.Text("CLEAR", largeLabelStyle, lightGray).set({x:156,y:940});
+  var clearLabel = new createjs.Text("CLEAR", largeLabelStyle, white).set({x:219,y:940});
   clearLabel.textAlign = "center";
 
-  var testButton = new createjs.Shape().set({x:252,y:910});
-  testButton.graphics.beginFill("#616060").drawRect(0,0,200,100);
-  var testLabel = new createjs.Text("TEST", largeLabelStyle, white).set({x:352,y:940});
-  testLabel.textAlign = "center";
+  // var testButton = new createjs.Shape().set({x:252,y:910});
+  // testButton.graphics.beginFill("#616060").drawRect(0,0,200,100);
+  // var testLabel = new createjs.Text("TEST", largeLabelStyle, white).set({x:352,y:940});
+  // testLabel.textAlign = "center";
 
-  var playButton = new createjs.Shape().set({x:458,y:925});
-  playButton.graphics.beginFill(gray).drawRoundRect(0,0,180,80,10);
+  var playButton = new createjs.Shape().set({x:368,y:925});
+  playButton.graphics.beginFill(gray).drawRoundRect(0,0,250,80,10);
   playButton.alpha = .5;
   // playButton.addEventListener("click",play);
-  var playLabel = new createjs.Text("PLAY", largeLabelStyle, pink).set({x:548,y:940});
+  var playLabel = new createjs.Text("PLAY", largeLabelStyle, pink).set({x:493,y:940});
   playLabel.textAlign = "center";
   playLabel.alpha = .5;
 
-  sequenceBox.addChild(clearButton,clearLabel,testButton,testLabel,playButton,playLabel);
+  sequenceBox.addChild(clearButton,clearLabel,playButton,playLabel);
 
   var transformLabel = new createjs.Text("TRANSFORM", mediumLabelStyle, yellow).set({x:168,y:96});
   transformLabel.textAlign = "center";
@@ -1026,7 +1027,14 @@ function init() {
 
   }
 
+  function clearHighlight() {
+    clearLabel.color = lightGray;
+    stage.update();
+  }
+
   function clearSequence(event) {
+
+    clearLabel.color = white;
 
     var toClear = [];
 
@@ -1069,6 +1077,7 @@ function init() {
     }
 
     playCount = 0;
+    sequenceReady();
     stage.update();
   }
 
@@ -1092,11 +1101,13 @@ function init() {
     }
 
     if (playReady == true && falseCheck == 0) {
-      playButton.addEventListener("click",play);
+      playButton.addEventListener("mousedown",playHighlight);
+      playButton.addEventListener("pressup",play);
       playButton.alpha = 1;
       playLabel.alpha = 1;
     } else {
-      playButton.removeEventListener("click",play);
+      playButton.removeEventListener("mousedown",playHighlight);
+      playButton.removeEventListener("pressup",play);
       playButton.alpha = .5;
       playLabel.alpha = .5;
     }
@@ -1104,7 +1115,15 @@ function init() {
     stage.update();
   }
 
+  function playHighlight() {
+    playButton.alpha = .8;
+    stage.update();
+    console.log("play");
+  }
+
   function play() {
+
+    playButton.alpha = 1;
 
     playSequence();
     var playing = window.setInterval(playSequence,1000);
@@ -1756,6 +1775,7 @@ function init() {
     clearSequence();
     loadPositionSelectors();
     loadShapeSelectors();
+    sequenceReady();
 
     if (whiteTurn.visible == true) {
       whiteTurn.visible = false;
