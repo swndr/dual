@@ -1125,10 +1125,8 @@ function init() {
 
       if (!(playCount % 2)) {
         targetGameObjects(playCount);
-        console.log("target " + playCount);
       } else {
         deliverAction(targetGameObjects(playCount-1),playCount);
-        console.log("action " + playCount);
       }
 
       if (playCount < 8) { 
@@ -1138,7 +1136,7 @@ function init() {
         nextTurn();
       }
     }
-
+    window.setTimeout(endTween,1500);
   }
 
 
@@ -1233,13 +1231,8 @@ function init() {
         } else {
           createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:.2,}, 200, createjs.Ease.cubicIn);
         }
-
-      } else {
-        console.log("Incomplete rule set");
       }
     }
-
-    console.log(targets);
 
     return targets;
 
@@ -1642,7 +1635,7 @@ function init() {
         tempTR = 0;
       } else {
         morph(tr,white,0,-radius,0,radius,0,0);
-        tempTR = 0;
+        tempTR = 1;
       }
 
       if (obj.bl == 0) {
@@ -1662,13 +1655,29 @@ function init() {
   function morph(corner,color,x,y,tl,tr,br,bl) {
 
     //createjs.Ticker.setPaused(false); 
-    //createjs.Tween.get(o, {override:true}).to({scaleX:0.8,scaleY:0.8}, 100, createjs.Ease.cubicIn).to({scaleX:1,scaleY:1}, 200, createjs.Ease.cubicOut).call(endTween);
         
         corner.graphics
         .clear()
         .beginFill(color)
         .drawRoundRectComplex(x,y,radius,radius,tl,tr,br,bl);
+
+       /* var morphHighlight = corner.clone(true);
+        
+        morphHighlight.graphics.clear().beginFill(pink).drawRoundRectComplex(x,y,radius,radius,tl,tr,br,bl);
+        morphHighlight.name = "morph";
+        morphHighlight.alpha = .9;
+        corner.parent.addChild(morphHighlight);
         stage.update();
+
+        createjs.Tween.get(morphHighlight, {override:true}).wait(0).to({alpha:0}, 300, createjs.Ease.cubicOut).wait(200).call(removeMorph);
+
+        function removeMorph() {
+          for (i in corner.parent.children) {
+          var findMorph = corner.parent.getChildByName("morph");
+          console.log(findMorph);
+          corner.parent.removeChild(findMorph);
+          }
+        }*/
   }
 
   // SCORES
@@ -1699,7 +1708,7 @@ function init() {
 
     for (i in objectsInPlay) {
       createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:1,}, 200, createjs.Ease.cubicIn);
-      if (i == objectsInPlay.length) {endTween();}
+      if (i == objectsInPlay.length-1) {/*endTween();*/ console.log("ended");}
     }
 
     clearSequence();
@@ -1715,6 +1724,7 @@ function init() {
     }
 
     stage.update();
+    console.log(createjs.Ticker.paused);
   }
 
   function newGame() {
@@ -1723,14 +1733,13 @@ function init() {
       stage.removeChild(objectsInPlay[i]);
     }
 
-    for (var i in objectsInPlay) {
-      objectsInPlay.pop(objectsInPlay[i]);
-    }
+    objectsInPlay = [];
 
     clearSequence();
     loadGameObjects();
     loadPositionSelectors();
     loadShapeSelectors();
+
     updateScores();
 
     whiteTurn.visible = true;
