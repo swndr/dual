@@ -126,23 +126,21 @@ function init() {
   var nextTurnLabel = new createjs.Text("SWITCH PLAYER", mediumLabelStyle, pink).set({x:canvas.width-210,y:65});
   nextTurnLabel.textAlign = "center";
 
-  var whiteTurn = new createjs.Shape().set({x:0,y:(445-iconRadius)});
-  whiteTurn.graphics.beginFill(pink).drawRect(0,0,25,iconRadius*2);
+  var whiteTurn = new createjs.Text("PLAY", mediumLabelStyle, pink).set({x:44,y:(448+iconRadius)});
   whiteTurn.visible = true;
   var whiteIcon = new createjs.Shape().set({x:80,y:445});
   whiteIcon.graphics.beginFill(white).drawCircle(0,0,iconRadius,iconRadius);
   var whiteScore = new createjs.Text(wScore, largeLabelStyle, white).set({x:160,y:425});
   whiteScore.textAlign = "left";
 
-  var blackTurn = new createjs.Shape().set({x:(canvas.width - 25),y:(445 - iconRadius)});
-  blackTurn.graphics.beginFill(pink).drawRect(0,0,25,iconRadius*2);
+  var blackTurn = new createjs.Text("PLAY", mediumLabelStyle, pink).set({x:canvas.width-116,y:(448+iconRadius)});
   blackTurn.visible = false;
   var blackIcon = new createjs.Shape().set({x:(canvas.width - iconRadius - 80),y:(445 - iconRadius)});
   blackIcon.graphics.beginFill(black).drawRect(0,0,iconRadius*2,iconRadius*2);
   var blackScore = new createjs.Text(bScore, largeLabelStyle, black).set({x:(canvas.width - 160),y:425});
   blackScore.textAlign = "right";
 
-  stage.addChild(newGameButton,newGameLabel,nextTurnButton,nextTurnLabel,whiteTurn,whiteIcon,whiteScore,blackTurn,blackIcon,blackScore);
+  stage.addChild(newGameButton,newGameLabel,nextTurnButton,nextTurnLabel,whiteTurn,whiteIcon,blackTurn,blackIcon);
   stage.update();
 
   // CONSTRUCT SHAPES
@@ -230,6 +228,7 @@ function init() {
       fourm.x = colVal(column);
       fourm.y = rowVal(row);
       fourm.id = i;
+      fourm.complete = false;
 
       objectsInPlay.push(fourm);
       stage.addChild(fourm);
@@ -276,12 +275,6 @@ function init() {
   var sequenceBox = new Box(416,920,704,1054,"#616060",black,"SEQUENCE");
   var actionsBox = new Box(1160,920,336,1054,white,yellow,"ACTIONS","actionsBox");
 
-  // var positionLabel = new createjs.Text("POSITION", mediumLabelStyle, green).set({x:168,y:96});
-  // positionLabel.textAlign = "center";
-
-  // var shapeLabel = new createjs.Text("SHAPE", mediumLabelStyle, green).set({x:168,y:452});
-  // shapeLabel.textAlign = "center";
-
   var logicLabel = new createjs.Text("LOGIC", mediumLabelStyle, blue).set({x:168,y:820});
   logicLabel.textAlign = "center";
 
@@ -319,11 +312,11 @@ function init() {
   var transformLabel = new createjs.Text("SWITCH", mediumLabelStyle, yellow).set({x:168,y:96});
   transformLabel.textAlign = "center";
 
-  var rotateLabel = new createjs.Text("ROTATE", mediumLabelStyle, yellow).set({x:168,y:452});
-  rotateLabel.textAlign = "center";
-
-  var flipLabel = new createjs.Text("FLIP", mediumLabelStyle, yellow).set({x:168,y:820});
+  var flipLabel = new createjs.Text("FLIP", mediumLabelStyle, yellow).set({x:168,y:452});
   flipLabel.textAlign = "center";
+
+  var rotateLabel = new createjs.Text("ROTATE", mediumLabelStyle, yellow).set({x:168,y:682});
+  rotateLabel.textAlign = "center";
 
   actionsBox.addChild(transformLabel,rotateLabel,flipLabel);
 
@@ -538,43 +531,47 @@ function init() {
 
     var arc = new createjs.Shape();
     arc.graphics.beginStroke(pink);
-    arc.graphics.setStrokeStyle(16);
+    arc.graphics.setStrokeStyle(12);
 
     var arrow = new createjs.Shape();
     arrow.graphics.beginFill(pink);
 
+    var line = new createjs.Shape();
+    line.graphics.beginStroke(lightGray);
+    line.graphics.setStrokeStyle(8);
+
     if (type == 90) {
       if (dir == "cc") {
-        arc.graphics.arc(56,94,40,270*(Math.PI/180),0);
-        arrow.graphics.lineTo(26,56);
-        arrow.graphics.lineTo(56,36);
-        arrow.graphics.lineTo(56,76);
+        line.graphics.moveTo(100,30);
+        line.graphics.lineTo(100,100);
+        line.graphics.lineTo(30,100);
+        arc.graphics.arc(74,64,34,180*(Math.PI/180),280*(Math.PI/180));
+        arrow.graphics.lineTo(20,58);
+        arrow.graphics.lineTo(40,88);
+        arrow.graphics.lineTo(60,58);
         
       } else {
-        arc.graphics.arc(74,94,40,180*(Math.PI/180),270*(Math.PI/180));
-        arrow.graphics.lineTo(104,56);
-        arrow.graphics.lineTo(74,36);
-        arrow.graphics.lineTo(74,76);
+        line.graphics.moveTo(30,30);
+        line.graphics.lineTo(30,100);
+        line.graphics.lineTo(100,100);
+        arc.graphics.arc(56,66,34,260*(Math.PI/180),0);
+        arrow.graphics.lineTo(110,58);
+        arrow.graphics.lineTo(90,88);
+        arrow.graphics.lineTo(70,58);
       }
 
     } else {
-      if (dir == "cc") {
-        arc.graphics.arc(65,68,26,180*(Math.PI/180),0);
-        arrow.graphics.lineTo(39,98);
-        arrow.graphics.lineTo(19,68);
-        arrow.graphics.lineTo(59,68);
-      } else {
-        arc.graphics.arc(65,68,26,180*(Math.PI/180),0);
-        arrow.graphics.lineTo(91,98);
-        arrow.graphics.lineTo(71,68);
-        arrow.graphics.lineTo(111,68);
+        line.graphics.moveTo(30,100);
+        line.graphics.lineTo(100,100);
+        arc.graphics.arc(65,58,26,180*(Math.PI/180),0);
+        arrow.graphics.lineTo(40,88);
+        arrow.graphics.lineTo(20,58);
+        arrow.graphics.lineTo(60,58);
       }
 
-      arrow.graphics.closePath();
+    arrow.graphics.closePath();
 
-    }
-
-    rotateButton.addChild(button,arc,arrow);
+    rotateButton.addChild(button,line,arc,arrow);
     rotateButton.x = x;
     rotateButton.y = y;
     rotateButton.cache(0,0,buttonSize,buttonSize);
@@ -598,7 +595,7 @@ function init() {
     button.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
 
     var arrow1 = new createjs.Shape();
-    arrow1.graphics.beginFill(darkGray);
+    arrow1.graphics.beginFill(lightGray);
     arrow1.graphics.lineTo(a1,a2);
     arrow1.graphics.lineTo(a3,a4);
     arrow1.graphics.lineTo(a5,a6);
@@ -696,8 +693,8 @@ function init() {
     if (set[i] == null) {
 
         animateDuration = getRandomInt(200,600);
-        elasticOriginX = getRandomInt(-200,-400);
-        elasticOriginY = getRandomInt(100,750);
+        elasticOriginX = getRandomInt(-200,200);
+        elasticOriginY = getRandomInt(0,850);
         elasticRotation = getRandomInt(-30,30);
 
       if (!(i % 2)) {
@@ -720,7 +717,7 @@ function init() {
       var placeholder = new PlaceholderButton(shuffledSelectors[i].originX,shuffledSelectors[i].originY);
 
       selectorsBox.addChild(placeholder,shuffledSelectors[i]);
-      createjs.Tween.get(shuffledSelectors[i], {override:true}).to({rotation:0,x:shuffledSelectors[i].originX,y:shuffledSelectors[i].originY}, animateDuration, createjs.Ease.CubicInOut);
+      createjs.Tween.get(shuffledSelectors[i], {override:true}).to({rotation:0,x:shuffledSelectors[i].originX,y:shuffledSelectors[i].originY}, animateDuration, createjs.Ease.backOut);
 
       set[i] = shuffledSelectors[i];
 
@@ -745,7 +742,7 @@ function init() {
     if (i % 2) { buttonRow++; }
 
   }
-  
+    console.log(set);
     stage.update();
     window.setTimeout(endTween,1000);
   }
@@ -787,38 +784,34 @@ function init() {
   transformBL.func = transBL;
   var placeholderBL = new PlaceholderButton(transformBL.x,transformBL.y);
   
-  // rotate buttons
-
-  var rotate90cc = new RotateButton(90,"cc",34,510);
-  rotate90cc.name = "r90cc";
-  rotate90cc.func = rt90cc;
-  var placeholder90cc = new PlaceholderButton(rotate90cc.x,rotate90cc.y);
-  var rotate90c = new RotateButton(90,"c",(34 + buttonSize + buttonMargin),510);
-  rotate90c.name = "r90c";
-  rotate90c.func = rt90c;
-  var placeholder90c = new PlaceholderButton(rotate90c.x,rotate90c.y);
-  var rotate180cc = new RotateButton(180,"cc",34,(510 + buttonSize + buttonMargin));
-  rotate180cc.name = "r180cc";
-  rotate180cc.func = rt180cc;
-  var placeholder180cc = new PlaceholderButton(rotate180cc.x,rotate180cc.y);
-  var rotate180c = new RotateButton(180,"c",(34 + buttonSize + buttonMargin),(510 + buttonSize + buttonMargin));
-  rotate180c.name = "r180c";
-  rotate180c.func = rt180c;
-  var placeholder180c = new PlaceholderButton(rotate180c.x,rotate180c.y);
-
   // flip buttons
 
-  var flipV = new FlipButton(40,30,90,30,65,60,65,70,40,100,90,100,34,876);
+  var flipV = new FlipButton(40,30,90,30,65,60,65,70,40,100,90,100,34,510);
   flipV.name = "fV";
   flipV.func = flipVertical;
   var placeholderFlipV = new PlaceholderButton(flipV.x,flipV.y);
-  var flipH = new FlipButton(30,40,30,90,60,65,70,65,100,40,100,90,(34 + buttonSize + buttonMargin),876);
+  var flipH = new FlipButton(30,40,30,90,60,65,70,65,100,40,100,90,(34 + buttonSize + buttonMargin),510);
   flipH.name = "fH";
   flipH.func = flipHorizontal;
   var placeholderFlipH = new PlaceholderButton(flipH.x,flipH.y);
 
-  actionsBox.addChild(placeholderTL,placeholderTR,placeholderBR,placeholderBL,placeholder90cc,placeholder90c,placeholder180cc,placeholder180c,placeholderFlipV,placeholderFlipH);
-  actionsBox.addChild(transformTL,transformTR,transformBR,transformBL,rotate90cc,rotate90c,rotate180cc,rotate180c,flipV,flipH);
+  // rotate buttons
+
+  var rotate90cc = new RotateButton(90,"cc",34,740);
+  rotate90cc.name = "r90cc";
+  rotate90cc.func = rt90cc;
+  var placeholder90cc = new PlaceholderButton(rotate90cc.x,rotate90cc.y);
+  var rotate90c = new RotateButton(90,"c",(34 + buttonSize + buttonMargin),740);
+  rotate90c.name = "r90c";
+  rotate90c.func = rt90c;
+  var placeholder90c = new PlaceholderButton(rotate90c.x,rotate90c.y);
+  var rotate180cc = new RotateButton(180,"cc",34,(740 + buttonSize + buttonMargin));
+  rotate180cc.name = "r180cc";
+  rotate180cc.func = rt180cc;
+  var placeholder180cc = new PlaceholderButton(rotate180cc.x,rotate180cc.y);
+
+  actionsBox.addChild(placeholderTL,placeholderTR,placeholderBR,placeholderBL,placeholderFlipV,placeholderFlipH,placeholder90cc,placeholder90c,placeholder180cc);
+  actionsBox.addChild(transformTL,transformTR,transformBR,transformBL,flipV,flipH,rotate90cc,rotate90c,rotate180cc);
 
   stage.update();
 
@@ -1168,7 +1161,6 @@ function init() {
   function playHighlight() {
     playButton.alpha = .8;
     stage.update();
-    console.log("play");
   }
 
   function play() {
@@ -1272,18 +1264,13 @@ function init() {
 
     for (i in objectsInPlay) {
 
-      var findMorph = objectsInPlay[i].getChildByName("morph");
-      if (findMorph != null) {
-      createjs.Tween.get(findMorph, {override:true}).to({alpha:0}, 600, createjs.Ease.cubicOut).call(removeMorph,[objectsInPlay[i],findMorph]);
-      }
-
       if (ruleSet.length == 3) {
 
         if (ruleSet[1](ruleSet[0](objectsInPlay[i]),ruleSet[2](objectsInPlay[i]))) {
           targets.push(objectsInPlay[i]);
           createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:1,}, 300, createjs.Ease.cubicIn);
         } else {
-          createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:.2,}, 300, createjs.Ease.cubicIn);
+          createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:.2,}, 400, createjs.Ease.cubicOut);
         }
    
       } else if (ruleSet.length == 1) {
@@ -1292,11 +1279,18 @@ function init() {
           targets.push(objectsInPlay[i]);
           createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:1,}, 300, createjs.Ease.cubicIn);
         } else {
-          createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:.2,}, 300, createjs.Ease.cubicIn);
+          createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:.2,}, 400, createjs.Ease.cubicOut);
         }
       } else {
-        createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:.2,}, 300, createjs.Ease.cubicIn);
+        createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:.2,}, 400, createjs.Ease.cubicOut);
       }
+
+      var findMorph = objectsInPlay[i].getChildByName("morph");
+      if (findMorph != null) {
+        removeMorph(objectsInPlay[i],findMorph);
+        //createjs.Tween.get(findMorph, {override:true}).to({alpha:0}, 600, createjs.Ease.cubicOut).call(removeMorph,[objectsInPlay[i],findMorph]);
+      }
+
     }
 
     return targets;
@@ -1465,7 +1459,7 @@ function init() {
       obj.br = tempBR;
       obj.bl = tempBL;
 
-      createjs.Tween.get(obj, {override:true}).to({rotation:-90}, 200, createjs.Ease.cubicInOut).call(redraw,[obj]);
+      createjs.Tween.get(obj, {override:true}).to({rotation:-90}, 200, createjs.Ease.getBackOut(2)).call(redraw,[obj]);
 
   }
 
@@ -1521,7 +1515,7 @@ function init() {
       obj.br = tempBR;
       obj.bl = tempBL;
 
-      createjs.Tween.get(obj, {override:true}).to({rotation:90}, 200, createjs.Ease.cubicInOut).call(redraw,[obj]);
+      createjs.Tween.get(obj, {override:true}).to({rotation:90}, 200, createjs.Ease.getBackOut(2)).call(redraw,[obj]);
   }
 
   function rt180cc(obj) {
@@ -1576,62 +1570,7 @@ function init() {
       obj.br = tempBR;
       obj.bl = tempBL;
 
-      createjs.Tween.get(obj, {override:true}).to({rotation:-180}, 200, createjs.Ease.cubicInOut).call(redraw,[obj]);
-  }
-
-  function rt180c(obj) {
-
-    var tempTL;
-    var tempTR;
-    var tempBR;
-    var tempBL;
-
-    obj.cache(-130,-130,260,260);
-    createjs.Ticker.setPaused(false);
-
-    var tl = obj.getChildByName("TL");
-    var tr = obj.getChildByName("TR");
-    var br = obj.getChildByName("BR");
-    var bl = obj.getChildByName("BL");
-
-    if (obj.tl == 0) {
-        morph(br,black,0,0,0,0,0,0);
-        tempBR = 0;
-      } else {
-        morph(br,white,0,0,0,0,radius,0);
-        tempBR = 1;
-      }
-
-    if (obj.tr == 0) {
-         morph(bl,black,-radius,0,0,0,0,0);
-        tempBL = 0;
-      } else {
-        morph(bl,white,-radius,0,0,0,0,radius);
-        tempBL = 1;
-      }
-
-     if (obj.br == 0) {
-        morph(tl,black,-radius,-radius,0,0,0,0);
-        tempTL = 0;
-      } else {
-        morph(tl,white,-radius,-radius,radius,0,0,0);
-        tempTL = 1;
-      }
-
-      if (obj.bl == 0) {
-        morph(tr,black,0,-radius,0,0,0,0);
-        tempTR = 0;
-      } else {
-        morph(tr,white,0,-radius,0,radius,0,0);
-        tempTR = 1;
-      }
-
-      obj.tl = tempTL;
-      obj.tr = tempTR;
-      obj.br = tempBR;
-      obj.bl = tempBL;
-
-      createjs.Tween.get(obj, {override:true}).to({rotation:180}, 200, createjs.Ease.cubicInOut).call(redraw,[obj]);
+      createjs.Tween.get(obj, {override:true}).to({rotation:-180}, 200, createjs.Ease.getBackOut(2)).call(redraw,[obj]);
   }
 
   function flipHorizontal(obj) {
@@ -1686,7 +1625,7 @@ function init() {
       obj.br = tempBR;
       obj.bl = tempBL;
 
-      createjs.Tween.get(obj, {override:true}).to({scaleX:-1}, 400, createjs.Ease.cubicInOut).call(redraw,[obj]);
+      createjs.Tween.get(obj, {override:true}).to({scaleX:-1}, 300, createjs.Ease.cubicInOut).call(redraw,[obj]);
   }
 
   function flipVertical(obj) {
@@ -1757,7 +1696,7 @@ function init() {
         
         morphHighlight.graphics.clear().beginFill(pink).drawRoundRectComplex(x,y,radius,radius,tl,tr,br,bl);
         morphHighlight.name = "morph";
-        morphHighlight.alpha = .8;
+        morphHighlight.alpha = .95;
         corner.parent.addChild(morphHighlight);
         stage.update();
 
@@ -1792,9 +1731,13 @@ function init() {
 
   for (var i = 0; i < objectsInPlay.length; i++) {
     if (objectsInPlay[i].tl == 0 && objectsInPlay[i].tr == 0 && objectsInPlay[i].br == 0 && objectsInPlay[i].bl == 0) {
+      objectsInPlay[i].complete = "b";
       bScore++;
     } else if (objectsInPlay[i].tl == 1 && objectsInPlay[i].tr == 1 && objectsInPlay[i].br == 1 && objectsInPlay[i].bl == 1) {
+      objectsInPlay[i].complete = "w";
       wScore++;
+    } else {
+      objectsInPlay[i].complete = false;
     }
   } 
     blackScore.text = bScore;
@@ -1802,6 +1745,72 @@ function init() {
     stage.update();
 
   } 
+
+  function checkWin() {
+
+    var success = [];
+    var bRowsOrCols = 0;
+    var wRowsOrCols = 0;
+
+    for (var a = 0; a < 4; a++) {
+
+      var bColCount = 0;
+      var bRowCount = 0;
+      var wColCount = 0;
+      var wRowCount = 0;
+
+      for (var i = 0; i < objectsInPlay.length; i++) {
+
+        if (objectsInPlay[i].complete == "b" && objectsInPlay[i].x == colVal(a)) {
+          bColCount++;
+        } else if (objectsInPlay[i].complete == "w" && objectsInPlay[i].x == colVal(a)) {
+          wColCount++;
+        } else if (objectsInPlay[i].complete == "b" && objectsInPlay[i].y == rowVal(a)) {
+          bRowCount++;
+        } else if (objectsInPlay[i].complete == "w" && objectsInPlay[i].y == rowVal(a)) {
+          wRowCount++;
+        }
+      }
+
+      if (bColCount == 4) {
+        success.push([["b"],["col"],[a]]);
+        console.log("BCOL " + a);
+      } else if (bRowCount == 4) {
+        success.push([["b"],["row"],[a]]);
+        console.log("BROW " + a);
+      } else if (wColCount == 4) {
+        success.push([["w"],["col"],[a]]);
+        console.log("WCOL " + a);
+      } else if (wRowCount == 4) {
+        success.push([["w"],["row"],[a]]);
+        console.log("WROW " + a);
+      }
+    }
+
+    if (success.length == 1) {
+      if (success[0][0] == "b") {
+        console.log("BLACK WINS");
+      } else {
+        console.log("WHITE WINS");
+      }
+    } else if (success.length > 1) {
+      for (i in success) {
+        if (success[i][0] == "b") {
+          bRowsOrCols++;
+        } else {
+          wRowsOrCols++;
+        }
+      }
+
+      if (bRowsOrCols > wRowsOrCols) {
+        console.log("BLACK WINS");
+      } else if (bRowsOrCols < wRowsOrCols) {
+        console.log("WHITE WINS");
+      } else {
+        console.log("DRAW");
+      }
+    }
+  }
 
   // GAME MGMT
 
@@ -1831,7 +1840,7 @@ function init() {
       blackTurn.visible = true;
 
       for (var i = 0; i < selectorsP1.length; i++) {
-        if (selectorsP1[i].inSlot != false || selectorsP1[i].inSlot === 0) {
+        if (selectorsP1[i].inSlot !== false) {
           selectorsP1[i] = null;
         }
       }
@@ -1843,7 +1852,7 @@ function init() {
       blackTurn.visible = false;
       
       for (var i = 0; i < selectorsP2.length; i++) {
-        if (selectorsP2[i].inSlot != false || selectorsP2[i].inSlot === 0) {
+        if (selectorsP2[i].inSlot !== false) {
           selectorsP2[i] = null;
         }
       }
@@ -1851,6 +1860,7 @@ function init() {
       loadSelectors(selectorsP1);
     }
 
+    checkWin();
     stage.update();
   }
 
