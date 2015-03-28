@@ -42,6 +42,12 @@ function init() {
   var shuffledSelectors = [];
   var selectorsP1 = [];
   var selectorsP2 = [];
+
+  var animateDuration;
+  var elasticOriginX;
+  var elasticOriginY;
+  var elasticRotation;
+
   var andCount = 4;
   var orCount = 4;
 
@@ -683,25 +689,38 @@ function init() {
     }
   }
 
+  createjs.Ticker.setPaused(false);
+
   for (var i = 0; i < 10; i++) {
 
     if (set[i] == null) {
 
+        animateDuration = getRandomInt(200,600);
+        elasticOriginX = getRandomInt(-200,-400);
+        elasticOriginY = getRandomInt(100,750);
+        elasticRotation = getRandomInt(-30,30);
+
       if (!(i % 2)) {
-        shuffledSelectors[i].x = 34;
-        shuffledSelectors[i].y = 106 + (buttonRow * (buttonSize + buttonMargin));
-        shuffledSelectors[i].originX = shuffledSelectors[i].x
-        shuffledSelectors[i].originY = shuffledSelectors[i].y
-        var placeholder = new PlaceholderButton(shuffledSelectors[i].x,shuffledSelectors[i].y);
-        selectorsBox.addChild(placeholder,shuffledSelectors[i]);
+
+        shuffledSelectors[i].x = elasticOriginX;
+        shuffledSelectors[i].y = elasticOriginY;
+        shuffledSelectors[i].rotation = elasticRotation;
+        shuffledSelectors[i].originX = 34;
+        shuffledSelectors[i].originY = 106 + (buttonRow * (buttonSize + buttonMargin));
+
       } else {
-        shuffledSelectors[i].x = (34 + buttonSize + buttonMargin);
-        shuffledSelectors[i].y = 106 + (buttonRow * (buttonSize + buttonMargin));
-        shuffledSelectors[i].originX = shuffledSelectors[i].x
-        shuffledSelectors[i].originY = shuffledSelectors[i].y
-        var placeholder = new PlaceholderButton(shuffledSelectors[i].x,shuffledSelectors[i].y);
-        selectorsBox.addChild(placeholder,shuffledSelectors[i]);
+
+        shuffledSelectors[i].x = elasticOriginX;
+        shuffledSelectors[i].y = elasticOriginY;
+        shuffledSelectors[i].rotation = elasticRotation;
+        shuffledSelectors[i].originX = (34 + buttonSize + buttonMargin);
+        shuffledSelectors[i].originY = 106 + (buttonRow * (buttonSize + buttonMargin));
       }
+
+      var placeholder = new PlaceholderButton(shuffledSelectors[i].originX,shuffledSelectors[i].originY);
+
+      selectorsBox.addChild(placeholder,shuffledSelectors[i]);
+      createjs.Tween.get(shuffledSelectors[i], {override:true}).to({rotation:0,x:shuffledSelectors[i].originX,y:shuffledSelectors[i].originY}, animateDuration, createjs.Ease.CubicInOut);
 
       set[i] = shuffledSelectors[i];
 
@@ -712,22 +731,23 @@ function init() {
         set[i].y = 106 + (buttonRow * (buttonSize + buttonMargin));
         set[i].originX = set[i].x
         set[i].originY = set[i].y
-        var placeholder = new PlaceholderButton(set[i].x,set[i].y);
-        selectorsBox.addChild(placeholder,set[i]);
       } else {
         set[i].x = (34 + buttonSize + buttonMargin);
         set[i].y = 106 + (buttonRow * (buttonSize + buttonMargin));
         set[i].originX = set[i].x
         set[i].originY = set[i].y
-        var placeholder = new PlaceholderButton(set[i].x,set[i].y);
-        selectorsBox.addChild(placeholder,set[i]);
       }
+
+      var placeholder = new PlaceholderButton(set[i].x,set[i].y);
+      selectorsBox.addChild(placeholder,set[i]);
     }
 
     if (i % 2) { buttonRow++; }
+
   }
-    
+  
     stage.update();
+    window.setTimeout(endTween,1000);
   }
 
   loadSelectors(selectorsP1);
@@ -1800,8 +1820,6 @@ function init() {
       createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:1,}, 300, createjs.Ease.cubicIn);
       } else {
         createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:1,}, 300, createjs.Ease.cubicIn);
-        window.setTimeout(endTween,500); 
-        console.log("ended");
       }
     }
 
@@ -1813,10 +1831,8 @@ function init() {
       blackTurn.visible = true;
 
       for (var i = 0; i < selectorsP1.length; i++) {
-        console.log(i + " " + selectorsP1[i].inSlot);
         if (selectorsP1[i].inSlot != false || selectorsP1[i].inSlot === 0) {
           selectorsP1[i] = null;
-          console.log(i + " " + selectorsP1[i]);
         }
       }
 
