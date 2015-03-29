@@ -692,19 +692,49 @@ function init() {
 
   buttonRow = 0;
 
-  shuffledRowSelectors = shuffle(rowSelectors); // randomize pos selectors
-  shuffledColSelectors = shuffle(colSelectors); // randomize pos selectors
-  shuffledShapeSelectors = shuffle(shapeSelectors); // randomize shape selectors
+  function buildSet() {
 
-  for (var i = 0; i < 10; i++) {
-    if (i < 2) {
-      shuffledSelectors[i] = shuffledRowSelectors[i];
-    } else if (i >= 2 && i < 4) {
-      shuffledSelectors[i] = shuffledColSelectors[i];
-    } else {
-      shuffledSelectors[i] = new ShapeButton(shuffledShapeSelectors[i][0],shuffledShapeSelectors[i][1],shuffledShapeSelectors[i][2],shuffledShapeSelectors[i][3],0,0);
+    var dupe = false;
+
+    shuffledRowSelectors = shuffle(rowSelectors); // randomize pos selectors
+    shuffledColSelectors = shuffle(colSelectors); // randomize pos selectors
+    shuffledShapeSelectors = shuffle(shapeSelectors); // randomize shape selectors
+
+    for (var i = 0; i < 10; i++) {
+      if (i < 2) {
+        shuffledSelectors[i] = shuffledRowSelectors[i];
+      } else if (i >= 2 && i < 4) {
+        shuffledSelectors[i] = shuffledColSelectors[i];
+      } else {
+        shuffledSelectors[i] = new ShapeButton(shuffledShapeSelectors[i][0],shuffledShapeSelectors[i][1],shuffledShapeSelectors[i][2],shuffledShapeSelectors[i][3],0,0);
+      }
     }
+
+    for (i in shuffledSelectors) {
+      for (n in set) {
+        if (set[n] != null) {
+          if (n < 2) {
+            if (shuffledSelectors[i].val == set[n].val) {
+              dupe = true;
+            }
+          } else if (n >= 2 && i < 4) {
+            if (shuffledSelectors[i].val == set[n].val) {
+              dupe = true;
+            }
+          } else {
+            if ((shuffledSelectors[i].val[0] == set[n].val[0]) && (shuffledSelectors[i].val[1] == set[n].val[1]) && (shuffledSelectors[i].val[2] == set[n].val[2]) && (shuffledSelectors[i].val[3] == set[n].val[3])) {
+              dupe = true;
+            }
+          }
+        }
+      }
+    }
+
+  if (dupe == true) {buildSet();}
+
   }
+
+  buildSet();
 
   createjs.Ticker.setPaused(false);
 
