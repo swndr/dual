@@ -126,6 +126,23 @@ function init() {
   var nextTurnLabel = new createjs.Text("SWITCH PLAYER", mediumLabelStyle, pink).set({x:canvas.width-210,y:65});
   nextTurnLabel.textAlign = "center";
 
+  var whiteTurn = new createjs.Shape().set({x:0,y:(445-iconRadius)});
+  whiteTurn.graphics.beginFill(pink).drawRect(0,0,25,iconRadius*2);
+  whiteTurn.visible = true;
+  var whiteIcon = new createjs.Shape().set({x:80,y:445});
+  whiteIcon.graphics.beginFill(white).drawCircle(0,0,iconRadius,iconRadius);
+  var whiteScore = new createjs.Text(wScore, largeLabelStyle, white).set({x:160,y:425});
+  whiteScore.textAlign = "left";
+
+  var blackTurn = new createjs.Shape().set({x:(canvas.width - 25),y:(445 - iconRadius)});
+  blackTurn.graphics.beginFill(pink).drawRect(0,0,25,iconRadius*2);
+  blackTurn.visible = false;
+  var blackIcon = new createjs.Shape().set({x:(canvas.width - iconRadius - 80),y:(445 - iconRadius)});
+  blackIcon.graphics.beginFill(black).drawRect(0,0,iconRadius*2,iconRadius*2);
+  var blackScore = new createjs.Text(bScore, largeLabelStyle, black).set({x:(canvas.width - 160),y:425});
+  blackScore.textAlign = "right";
+
+  /*
   var whiteTurn = new createjs.Text("PLAY", mediumLabelStyle, pink).set({x:44,y:(448+iconRadius)});
   whiteTurn.visible = true;
   var whiteIcon = new createjs.Shape().set({x:80,y:445});
@@ -138,7 +155,7 @@ function init() {
   var blackIcon = new createjs.Shape().set({x:(canvas.width - iconRadius - 80),y:(445 - iconRadius)});
   blackIcon.graphics.beginFill(black).drawRect(0,0,iconRadius*2,iconRadius*2);
   var blackScore = new createjs.Text(bScore, largeLabelStyle, black).set({x:(canvas.width - 160),y:425});
-  blackScore.textAlign = "right";
+  blackScore.textAlign = "right";*/
 
   stage.addChild(newGameButton,newGameLabel,nextTurnButton,nextTurnLabel,whiteTurn,whiteIcon,blackTurn,blackIcon);
   stage.update();
@@ -254,7 +271,8 @@ function init() {
     var bg = new createjs.Shape();
     bg.graphics.beginFill(bgColor);
     bg.graphics.drawRoundRect(0,0,w,h,10);
-    if (bgColor == white) { bg.alpha = .7; }
+    bg.name = "bg";
+    //if (bgColor == white) { bg.alpha = .7; }
 
     var header = new createjs.Shape();
     header.graphics.beginFill(color);
@@ -271,9 +289,9 @@ function init() {
     return box;
   }
 
-  var selectorsBox = new Box(40,920,336,1054,white,green,"CONDITIONS");
+  var selectorsBox = new Box(40,920,336,1054,"#F9F9F9",green,"CONDITIONS");
   var sequenceBox = new Box(416,920,704,1054,"#616060",black,"SEQUENCE");
-  var actionsBox = new Box(1160,920,336,1054,white,yellow,"ACTIONS","actionsBox");
+  var actionsBox = new Box(1160,920,336,1054,"#F9F9F9",yellow,"ACTIONS","actionsBox");
 
   var logicLabel = new createjs.Text("LOGIC", mediumLabelStyle, blue).set({x:168,y:820});
   logicLabel.textAlign = "center";
@@ -309,13 +327,13 @@ function init() {
 
   sequenceBox.addChild(clearButton,clearLabel,playButton,playLabel);
 
-  var transformLabel = new createjs.Text("SWITCH", mediumLabelStyle, yellow).set({x:168,y:96});
+  var transformLabel = new createjs.Text("SWITCH", mediumLabelStyle, yellow).set({x:168,y:106});
   transformLabel.textAlign = "center";
 
-  var flipLabel = new createjs.Text("FLIP", mediumLabelStyle, yellow).set({x:168,y:452});
+  var flipLabel = new createjs.Text("FLIP", mediumLabelStyle, yellow).set({x:168,y:464});
   flipLabel.textAlign = "center";
 
-  var rotateLabel = new createjs.Text("ROTATE", mediumLabelStyle, yellow).set({x:168,y:682});
+  var rotateLabel = new createjs.Text("ROTATE", mediumLabelStyle, yellow).set({x:168,y:680});
   rotateLabel.textAlign = "center";
 
   actionsBox.addChild(transformLabel,rotateLabel,flipLabel);
@@ -328,12 +346,14 @@ function init() {
   function PlaceholderButton(x,y) {
 
     var button = new createjs.Shape();
-    button.graphics.beginFill(gray);
+    button.graphics.beginFill(lightGray);
     button.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
+    button.alpha = .4;
+    button.type = "placeholder";
 
     button.x = x;
     button.y = y;
-    button.cache(0,0,buttonSize,buttonSize);
+    //button.cache(0,0,buttonSize,buttonSize);
 
     return button;
   }
@@ -659,7 +679,7 @@ function init() {
   var toClear = [];
 
   for (i in selectorsBox.children) {
-    if (selectorsBox.children[i].type == "position" || selectorsBox.children[i].type == "shape") {
+    if (selectorsBox.children[i].type == "position" || selectorsBox.children[i].type == "shape" || selectorsBox.children[i].type == "placeholder") {
       toClear.push(selectorsBox.children[i]);
     } 
   }
@@ -703,7 +723,7 @@ function init() {
         shuffledSelectors[i].y = elasticOriginY;
         shuffledSelectors[i].rotation = elasticRotation;
         shuffledSelectors[i].originX = 34;
-        shuffledSelectors[i].originY = 106 + (buttonRow * (buttonSize + buttonMargin));
+        shuffledSelectors[i].originY = 110 + (buttonRow * (buttonSize + buttonMargin));
 
       } else {
 
@@ -711,7 +731,7 @@ function init() {
         shuffledSelectors[i].y = elasticOriginY;
         shuffledSelectors[i].rotation = elasticRotation;
         shuffledSelectors[i].originX = (34 + buttonSize + buttonMargin);
-        shuffledSelectors[i].originY = 106 + (buttonRow * (buttonSize + buttonMargin));
+        shuffledSelectors[i].originY = 110 + (buttonRow * (buttonSize + buttonMargin));
       }
 
       var placeholder = new PlaceholderButton(shuffledSelectors[i].originX,shuffledSelectors[i].originY);
@@ -725,12 +745,12 @@ function init() {
 
       if (!(i % 2)) {
         set[i].x = 34;
-        set[i].y = 106 + (buttonRow * (buttonSize + buttonMargin));
+        set[i].y = 110 + (buttonRow * (buttonSize + buttonMargin));
         set[i].originX = set[i].x
         set[i].originY = set[i].y
       } else {
         set[i].x = (34 + buttonSize + buttonMargin);
-        set[i].y = 106 + (buttonRow * (buttonSize + buttonMargin));
+        set[i].y = 110 + (buttonRow * (buttonSize + buttonMargin));
         set[i].originX = set[i].x
         set[i].originY = set[i].y
       }
@@ -767,30 +787,30 @@ function init() {
 
   // transform buttons
   
-  var transformTL = new TransformButton(50,50,iconRadius,0,0,0,35,35,34,(16 + buttonSize + buttonMargin));
+  var transformTL = new TransformButton(50,50,iconRadius,0,0,0,35,35,34,(34 + buttonSize + buttonMargin));
   transformTL.name = "transTL";
   transformTL.func = transTL;
   var placeholderTL = new PlaceholderButton(transformTL.x,transformTL.y);
-  var transformTR = new TransformButton(35,50,0,iconRadius,0,0,50,35,(34 + buttonSize + buttonMargin),(16 + buttonSize + buttonMargin));
+  var transformTR = new TransformButton(35,50,0,iconRadius,0,0,50,35,(34 + buttonSize + buttonMargin),(34 + buttonSize + buttonMargin));
   transformTR.name = "transTR";
   transformTR.func = transTR;
   var placeholderTR = new PlaceholderButton(transformTR.x,transformTR.y);
-  var transformBR = new TransformButton(35,35,0,0,iconRadius,0,50,50,(34 + buttonSize + buttonMargin),(16 + (buttonSize*2) + (buttonMargin*2)));
+  var transformBR = new TransformButton(35,35,0,0,iconRadius,0,50,50,(34 + buttonSize + buttonMargin),(34 + (buttonSize*2) + (buttonMargin*2)));
   transformBR.name = "transBR";
   transformBR.func = transBR;
   var placeholderBR = new PlaceholderButton(transformBR.x,transformBR.y);
-  var transformBL = new TransformButton(50,35,0,0,0,iconRadius,35,50,34,(16 + (buttonSize*2) + (buttonMargin*2)));
+  var transformBL = new TransformButton(50,35,0,0,0,iconRadius,35,50,34,(34 + (buttonSize*2) + (buttonMargin*2)));
   transformBL.name = "transBL";
   transformBL.func = transBL;
   var placeholderBL = new PlaceholderButton(transformBL.x,transformBL.y);
   
   // flip buttons
 
-  var flipV = new FlipButton(40,30,90,30,65,60,65,70,40,100,90,100,34,510);
+  var flipV = new FlipButton(40,30,90,30,65,60,65,70,40,100,90,100,34,524);
   flipV.name = "fV";
   flipV.func = flipVertical;
   var placeholderFlipV = new PlaceholderButton(flipV.x,flipV.y);
-  var flipH = new FlipButton(30,40,30,90,60,65,70,65,100,40,100,90,(34 + buttonSize + buttonMargin),510);
+  var flipH = new FlipButton(30,40,30,90,60,65,70,65,100,40,100,90,(34 + buttonSize + buttonMargin),524);
   flipH.name = "fH";
   flipH.func = flipHorizontal;
   var placeholderFlipH = new PlaceholderButton(flipH.x,flipH.y);
@@ -1839,6 +1859,11 @@ function init() {
       whiteTurn.visible = false;
       blackTurn.visible = true;
 
+      selectorsBox.getChildByName("bg").graphics.beginFill(black);
+      selectorsBox.getChildByName("bg").graphics.drawRoundRect(0,0,336,1054,10);
+      actionsBox.getChildByName("bg").graphics.beginFill(black);
+      actionsBox.getChildByName("bg").graphics.drawRoundRect(0,0,336,1054,10);
+
       for (var i = 0; i < selectorsP1.length; i++) {
         if (selectorsP1[i].inSlot !== false) {
           selectorsP1[i] = null;
@@ -1851,6 +1876,11 @@ function init() {
       whiteTurn.visible = true;
       blackTurn.visible = false;
       
+      selectorsBox.getChildByName("bg").graphics.beginFill("#F9F9F9");
+      selectorsBox.getChildByName("bg").graphics.drawRoundRect(0,0,336,1054,10);
+      actionsBox.getChildByName("bg").graphics.beginFill("#F9F9F9");
+      actionsBox.getChildByName("bg").graphics.drawRoundRect(0,0,336,1054,10);
+
       for (var i = 0; i < selectorsP2.length; i++) {
         if (selectorsP2[i].inSlot !== false) {
           selectorsP2[i] = null;
