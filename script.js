@@ -64,6 +64,135 @@ function init() {
   createjs.Ticker.addEventListener("tick", tick);
   createjs.Ticker.setPaused(true);
 
+  // INTRO AND TUTORIAL
+
+  var startOverlay = new createjs.Container();
+
+  function loadIntro() {
+
+    var startOverlayBG = new createjs.Shape();
+    startOverlayBG.graphics.beginFill(green).drawRect(0,0,canvas.width,canvas.height);
+
+    var logo = new createjs.Container();
+    logo.y = 700;
+
+    var D = new GameObject(0,1,1,0).set({x:centerX-450,y:0});
+    D.scaleX = 1.8;
+    D.scaleY = 1.8;
+
+    var U = new GameObject(0,0,1,1).set({x:centerX-150,y:0});
+    U.scaleX = 1.8;
+    U.scaleY = 1.8;
+
+    var A = new GameObject(1,1,0,0).set({x:centerX+150,y:0});
+    A.scaleX = 1.8;
+    A.scaleY = 1.8;
+
+    var L = new GameObject(0,1,0,0).set({x:centerX+450,y:0});
+    L.scaleX = 1.8;
+    L.scaleY = 1.8;
+
+    var pathForD = new createjs.Shape();
+    pathForD.graphics.beginStroke(lightGray).setStrokeStyle(20,"butt");
+    pathForD.graphics.moveTo((centerX-450-(75*1.8))+10,(-(75*1.8))+10);
+    pathForD.graphics.lineTo((centerX-450)+10,(-(75*1.8))+10);
+    pathForD.graphics.arc((centerX-450),0,(75*1.8)-10,270*(Math.PI/180),90*(Math.PI/180));
+    pathForD.graphics.lineTo((centerX-450-(75*1.8)+10),(75*1.8)-10);
+    pathForD.graphics.lineTo((centerX-450-(75*1.8)+10),-(75*1.8));
+
+    var pathForU = new createjs.Shape();
+    pathForU.graphics.beginStroke(lightGray).setStrokeStyle(20,"butt");
+    pathForU.graphics.moveTo((centerX-150-(75*1.8))+10,-(75*1.8));
+    pathForU.graphics.lineTo((centerX-150-(75*1.8)+10),0);
+    pathForU.graphics.arc((centerX-150),0,(75*1.8)-10,180*(Math.PI/180),360*(Math.PI/180),true);
+    pathForU.graphics.lineTo((centerX-150+(75*1.8))-10,-(75*1.8));
+
+    var pathForA = new createjs.Shape();
+    pathForA.graphics.beginStroke(lightGray).setStrokeStyle(20,"butt");
+    pathForA.graphics.moveTo((centerX+150-(75*1.8))+10,(75*1.8));
+    pathForA.graphics.lineTo((centerX+150-(75*1.8))+10,0);
+    pathForA.graphics.arc((centerX+150),0,(75*1.8)-10,180*(Math.PI/180),360*(Math.PI/180));
+    pathForA.graphics.lineTo((centerX+150+(75*1.8))-10,(75*1.8));
+
+    var pathForL = new createjs.Shape();
+    pathForL.graphics.beginStroke(lightGray).setStrokeStyle(20,"butt");
+    pathForL.graphics.moveTo((centerX+450-(75*1.8))+10,-(75*1.8));
+    pathForL.graphics.lineTo((centerX+450-(75*1.8))+10,(75*1.8)-10);
+    pathForL.graphics.lineTo((centerX+450+(75*1.8)),(75*1.8)-10);
+
+    logo.addChild(D,pathForD,U,pathForU,A,pathForA,L,pathForL);
+
+    var tagline = new createjs.Text("A GAME ABOUT COMPUTATION","bold 60px Avenir-Heavy",black).set({x:centerX,y:900});
+    tagline.textAlign = "center";
+
+    var learn = new createjs.Container().set({x:centerX,y:1200});
+    var learnButton = new createjs.Shape().set({x:-200,y:-60});
+    learnButton.graphics.beginFill(green).drawRect(0,0,400,200);
+    learnButton.alpha = 0.1;
+    var learnText = new createjs.Text("LEARN","bold 60px Avenir-Heavy",white).set({x:0,y:0});
+    learnText.textAlign = "center";
+
+    learn.addChild(learnButton,learnText);
+    learn.addEventListener("mousedown",highlightLearn);
+    learn.addEventListener("pressup",beginTutorial);
+
+    var start = new createjs.Container().set({x:centerX,y:1500});
+    var startButton = new createjs.Shape().set({x:-200,y:-60});
+    startButton.graphics.beginFill(green).drawRect(0,0,400,200);
+    startButton.alpha = 0.1;
+    var startText = new createjs.Text("START","bold 60px Avenir-Heavy",white).set({x:0,y:0});
+    startText.textAlign = "center";
+
+    start.addChild(startButton,startText);
+    start.addEventListener("mousedown",highlightStart);
+    start.addEventListener("pressup",beginGame);
+
+    startOverlay.addChild(startOverlayBG,logo,tagline,learn,start);
+    stage.addChild(startOverlay);
+    stage.update();
+
+  }
+
+  loadIntro();
+
+  // TUTORIAL
+
+  function beginTutorial(event) {
+    event.currentTarget.alpha = 1;
+    stage.update();
+  }
+
+  function highlightLearn(event) {
+    event.currentTarget.alpha = .8;
+    stage.update();
+  }
+
+
+  // BEGIN GAME
+
+  function beginGame(event) {
+
+    createjs.Ticker.setPaused(false);
+
+    event.currentTarget.alpha = 1;
+    startOverlay.cache(0,0,canvas.width,canvas.height);
+    stage.removeAllChildren();
+    loadGame();
+    stage.addChild(startOverlay);
+    stage.update();
+
+    createjs.Tween.get(startOverlay, {override:true}).to({y:canvas.height}, 1000, createjs.Ease.cubicOut).call(loadSelectors,[selectorsP1]);
+    
+  }
+
+  function highlightStart(event) {
+    event.currentTarget.alpha = .8;
+    stage.update();
+  }
+
+
+
+
   // BOARD
 
   var board = new createjs.Container();
@@ -917,9 +1046,13 @@ function loadSelectors(set) {
 
   // ADD BOARD & GAME OBJECTS
 
-  function loadBoard() {
+  function loadGame() {
     stage.addChild(board,sequenceBox,selectorsBox,actionsBox);
-    stage.update();
+    popSelectors(selectorsP1);
+    popSelectors(selectorsP2);
+    loadGameObjects(4);
+    loadSelectors(selectorsP1);
+    //stage.update();
   }
 
   function loadGameObjects(gridSize) {
@@ -949,12 +1082,8 @@ function loadSelectors(set) {
     stage.update();
   }
 
-  popSelectors(selectorsP1);
-  popSelectors(selectorsP2);
-  loadBoard();
-  loadGameObjects(4);
-  loadSelectors(selectorsP1);
-
+  // LOAD GAME
+  // loadGame();
 
   // INTERACTION
 
@@ -1655,10 +1784,7 @@ function loadSelectors(set) {
     actionsBox.mouseEnabled = true;
 
     clearSequence();
-    loadBoard();
-    loadGameObjects(4);
-    popSelectors(selectorsP1);
-    popSelectors(selectorsP2);
+    loadGame();
     updateScores();
 
     whiteTurn.visible = true;
