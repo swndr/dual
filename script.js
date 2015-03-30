@@ -25,10 +25,6 @@ function init() {
   var buttonSize = 130;
   var buttonRow = 0;
   var buttonMargin = 8;
-  var gridSize = 4;
-  var gridSpacing = 180;
-  var gridLeft = ((canvas.width - ((gridSize-1) * gridSpacing))/2);
-  var gridTop = ((890 - ((gridSize-1) * gridSpacing))/2);
 
   var dropPosition = null;
 
@@ -81,34 +77,8 @@ function init() {
 
   // BUILD GRID
 
-  var grid = new createjs.Shape();
-
-  grid.graphics.beginStroke(white);
-  grid.graphics.setStrokeStyle(2);
-  grid.alpha = .2;
-  
-  for (var i = 0; i < gridSize; i++) {
-    grid.graphics.moveTo(gridLeft+(i*gridSpacing),0);
-    grid.graphics.lineTo(gridLeft+(i*gridSpacing),890);
-    grid.graphics.moveTo(0,(gridTop+(i*gridSpacing)));
-    grid.graphics.lineTo(canvas.width,(gridTop+(i*gridSpacing)));
-  }
-
-  board.addChild(bg,grid);
-  grid.cache(0,0,canvas.width,890);
-
-  for (var i = 0; i < gridSize; i++) {
-      var hLabel = new createjs.Text(i, lightLabelStyle, pink);
-      hLabel.x = (gridLeft-8) + (i*gridSpacing);
-      hLabel.y = gridTop - 150;
-      hLabel.alpha = .5;
-    var vLabel = new createjs.Text(i, lightLabelStyle, pink);
-      vLabel.x = gridLeft - 150;
-      vLabel.y = (gridTop-18) + (i*gridSpacing);
-      vLabel.alpha = .5;
-    board.addChild(hLabel);
-    board.addChild(vLabel);
-  }
+  var boardGrid = new Grid(4,180,890);
+  board.addChild(boardGrid);
 
   // GAME MGMT & SCORES
 
@@ -521,6 +491,44 @@ function loadSelectors(set) {
 
   // CONSTRUCTORS
 
+  function Grid(gridSize,gridSpacing,gridHeight) {
+
+    var gridLeft = ((canvas.width - ((gridSize-1) * gridSpacing))/2);
+    var gridTop = ((gridHeight - ((gridSize-1) * gridSpacing))/2);
+
+    var gridContainer = new createjs.Container();
+
+    var grid = new createjs.Shape();
+
+    grid.graphics.beginStroke(white);
+    grid.graphics.setStrokeStyle(2);
+    grid.alpha = .2;
+    
+    for (var i = 0; i < gridSize; i++) {
+      grid.graphics.moveTo(gridLeft+(i*gridSpacing),0);
+      grid.graphics.lineTo(gridLeft+(i*gridSpacing),gridHeight);
+      grid.graphics.moveTo(0,(gridTop+(i*gridSpacing)));
+      grid.graphics.lineTo(canvas.width,(gridTop+(i*gridSpacing)));
+    }
+
+    gridContainer.addChild(bg,grid);
+    grid.cache(0,0,canvas.width,gridHeight);
+
+    for (var i = 0; i < gridSize; i++) {
+        var hLabel = new createjs.Text(i, lightLabelStyle, pink);
+        hLabel.x = (gridLeft-8) + (i*gridSpacing);
+        hLabel.y = gridTop - 150;
+        hLabel.alpha = .5;
+      var vLabel = new createjs.Text(i, lightLabelStyle, pink);
+        vLabel.x = gridLeft - 150;
+        vLabel.y = (gridTop-18) + (i*gridSpacing);
+        vLabel.alpha = .5;
+      gridContainer.addChild(hLabel);
+      gridContainer.addChild(vLabel);
+    }
+    return gridContainer;
+  }
+
   function GameObject(tl,tr,br,bl) {
 
     var gameObject = new createjs.Container();
@@ -907,7 +915,6 @@ function loadSelectors(set) {
   }
 
 
-
   // ADD BOARD & GAME OBJECTS
 
   function loadBoard() {
@@ -915,7 +922,7 @@ function loadSelectors(set) {
     stage.update();
   }
 
-  function loadGameObjects() {
+  function loadGameObjects(gridSize) {
 
     var row = 0;
     var column = 0;
@@ -927,8 +934,8 @@ function loadSelectors(set) {
       if (i/(row+1) == gridSize) { row++; column = 0; }
 
       var fourm = new GameObject(startObjects[i][0],startObjects[i][1],startObjects[i][2],startObjects[i][3]);
-      fourm.x = colVal(column);
-      fourm.y = rowVal(row);
+      fourm.x = colVal(column,4,180);
+      fourm.y = rowVal(row,4,180,890);
       fourm.id = i;
       fourm.complete = false;
 
@@ -945,7 +952,7 @@ function loadSelectors(set) {
   popSelectors(selectorsP1);
   popSelectors(selectorsP2);
   loadBoard();
-  loadGameObjects();
+  loadGameObjects(4);
   loadSelectors(selectorsP1);
 
 
@@ -1349,11 +1356,11 @@ function loadSelectors(set) {
 
       if (rule.name == "col") {
         ruleComponents = function(obj) {
-          if (obj.x == colVal(rule.val)) {return true;}
+          if (obj.x == colVal(rule.val,4,180)) {return true;}
         }
       } else {
         ruleComponents = function(obj) {
-        if (obj.y == rowVal(rule.val)) {return true;}
+        if (obj.y == rowVal(rule.val,4,180,890)) {return true;}
         }
       }
 
@@ -1547,7 +1554,6 @@ function loadSelectors(set) {
     }
 
     var winOverlay = new createjs.Container().set({x:0,y:canvas.height});
-    winOverlay.addEventListener("mousedown",function() {console.log("tap");});
 
     var winBG = new createjs.Shape();
     winBG.graphics.beginFill(pink).drawRect(0,0,canvas.width,(canvas.height-890));
@@ -1557,6 +1563,9 @@ function loadSelectors(set) {
 
     winOverlay.addChild(winBG,victory);
     stage.addChild(winOverlay);
+    selectorsBox.mouseEnabled = false;
+    sequenceBox.mouseEnabled = false;
+    actionsBox.mouseEnabled = false;
     stage.update();
 
     createjs.Tween.get(winOverlay, {override:true}).to({y:890}, 300, createjs.Ease.cubicInOut).call(endTween);
@@ -1641,9 +1650,13 @@ function loadSelectors(set) {
       selectorsP2[i] = null;
     }
 
+    selectorsBox.mouseEnabled = true;
+    sequenceBox.mouseEnabled = true;
+    actionsBox.mouseEnabled = true;
+
     clearSequence();
     loadBoard();
-    loadGameObjects();
+    loadGameObjects(4);
     popSelectors(selectorsP1);
     popSelectors(selectorsP2);
     updateScores();
@@ -2038,8 +2051,15 @@ function loadSelectors(set) {
 
   // UTILITIES
 
-  function rowVal (r) {return (gridTop-gridSpacing)+((r+1)*gridSpacing)} // calcs row
-  function colVal (c) {return (gridLeft+(c*gridSpacing))} // calcs col
+  function rowVal (r,gridSize,gridSpacing,gridHeight) { // calcs row
+    var gridTop = ((gridHeight - ((gridSize-1) * gridSpacing))/2);
+    return (gridTop-gridSpacing)+((r+1)*gridSpacing)
+    }
+
+  function colVal (c,gridSize,gridSpacing) { // calcs col
+    var gridLeft = ((canvas.width - ((gridSize-1) * gridSpacing))/2);
+    return (gridLeft+(c*gridSpacing))
+  }
 
   function shuffle(array) {
     var currentIndex = array.length, temporaryValue, randomIndex;
