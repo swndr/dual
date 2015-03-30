@@ -55,6 +55,7 @@ function init() {
 
   var wScore = 0;
   var bScore = 0;
+  var gameOver = false;
 
   var stage = new createjs.Stage(canvas);
   createjs.Touch.enable(stage);
@@ -119,13 +120,6 @@ function init() {
   var newGameLabel = new createjs.Text("NEW GAME", mediumLabelStyle, white).set({x:206,y:65});
   newGameLabel.textAlign = "center";
 
-  var nextTurnButton = new createjs.Shape().set({x:canvas.width-360,y:35});
-  nextTurnButton.graphics.beginFill("#AAA5A5").drawRect(0,0,300,100);
-  nextTurnButton.addEventListener("click",nextTurn);
-  nextTurnButton.name = "next";
-  var nextTurnLabel = new createjs.Text("SWITCH PLAYER", mediumLabelStyle, pink).set({x:canvas.width-210,y:65});
-  nextTurnLabel.textAlign = "center";
-
   var whiteTurn = new createjs.Shape().set({x:0,y:(445-iconRadius)});
   whiteTurn.graphics.beginFill(pink).drawRect(0,0,25,iconRadius*2);
   whiteTurn.visible = true;
@@ -157,7 +151,7 @@ function init() {
   var blackScore = new createjs.Text(bScore, largeLabelStyle, black).set({x:(canvas.width - 160),y:425});
   blackScore.textAlign = "right";*/
 
-  stage.addChild(newGameButton,newGameLabel,nextTurnButton,nextTurnLabel,whiteTurn,whiteIcon,blackTurn,blackIcon);
+  stage.addChild(newGameButton,newGameLabel,whiteTurn,whiteIcon,blackTurn,blackIcon);
   stage.update();
 
   // CONSTRUCT SHAPES
@@ -674,31 +668,13 @@ function init() {
     selectorsP2[i] = null;
    }
 
-  function loadSelectors(set) {
-
-  var toClear = [];
-
-  for (i in selectorsBox.children) {
-    if (selectorsBox.children[i].type == "position" || selectorsBox.children[i].type == "shape" || selectorsBox.children[i].type == "placeholder") {
-      toClear.push(selectorsBox.children[i]);
-    } 
-  }
-
-  for (var i = 0; i < toClear.length; i++) {
-      selectorsBox.removeChild(toClear[i]);
-    }
+function popSelectors(set) {
 
   shuffledSelectors = [];
 
-  buttonRow = 0;
-
-  function buildSet() {
-
-    var dupe = false;
-
-    shuffledRowSelectors = shuffle(rowSelectors); // randomize pos selectors
-    shuffledColSelectors = shuffle(colSelectors); // randomize pos selectors
-    shuffledShapeSelectors = shuffle(shapeSelectors); // randomize shape selectors
+  shuffledRowSelectors = shuffle(rowSelectors); // randomize pos selectors
+  shuffledColSelectors = shuffle(colSelectors); // randomize pos selectors
+  shuffledShapeSelectors = shuffle(shapeSelectors); // randomize shape selectors
 
     for (var i = 0; i < 10; i++) {
       if (i < 2) {
@@ -710,42 +686,87 @@ function init() {
       }
     }
 
-    for (i in shuffledSelectors) {
-      for (n in set) {
-        if (set[n] != null) {
-          if (n < 2) {
-            if (shuffledSelectors[i].val == set[n].val) {
-              dupe = true;
-            }
-          } else if (n >= 2 && i < 4) {
-            if (shuffledSelectors[i].val == set[n].val) {
-              dupe = true;
-            }
-          } else {
-            if ((shuffledSelectors[i].val[0] == set[n].val[0]) && (shuffledSelectors[i].val[1] == set[n].val[1]) && (shuffledSelectors[i].val[2] == set[n].val[2]) && (shuffledSelectors[i].val[3] == set[n].val[3])) {
-              dupe = true;
-            }
+  function buildSet(set) {
+
+    if (comparePosSets(shuffledSelectors,set,0,2)) {
+      shuffledRowSelectors = shuffle(rowSelectors); // randomize pos selectors
+      for (var i = 0; i < 2; i++) { shuffledSelectors[i] = shuffledRowSelectors[i];}
+      buildSet(set);
+    }
+    
+    else if (comparePosSets(shuffledSelectors,set,2,4)) {
+      shuffledColSelectors = shuffle(colSelectors); // randomize pos selectors
+      for (var i = 2; i < 4; i++) { shuffledSelectors[i] = shuffledColSelectors[i];}
+      buildSet(set);
+    }
+
+    else if (compareShapeSets(shuffledSelectors,set,4,10)) {
+      shuffledShapeSelectors = shuffle(shapeSelectors); // randomize shape selectors
+      for (var i = 4; i < 10; i++) { shuffledSelectors[i] = new ShapeButton(shuffledShapeSelectors[i][0],shuffledShapeSelectors[i][1],shuffledShapeSelectors[i][2],shuffledShapeSelectors[i][3],0,0);}
+      buildSet(set);
+    }
+
+    //else { console.log("populated successfully"); }
+
+
+  function comparePosSets(newSet,currentSet,start,end) {
+
+    var duplicate = false;
+
+    for (var i = start; i < end; i++) {
+        for (var n = start; n < end; n++) {
+          if (currentSet[i] != null && (currentSet[i].val == newSet[n].val)) {
+            duplicate = true;
           }
         }
       }
+      return duplicate;
     }
 
-  if (dupe == true) {buildSet();}
+    function compareShapeSets(newSet,currentSet,start,end) {
+
+    var duplicate = false;
+
+    for (var i = start; i < end; i++) {
+        for (var n = start; n < end; n++) {
+          if (currentSet[i] != null && ((currentSet[i].val[0] == newSet[n].val[0]) && (currentSet[i].val[1] == newSet[n].val[1]) && (currentSet[i].val[2] == newSet[n].val[2]) && (currentSet[i].val[3] == newSet[n].val[3]))) {
+            duplicate = true;
+          }
+        }
+      }
+      return duplicate;
+    }
 
   }
 
-  buildSet();
+  buildSet(set);
+}
+
+function loadSelectors(set) {
 
   createjs.Ticker.setPaused(false);
+
+  var toClear = [];
+  buttonRow = 0;
+
+  for (i in selectorsBox.children) {
+    if (selectorsBox.children[i].type == "position" || selectorsBox.children[i].type == "shape" || selectorsBox.children[i].type == "placeholder") {
+      toClear.push(selectorsBox.children[i]);
+    } 
+  }
+
+  for (var i = 0; i < toClear.length; i++) {
+      selectorsBox.removeChild(toClear[i]);
+    }
 
   for (var i = 0; i < 10; i++) {
 
     if (set[i] == null) {
 
-        animateDuration = getRandomInt(200,600);
+        animateDuration = getRandomInt(200,500);
         elasticOriginX = getRandomInt(-200,200);
-        elasticOriginY = getRandomInt(0,850);
-        elasticRotation = getRandomInt(-30,30);
+        elasticOriginY = getRandomInt(50,700);
+        elasticRotation = getRandomInt(-80,80);
 
       if (!(i % 2)) {
 
@@ -792,12 +813,14 @@ function init() {
     if (i % 2) { buttonRow++; }
 
   }
-    console.log(set);
     stage.update();
-    window.setTimeout(endTween,1000);
+    if (gameOver == false) { window.setTimeout(endTween,1500); }
   }
 
+  popSelectors(selectorsP1);
   loadSelectors(selectorsP1);
+
+  popSelectors(selectorsP2);
 
   // LOGIC ITEMS
 
@@ -1234,6 +1257,7 @@ function init() {
         playCount++; 
       } else {
         clearInterval(playing);
+        updateScores();
         nextTurn();
       }
     }
@@ -1400,7 +1424,270 @@ function init() {
         sequence[15].func(targets[i]);
       }
     }
-      updateScores();
+  }
+
+  
+  // GAME MGMT
+
+  function updateScores() {
+
+  bScore = 0;
+  wScore = 0;
+
+  for (var i = 0; i < objectsInPlay.length; i++) {
+    if (objectsInPlay[i].tl == 0 && objectsInPlay[i].tr == 0 && objectsInPlay[i].br == 0 && objectsInPlay[i].bl == 0) {
+      objectsInPlay[i].complete = 0;
+      bScore++;
+    } else if (objectsInPlay[i].tl == 1 && objectsInPlay[i].tr == 1 && objectsInPlay[i].br == 1 && objectsInPlay[i].bl == 1) {
+      objectsInPlay[i].complete = 1;
+      wScore++;
+    } else {
+      objectsInPlay[i].complete = false;
+    }
+  } 
+
+  if (bScore > 3 && wScore > 3) {
+    checkWin(2);
+  } else if (wScore > 3 && bScore <= 3) {
+    checkWin(1);
+  } else if (bScore > 3 && wScore <= 3) {
+    checkWin(0);
+  }
+
+  console.log(bScore);
+  console.log(wScore);
+  //blackScore.text = bScore;
+  //whiteScore.text = wScore;
+  stage.update();
+
+  } 
+
+  function checkWin(n) {
+
+    var completeRows;
+    var completeCols;
+
+    console.log("checking for win");
+
+    var rows = [[0,1,2,3],[4,5,6,7],[8,9,10,11],[12,13,14,15]];
+    var cols = [[0,4,8,12],[1,5,9,13],[2,6,10,14],[3,7,11,15]];
+
+    switch(n) {
+      case 0:
+        if (countCompleteShapes(0)) {
+          console.log(completeRows);
+          console.log(completeCols);
+          endGame(0);
+          console.log("black win");
+        }
+        break;
+      case 1:
+        if (countCompleteShapes(1)) {
+            console.log(completeRows);
+            console.log(completeCols);
+            endGame(1);
+            console.log("white win");
+        }
+        break;
+      case 2:
+        if ((countCompleteShapes(0)) && !(countCompleteShapes(1))) {
+            console.log(completeRows);
+            console.log(completeCols);
+            endGame(0);
+            console.log("black win");
+        } else if (!(countCompleteShapes(0)) && (countCompleteShapes(1))) {
+            console.log(completeRows);
+            console.log(completeCols);
+            endGame(1);
+            console.log("white win");
+        } else if ((countCompleteShapes(0)) && (countCompleteShapes(1))) {
+            countCompleteShapes(0);
+            var blackTotal = completeRows.length + completeCols.length;
+            countCompleteShapes(1);
+            var whiteTotal = completeRows.length + completeCols.length;
+          if (blackTotal > whiteTotal) {
+            countCompleteShapes(0);
+            console.log(completeRows);
+            console.log(completeCols);
+            endGame(0);
+            console.log("black win");
+          } else if (whiteTotal > blackTotal) {
+            endGame(1);
+            console.log("white win");
+            console.log(completeRows);
+            console.log(completeCols);
+          } else {
+            endGame(2);
+            console.log("draw");
+            console.log(completeRows);
+            console.log(completeCols);
+            countCompleteShapes(0);
+            console.log(completeRows);
+            console.log(completeCols);
+          }
+        }
+        break;
+    }
+
+    function countCompleteShapes(color) {
+
+      var success = false;
+      var rowCounter = 0;
+      var colCounter = 0;
+      completeRows = [];
+      completeCols = [];
+
+      for (var a = 0; a < 4; a++) {
+        for (var b = 0; b < 4; b++) {
+          if (objectsInPlay[rows[a][b]].complete === color) {
+            rowCounter++;
+          }
+          if (objectsInPlay[cols[a][b]].complete === color) {
+            colCounter++;
+          }
+        }
+
+        if (rowCounter > 3) {
+          success = true;
+          completeRows.push(a);
+        }
+
+        if (colCounter > 3) {
+          success = true;
+          completeCols.push(a);
+        }
+        rowCounter = 0;
+        colCounter = 0;
+      }
+      return success;
+    }
+  }
+
+  function endGame(color) {
+
+    gameOver = true;
+    console.log(gameOver);
+    createjs.Ticker.setPaused(false);
+
+    if (color == 0) {
+      var winner = "BLACK WINS";
+      var victoryColor = black;
+    } else if (color == 1) {
+      var winner = "WHITE WINS";
+      var victoryColor = white;
+    } else {
+      var winner = "DRAW";
+      var victoryColor = lightGray;
+    }
+
+    var winOverlay = new createjs.Container().set({x:0,y:canvas.height});
+    winOverlay.addEventListener("mousedown",function() {console.log("tap");});
+
+    var winBG = new createjs.Shape();
+    winBG.graphics.beginFill(pink).drawRect(0,0,canvas.width,(canvas.height-890));
+
+    var victory = new createjs.Text(winner,"bold 80px Avenir-Heavy",victoryColor).set({x:centerX,y:100});
+    victory.textAlign = "center";
+
+    winOverlay.addChild(winBG,victory);
+    stage.addChild(winOverlay);
+    stage.update();
+
+    createjs.Tween.get(winOverlay, {override:true}).to({y:890}, 300, createjs.Ease.cubicInOut).call(endTween);
+
+  }
+
+
+
+  function nextTurn() {
+
+    createjs.Ticker.setPaused(false);
+
+    for (var i in objectsInPlay) {
+
+      var findMorph = objectsInPlay[i].getChildByName("morph");
+        if (findMorph != null) {
+        removeMorph(objectsInPlay[i],findMorph);
+      }
+
+      if (i < objectsInPlay.length-1) {
+      createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:1,}, 300, createjs.Ease.cubicIn);
+      } else {
+        createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:1,}, 300, createjs.Ease.cubicIn);
+      }
+    }
+
+    clearSequence();
+    sequenceReady();
+
+    if (whiteTurn.visible == true) {
+
+      loadSelectors(selectorsP2);
+
+      whiteTurn.visible = false;
+      blackTurn.visible = true;
+
+      selectorsBox.getChildByName("bg").graphics.beginFill(black);
+      selectorsBox.getChildByName("bg").graphics.drawRoundRect(0,0,336,1054,10);
+      actionsBox.getChildByName("bg").graphics.beginFill(black);
+      actionsBox.getChildByName("bg").graphics.drawRoundRect(0,0,336,1054,10);
+
+      for (var i = 0; i < selectorsP1.length; i++) {
+        if (selectorsP1[i].inSlot !== false) {
+          selectorsP1[i] = null;
+        }
+      }
+
+      window.setTimeout(popSelectors,2000,selectorsP1);
+
+    } else {
+
+      loadSelectors(selectorsP1);
+
+      whiteTurn.visible = true;
+      blackTurn.visible = false;
+      
+      selectorsBox.getChildByName("bg").graphics.beginFill("#F9F9F9");
+      selectorsBox.getChildByName("bg").graphics.drawRoundRect(0,0,336,1054,10);
+      actionsBox.getChildByName("bg").graphics.beginFill("#F9F9F9");
+      actionsBox.getChildByName("bg").graphics.drawRoundRect(0,0,336,1054,10);
+
+      for (var i = 0; i < selectorsP2.length; i++) {
+        if (selectorsP2[i].inSlot !== false) {
+          selectorsP2[i] = null;
+        }
+      }
+      
+      window.setTimeout(popSelectors,2000,selectorsP2);
+
+    }
+
+    stage.update();
+  }
+
+  function newGame() {
+
+    for (var i in objectsInPlay) {
+      stage.removeChild(objectsInPlay[i]);
+    }
+
+    objectsInPlay = [];
+
+    for (var i = 0; i < 10; i++) {
+      selectorsP1[i] = null;
+      selectorsP2[i] = null;
+    }
+
+    clearSequence();
+    loadGameObjects();
+    loadSelectors(selectorsP1);
+
+    updateScores();
+
+    whiteTurn.visible = true;
+    blackTurn.visible = false;
+
+    stage.update();
   }
 
   // ACTION FUNCTIONS
@@ -1734,8 +2021,6 @@ function init() {
   }
 
   function morphWithHighlight(corner,color,x,y,tl,tr,br,bl) {
-
-    //createjs.Ticker.setPaused(false); 
         
         corner.graphics
         .clear()
@@ -1750,7 +2035,6 @@ function init() {
         corner.parent.addChild(morphHighlight);
         stage.update();
 
-        //createjs.Tween.get(morphHighlight, {override:true}).to({alpha:.8}, 300, createjs.Ease.cubicIn).to({alpha:0}, 300, createjs.Ease.cubicOut).call(removeMorph,[corner]);
   }
 
   function morph(corner,color,x,y,tl,tr,br,bl) {
@@ -1772,183 +2056,6 @@ function init() {
     obj.uncache();
   }
 
-  // SCORES
-
-  function updateScores() {
-
-  bScore = 0;
-  wScore = 0;
-
-  for (var i = 0; i < objectsInPlay.length; i++) {
-    if (objectsInPlay[i].tl == 0 && objectsInPlay[i].tr == 0 && objectsInPlay[i].br == 0 && objectsInPlay[i].bl == 0) {
-      objectsInPlay[i].complete = "b";
-      bScore++;
-    } else if (objectsInPlay[i].tl == 1 && objectsInPlay[i].tr == 1 && objectsInPlay[i].br == 1 && objectsInPlay[i].bl == 1) {
-      objectsInPlay[i].complete = "w";
-      wScore++;
-    } else {
-      objectsInPlay[i].complete = false;
-    }
-  } 
-    blackScore.text = bScore;
-    whiteScore.text = wScore;
-    stage.update();
-
-  } 
-
-  function checkWin() {
-
-    var success = [];
-    var bRowsOrCols = 0;
-    var wRowsOrCols = 0;
-
-    for (var a = 0; a < 4; a++) {
-
-      var bColCount = 0;
-      var bRowCount = 0;
-      var wColCount = 0;
-      var wRowCount = 0;
-
-      for (var i = 0; i < objectsInPlay.length; i++) {
-
-        if (objectsInPlay[i].complete == "b" && objectsInPlay[i].x == colVal(a)) {
-          bColCount++;
-        } else if (objectsInPlay[i].complete == "w" && objectsInPlay[i].x == colVal(a)) {
-          wColCount++;
-        } else if (objectsInPlay[i].complete == "b" && objectsInPlay[i].y == rowVal(a)) {
-          bRowCount++;
-        } else if (objectsInPlay[i].complete == "w" && objectsInPlay[i].y == rowVal(a)) {
-          wRowCount++;
-        }
-      }
-
-      if (bColCount == 4) {
-        success.push([["b"],["col"],[a]]);
-        console.log("BCOL " + a);
-      } else if (bRowCount == 4) {
-        success.push([["b"],["row"],[a]]);
-        console.log("BROW " + a);
-      } else if (wColCount == 4) {
-        success.push([["w"],["col"],[a]]);
-        console.log("WCOL " + a);
-      } else if (wRowCount == 4) {
-        success.push([["w"],["row"],[a]]);
-        console.log("WROW " + a);
-      }
-    }
-
-    if (success.length == 1) {
-      if (success[0][0] == "b") {
-        console.log("BLACK WINS");
-      } else {
-        console.log("WHITE WINS");
-      }
-    } else if (success.length > 1) {
-      for (i in success) {
-        if (success[i][0] == "b") {
-          bRowsOrCols++;
-        } else {
-          wRowsOrCols++;
-        }
-      }
-
-      if (bRowsOrCols > wRowsOrCols) {
-        console.log("BLACK WINS");
-      } else if (bRowsOrCols < wRowsOrCols) {
-        console.log("WHITE WINS");
-      } else {
-        console.log("DRAW");
-      }
-    }
-  }
-
-  // GAME MGMT
-
-  function nextTurn() {
-
-    createjs.Ticker.setPaused(false);
-
-    for (var i in objectsInPlay) {
-
-      var findMorph = objectsInPlay[i].getChildByName("morph");
-        if (findMorph != null) {
-        removeMorph(objectsInPlay[i],findMorph);
-      }
-
-      if (i < objectsInPlay.length-1) {
-      createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:1,}, 300, createjs.Ease.cubicIn);
-      } else {
-        createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:1,}, 300, createjs.Ease.cubicIn);
-      }
-    }
-
-    clearSequence();
-    sequenceReady();
-
-    if (whiteTurn.visible == true) {
-      whiteTurn.visible = false;
-      blackTurn.visible = true;
-
-      selectorsBox.getChildByName("bg").graphics.beginFill(black);
-      selectorsBox.getChildByName("bg").graphics.drawRoundRect(0,0,336,1054,10);
-      actionsBox.getChildByName("bg").graphics.beginFill(black);
-      actionsBox.getChildByName("bg").graphics.drawRoundRect(0,0,336,1054,10);
-
-      for (var i = 0; i < selectorsP1.length; i++) {
-        if (selectorsP1[i].inSlot !== false) {
-          selectorsP1[i] = null;
-        }
-      }
-
-      loadSelectors(selectorsP2);
-
-    } else {
-      whiteTurn.visible = true;
-      blackTurn.visible = false;
-      
-      selectorsBox.getChildByName("bg").graphics.beginFill("#F9F9F9");
-      selectorsBox.getChildByName("bg").graphics.drawRoundRect(0,0,336,1054,10);
-      actionsBox.getChildByName("bg").graphics.beginFill("#F9F9F9");
-      actionsBox.getChildByName("bg").graphics.drawRoundRect(0,0,336,1054,10);
-
-      for (var i = 0; i < selectorsP2.length; i++) {
-        if (selectorsP2[i].inSlot !== false) {
-          selectorsP2[i] = null;
-        }
-      }
-      
-      loadSelectors(selectorsP1);
-    }
-
-    checkWin();
-    stage.update();
-  }
-
-  function newGame() {
-
-    for (var i in objectsInPlay) {
-      stage.removeChild(objectsInPlay[i]);
-    }
-
-    objectsInPlay = [];
-
-    for (var i = 0; i < 10; i++) {
-      selectorsP1[i] = null;
-      selectorsP2[i] = null;
-    }
-
-    clearSequence();
-    loadGameObjects();
-    loadSelectors(selectorsP1);
-
-    updateScores();
-
-    whiteTurn.visible = true;
-    blackTurn.visible = false;
-
-    stage.update();
-  }
-
   // ANIMATION
 
   function tick(event) {
@@ -1958,14 +2065,14 @@ function init() {
   }
 
   function endTween() {
-    createjs.Ticker.setPaused(true);
-    console.log(createjs.Ticker.paused);
+    window.setTimeout(function() {    createjs.Ticker.setPaused(true);
+    console.log("ticker paused");},1000);
   }
 
   // UTILITIES
 
   function shuffle(array) {
-    var currentIndex = array.length, temporaryValue, randomIndex ;
+    var currentIndex = array.length, temporaryValue, randomIndex;
 
     // While there remain elements to shuffle...
     while (0 !== currentIndex) {
