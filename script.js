@@ -50,6 +50,7 @@ function init() {
   var andCount = 4;
   var orCount = 4;
 
+  var tutorialObjectsInPlay = [];
   var objectsInPlay = [];
 
   var wScore = 0;
@@ -73,24 +74,40 @@ function init() {
     var startOverlayBG = new createjs.Shape();
     startOverlayBG.graphics.beginFill(green).drawRect(0,0,canvas.width,canvas.height);
 
+    var topBorder = new createjs.Shape();
+    topBorder.graphics.beginStroke(white).setStrokeStyle(10);
+    topBorder.graphics.moveTo(0,5);
+    topBorder.graphics.lineTo(canvas.width,5);
+
+    var tutorialGrid = new Grid(2,380,1000,230);
+    tutorialGrid.alpha = 0;
+
     var logo = new createjs.Container();
     logo.y = 700;
 
     var D = new GameObject(0,1,1,0).set({x:centerX-450,y:0});
     D.scaleX = 1.8;
     D.scaleY = 1.8;
+    D.cache(-135,-135,270,270);
+    tutorialObjectsInPlay.push(D);
 
     var U = new GameObject(0,0,1,1).set({x:centerX-150,y:0});
     U.scaleX = 1.8;
     U.scaleY = 1.8;
+    U.cache(-135,-135,270,270);
+    tutorialObjectsInPlay.push(U);
 
     var A = new GameObject(1,1,0,0).set({x:centerX+150,y:0});
     A.scaleX = 1.8;
     A.scaleY = 1.8;
+    A.cache(-135,-135,270,270);
+    tutorialObjectsInPlay.push(A);
 
     var L = new GameObject(0,1,0,0).set({x:centerX+450,y:0});
     L.scaleX = 1.8;
     L.scaleY = 1.8;
+    L.cache(-135,-135,270,270);
+    tutorialObjectsInPlay.push(L);
 
     var pathForD = new createjs.Shape();
     pathForD.graphics.beginStroke(lightGray).setStrokeStyle(20,"butt");
@@ -147,51 +164,163 @@ function init() {
     start.addEventListener("mousedown",highlightStart);
     start.addEventListener("pressup",beginGame);
 
-    startOverlay.addChild(startOverlayBG,logo,tagline,learn,start);
+    startOverlay.addChild(startOverlayBG,topBorder,tutorialGrid,logo,tagline,learn,start);
     stage.addChild(startOverlay);
     stage.update();
+
+    // TUTORIAL
+
+    function beginTutorial(event) {
+
+      createjs.Ticker.setPaused(false);
+
+      var closeTutorial = new createjs.Container().set({x:100,y:100});
+      var closeButton = new createjs.Shape();
+      closeButton.graphics.beginFill(green).drawRect(-25,-25,125,125);
+      var closeX = new createjs.Shape();
+      closeX.graphics.beginStroke(white).setStrokeStyle(20,"round");
+      closeX.graphics.moveTo(0,0);
+      closeX.graphics.lineTo(75,75);
+      closeX.graphics.moveTo(0,75);
+      closeX.graphics.lineTo(75,0);
+      closeTutorial.addChild(closeButton,closeX);
+      closeTutorial.alpha = 0;
+      closeTutorial.addEventListener("mousedown",highlightClose);
+      closeTutorial.addEventListener("pressup",returnToStart);
+
+      var tutorialBG = new createjs.Shape().set({x:0,y:1000});
+      tutorialBG.graphics.beginFill("#EAEAEA").drawRect(0,0,canvas.width,canvas.height-1000);
+      tutorialBG.alpha = 0;
+      var tutorialTray = new createjs.Shape().set({x:0,y:1000});
+      tutorialTray.graphics.beginFill("#616060").drawRect(0,0,canvas.width,300);
+      tutorialTray.alpha = 0;
+
+      var tutorialText1 = new createjs.Text("DUAL is a two player game about sequential thinking.", "100 60px Avenir-Book", black).set({x:centerX,y:1150});
+      tutorialText1.textAlign = "center";
+      tutorialText1.lineWidth = 1100;
+      tutorialText1.lineHeight = 80;
+      tutorialText1.alpha = 0;
+
+      var tutorialText2 = new createjs.Text("Your aim is to complete a row or column by transforming the four-part shapes into complete white circles (player one) or black squares (player two).", "100 60px Avenir-Book", black).set({x:centerX,y:1400});
+      tutorialText2.textAlign = "center";
+      tutorialText2.lineWidth = 1100;
+      tutorialText2.lineHeight = 80;
+      tutorialText2.alpha = 0;
+
+      var tutorialNextButton = new createjs.Shape().set({x:centerX-200,y:1790});
+      tutorialNextButton.graphics.beginFill("#EAEAEA").drawRect(0,0,400,100);
+      tutorialNextButton.alpha = 0;
+      tutorialNextButton.addEventListener("pressup",loadTutorialItems);
+      var tutorialNextLabel = new createjs.Text("NEXT", "100 60px Avenir-Heavy", green).set({x:centerX,y:1800});
+      tutorialNextLabel.textAlign = "center";
+      tutorialNextLabel.alpha = 0;
+
+      startOverlay.addChild(closeTutorial,tutorialBG,tutorialTray,tutorialText1,tutorialText2,tutorialNextButton,tutorialNextLabel);
+
+      createjs.Tween.get(learn).to({alpha:0}, 300, createjs.Ease.cubicIn);
+      createjs.Tween.get(start).wait(300).to({alpha:0}, 300, createjs.Ease.cubicIn);
+      createjs.Tween.get(tagline).wait(300).to({alpha:0}, 300, createjs.Ease.cubicIn);
+
+      createjs.Tween.get(tutorialGrid).wait(300).to({alpha:1}, 300, createjs.Ease.cubicIn);
+      createjs.Tween.get(tutorialBG).wait(500).to({alpha:1}, 400, createjs.Ease.cubicIn);
+      createjs.Tween.get(closeTutorial).wait(500).to({alpha:.9}, 400, createjs.Ease.cubicIn);
+
+      createjs.Tween.get(pathForD).wait(500).to({alpha:0}, 200, createjs.Ease.cubicOut);
+      createjs.Tween.get(pathForU).wait(600).to({alpha:0}, 200, createjs.Ease.cubicOut);
+      createjs.Tween.get(pathForA).wait(700).to({alpha:0}, 200, createjs.Ease.cubicOut);
+      createjs.Tween.get(pathForL).wait(800).to({alpha:0}, 200, createjs.Ease.cubicOut);
+
+      createjs.Tween.get(D).wait(1000).to({x:colVal(0,2,380),y:rowVal(0,2,380,1000)-700}, 600, createjs.Ease.backInOut);
+      createjs.Tween.get(U).wait(1200).to({x:colVal(1,2,380),y:rowVal(0,2,380,1000)-700}, 600, createjs.Ease.backInOut);
+      createjs.Tween.get(A).wait(1400).to({x:colVal(0,2,380),y:rowVal(1,2,380,1000)-700}, 500, createjs.Ease.backOut);
+      createjs.Tween.get(L).wait(1600).to({x:colVal(1,2,380),y:rowVal(1,2,380,1000)-700}, 500, createjs.Ease.backOut).call(tutorialReady);
+
+
+      function tutorialReady() {
+
+        createjs.Tween.get(tutorialText1).wait(400).to({alpha:1}, 400, createjs.Ease.cubicIn);
+        createjs.Tween.get(tutorialText2).wait(600).to({alpha:1}, 400, createjs.Ease.cubicIn);
+        createjs.Tween.get(tutorialNextButton).wait(800).to({alpha:1}, 100, createjs.Ease.cubicIn);
+        createjs.Tween.get(tutorialNextLabel).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn).call(endTween);
+
+        logo.y = 0;
+        D.y = rowVal(0,2,380,1000);
+        D.uncache();
+        U.y = rowVal(0,2,380,1000);
+        U.uncache();
+        A.y = rowVal(1,2,380,1000);
+        A.uncache();
+        L.y = rowVal(1,2,380,1000);
+        L.uncache();
+        stage.update();
+      }
+
+      function loadTutorialItems() {
+        console.log("load tutorial");
+
+        createjs.Ticker.setPaused(false);
+
+        createjs.Tween.get(tutorialText1).wait(400).to({alpha:0}, 400, createjs.Ease.cubicOut);
+        createjs.Tween.get(tutorialText2).wait(600).to({alpha:0}, 400, createjs.Ease.cubicOut);
+        createjs.Tween.get(tutorialNextButton).wait(800).to({alpha:0}, 100, createjs.Ease.cubicOut);
+        createjs.Tween.get(tutorialNextLabel).wait(800).to({alpha:0}, 400, createjs.Ease.cubicOut);
+        createjs.Tween.get(tutorialTray).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn).call(endTween);
+        tutorialNextLabel.removeEventListener("pressup",loadTutorialItems);
+
+        //stage.update();
+      }
+    }
+
+    function highlightLearn(event) {
+      event.currentTarget.alpha = .8;
+      stage.update();
+    }
+
+    function returnToStart(event) {
+      // event.currentTarget.alpha = 1;
+      // stage.update();
+      tutorialObjectsInPlay = [];
+      startOverlay.removeAllChildren();
+      stage.update();
+      loadIntro();
+    }
+
+    function highlightClose(event) {
+      event.currentTarget.alpha = .5;
+      stage.update();
+    }
+
+    // BEGIN GAME
+
+    function beginGame(event) {
+
+      createjs.Ticker.setPaused(false);
+
+      event.currentTarget.alpha = 1;
+      startOverlay.cache(0,0,canvas.width,canvas.height);
+      stage.removeAllChildren();
+      loadGame();
+      stage.addChild(startOverlay);
+      stage.update();
+
+      createjs.Tween.get(startOverlay, {override:true}).to({y:canvas.height}, 600, createjs.Ease.cubicIn).call(handleBeginGame);
+
+      function handleBeginGame() {
+        startOverlay.uncache();
+        stage.removeChild(startOverlay);
+        loadSelectors(selectorsP1);
+      }
+      
+    }
+
+    function highlightStart(event) {
+      event.currentTarget.alpha = .8;
+      stage.update();
+    }
 
   }
 
   loadIntro();
-
-  // TUTORIAL
-
-  function beginTutorial(event) {
-    event.currentTarget.alpha = 1;
-    stage.update();
-  }
-
-  function highlightLearn(event) {
-    event.currentTarget.alpha = .8;
-    stage.update();
-  }
-
-
-  // BEGIN GAME
-
-  function beginGame(event) {
-
-    createjs.Ticker.setPaused(false);
-
-    event.currentTarget.alpha = 1;
-    startOverlay.cache(0,0,canvas.width,canvas.height);
-    stage.removeAllChildren();
-    loadGame();
-    stage.addChild(startOverlay);
-    stage.update();
-
-    createjs.Tween.get(startOverlay, {override:true}).to({y:canvas.height}, 1000, createjs.Ease.cubicOut).call(loadSelectors,[selectorsP1]);
-    
-  }
-
-  function highlightStart(event) {
-    event.currentTarget.alpha = .8;
-    stage.update();
-  }
-
-
-
 
   // BOARD
 
@@ -206,8 +335,8 @@ function init() {
 
   // BUILD GRID
 
-  var boardGrid = new Grid(4,180,890);
-  board.addChild(boardGrid);
+  var boardGrid = new Grid(4,180,890,150);
+  board.addChild(bg,boardGrid);
 
   // GAME MGMT & SCORES
 
@@ -620,7 +749,7 @@ function loadSelectors(set) {
 
   // CONSTRUCTORS
 
-  function Grid(gridSize,gridSpacing,gridHeight) {
+  function Grid(gridSize,gridSpacing,gridHeight,labelMargin) {
 
     var gridLeft = ((canvas.width - ((gridSize-1) * gridSpacing))/2);
     var gridTop = ((gridHeight - ((gridSize-1) * gridSpacing))/2);
@@ -640,18 +769,18 @@ function loadSelectors(set) {
       grid.graphics.lineTo(canvas.width,(gridTop+(i*gridSpacing)));
     }
 
-    gridContainer.addChild(bg,grid);
+    gridContainer.addChild(grid);
     grid.cache(0,0,canvas.width,gridHeight);
 
     for (var i = 0; i < gridSize; i++) {
-        var hLabel = new createjs.Text(i, lightLabelStyle, pink);
+        var hLabel = new createjs.Text(i, lightLabelStyle, white);
         hLabel.x = (gridLeft-8) + (i*gridSpacing);
-        hLabel.y = gridTop - 150;
-        hLabel.alpha = .5;
-      var vLabel = new createjs.Text(i, lightLabelStyle, pink);
-        vLabel.x = gridLeft - 150;
+        hLabel.y = gridTop - labelMargin;
+        hLabel.alpha = .6;
+      var vLabel = new createjs.Text(i, lightLabelStyle, white);
+        vLabel.x = gridLeft - labelMargin;
         vLabel.y = (gridTop-18) + (i*gridSpacing);
-        vLabel.alpha = .5;
+        vLabel.alpha = .6;
       gridContainer.addChild(hLabel);
       gridContainer.addChild(vLabel);
     }
@@ -1051,7 +1180,7 @@ function loadSelectors(set) {
     popSelectors(selectorsP1);
     popSelectors(selectorsP2);
     loadGameObjects(4);
-    loadSelectors(selectorsP1);
+    //loadSelectors(selectorsP1);
     //stage.update();
   }
 
