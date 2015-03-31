@@ -267,6 +267,10 @@ function init() {
 
         tutorialNextButton.removeAllEventListeners();
 
+        var showLogic = false;
+        var triedAnd = false;
+        var triedOr = false;
+
         createjs.Ticker.setPaused(false);
 
         createjs.Tween.get(tutorialText1).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut);
@@ -274,9 +278,9 @@ function init() {
         createjs.Tween.get(tutorialNextButton).wait(600).to({alpha:0}, 100, createjs.Ease.cubicOut);
         createjs.Tween.get(tutorialNextLabel).wait(600).to({alpha:0}, 400, createjs.Ease.cubicOut);
 
-        var tutorialText3 = new createjs.Text("Target shapes on the grid by matching specific conditions. Try dragging conditions into the sequence tray above.", "100 60px Avenir-Book", black).set({x:centerX,y:1620});
+        var tutorialText3 = new createjs.Text("Target shapes on the grid by matching specific conditions, like position or shape. Drag conditions into the sequence tray above to see what happens.", "100 60px Avenir-Book", black).set({x:centerX,y:1600});
         tutorialText3.textAlign = "center";
-        tutorialText3.lineWidth = 1100;
+        tutorialText3.lineWidth = 1150;
         tutorialText3.lineHeight = 80;
         tutorialText3.alpha = 0;
 
@@ -363,15 +367,52 @@ function init() {
         shapeSelector2.addEventListener("pressmove",dragAndDrop);
         shapeSelector2.addEventListener("pressup",snapToLearn);
         shapeSelector2.originParent = tutorialConditions;
-        var placeholder4 = new PlaceholderButton(shapeSelector2.x,shapeSelector2.y)
+        var placeholder4 = new PlaceholderButton(shapeSelector2.x,shapeSelector2.y);
 
-        tutorialConditions.addChild(placeholder1,placeholder2,placeholder3,placeholder4,rowSelector,colSelector,shapeSelector1,shapeSelector2);
+        var andLogic = new LogicButton("AND",48 + (4*buttonSize) + (4*buttonMargin),0);
+        andLogic.removeAllEventListeners();
+        andLogic.addEventListener("mousedown",grabItemLearn);
+        andLogic.addEventListener("pressmove",dragAndDrop);
+        andLogic.addEventListener("pressup",snapToLearn);
+        andLogic.originParent = tutorialConditions;
+        andLogic.alpha = 0;
+        var placeholder5 = new PlaceholderButton(andLogic.x,andLogic.y);
+        placeholder5.alpha = 0;
+        var orLogic = new LogicButton("OR",48 + (5*buttonSize) + (5*buttonMargin),0);
+        orLogic.removeAllEventListeners();
+        orLogic.addEventListener("mousedown",grabItemLearn);
+        orLogic.addEventListener("pressmove",dragAndDrop);
+        orLogic.addEventListener("pressup",snapToLearn);
+        orLogic.originParent = tutorialConditions;
+        orLogic.alpha = 0;
+        var placeholder6 = new PlaceholderButton(orLogic.x,orLogic.y);
+        placeholder6.alpha = 0;
+
+        tutorialConditions.addChild(placeholder1,placeholder2,placeholder3,placeholder4,placeholder5,placeholder6,rowSelector,colSelector,shapeSelector1,shapeSelector2,andLogic,orLogic);
         startOverlay.addChild(sequenceBox,tutorialConditions,tutorialText3);
 
         createjs.Tween.get(tutorialTray).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
         createjs.Tween.get(sequenceBox).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn);
         createjs.Tween.get(tutorialConditions).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn);
-        createjs.Tween.get(tutorialText3).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn).call(endTween);;
+        createjs.Tween.get(tutorialText3).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn).call(endTween);
+
+        function showLogicItems() {
+
+          createjs.Ticker.setPaused(false);
+
+          showLogic = true;
+
+          tutorialText3.text = "If you use two conditions you need to add logic. Use AND to target shapes matching both conditions. Use OR to match either condition. Try it out!"
+          
+          createjs.Tween.get(tutorialConditions).wait(800).to({x:320}, 400, createjs.Ease.cubicInOut);
+          createjs.Tween.get(placeholder5).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn);
+          createjs.Tween.get(placeholder6).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicInOut);
+          createjs.Tween.get(andLogic).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicInOut);
+          createjs.Tween.get(orLogic).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicInOut).call(endTween);
+
+
+        }
+
 
         // INTERACTION
 
@@ -501,7 +542,6 @@ function init() {
             if (sequence[i] != null) {
             var rule = extractRuleLearn(sequence[i]);
             ruleSet.push(rule);
-            console.log(ruleSet);
             }
           }
 
@@ -517,6 +557,11 @@ function init() {
               } else {
                 tutorialObjectsInPlay[i].alpha = .2;
               }
+
+            } else if (ruleSet.length == 2) {
+
+              if (showLogic == false) { showLogicItems(); }
+              tutorialObjectsInPlay[i].alpha = .2;
          
             } else if (ruleSet.length == 1) {
 
