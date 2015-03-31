@@ -387,8 +387,53 @@ function init() {
         orLogic.alpha = 0;
         var placeholder6 = new PlaceholderButton(orLogic.x,orLogic.y);
         placeholder6.alpha = 0;
+  
+        var transformTL = new TransformButton(50,50,iconRadius,0,0,0,35,35,62 + (6*buttonSize) + (6*buttonMargin),0);
+        transformTL.removeAllEventListeners();
+        transformTL.addEventListener("mousedown",grabItemLearn);
+        transformTL.addEventListener("pressmove",dragAndDrop);
+        transformTL.addEventListener("pressup",snapToLearn);
+        transformTL.originParent = tutorialConditions;
+        transformTL.alpha = 0;
+        transformTL.name = "transTL";
+        transformTL.func = transTL;
+        var placeholder7 = new PlaceholderButton(transformTL.x,transformTL.y);
+        placeholder7.alpha = 0;
+        var transformTR = new TransformButton(35,50,0,iconRadius,0,0,50,35,62 + (7*buttonSize) + (7*buttonMargin),0);
+        transformTR.removeAllEventListeners();
+        transformTR.addEventListener("mousedown",grabItemLearn);
+        transformTR.addEventListener("pressmove",dragAndDrop);
+        transformTR.addEventListener("pressup",snapToLearn);
+        transformTR.originParent = tutorialConditions;
+        transformTR.alpha = 0;
+        transformTR.name = "transTR";
+        transformTR.func = transTR;
+        var placeholder8 = new PlaceholderButton(transformTR.x,transformTR.y);
+        placeholder8.alpha = 0;
+        var flipV = new FlipButton(40,30,90,30,65,60,65,70,40,100,90,100,62 + (8*buttonSize) + (8*buttonMargin),0);
+        flipV.removeAllEventListeners();
+        flipV.addEventListener("mousedown",grabItemLearn);
+        flipV.addEventListener("pressmove",dragAndDrop);
+        flipV.addEventListener("pressup",snapToLearn);
+        flipV.originParent = tutorialConditions;
+        flipV.alpha = 0;
+        flipV.name = "fV";
+        flipV.func = flipVertical;
+        var placeholder9 = new PlaceholderButton(flipV.x,flipV.y);
+        placeholder9.alpha = 0;
+        var rotate180cc = new RotateButton(180,"cc",62 + (9*buttonSize) + (9*buttonMargin),0);
+        rotate180cc.removeAllEventListeners();
+        rotate180cc.addEventListener("mousedown",grabItemLearn);
+        rotate180cc.addEventListener("pressmove",dragAndDrop);
+        rotate180cc.addEventListener("pressup",snapToLearn);
+        rotate180cc.originParent = tutorialConditions;
+        rotate180cc.alpha = 0;
+        rotate180cc.name = "r180cc";
+        rotate180cc.func = rt180cc;
+        var placeholder10 = new PlaceholderButton(rotate180cc.x,rotate180cc.y);
+        placeholder10.alpha = 0;
 
-        tutorialConditions.addChild(placeholder1,placeholder2,placeholder3,placeholder4,placeholder5,placeholder6,rowSelector,colSelector,shapeSelector1,shapeSelector2,andLogic,orLogic);
+        tutorialConditions.addChild(placeholder1,placeholder2,placeholder3,placeholder4,placeholder5,placeholder6,placeholder7,placeholder8,placeholder9,placeholder10,rowSelector,colSelector,shapeSelector1,shapeSelector2,andLogic,orLogic,transformTL,transformTR,flipV,rotate180cc);
         startOverlay.addChild(sequenceBox,tutorialConditions,tutorialText3);
 
         createjs.Tween.get(tutorialTray).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
@@ -405,14 +450,39 @@ function init() {
           tutorialText3.text = "If you use two conditions you need to add logic. Use AND to target shapes matching both conditions. Use OR to match either condition. Try it out!"
           
           createjs.Tween.get(tutorialConditions).wait(800).to({x:320}, 400, createjs.Ease.cubicInOut);
-          createjs.Tween.get(placeholder5).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn);
-          createjs.Tween.get(placeholder6).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicInOut);
-          createjs.Tween.get(andLogic).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicInOut);
-          createjs.Tween.get(orLogic).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicInOut).call(endTween);
-
+          createjs.Tween.get(placeholder5).wait(1200).to({alpha:.4}, 400, createjs.Ease.cubicIn);
+          createjs.Tween.get(placeholder6).wait(1200).to({alpha:.4}, 400, createjs.Ease.cubicIn);
+          createjs.Tween.get(andLogic).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn);
+          createjs.Tween.get(orLogic).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn).call(endTween);
 
         }
 
+        function showActionItems() {
+
+          createjs.Ticker.setPaused(false);
+
+          dropZoneContainer.addChild(dropZone3);
+
+          tutorialText3.text = "You can use one action on each set of targeted shapes. Switch corners from black to white or vice versa. Flip or rotate shapes to target them later in your sequence."
+          tutorialNextButton.alpha = 0;
+          tutorialNextLabel.alpha = 0;
+
+          createjs.Tween.get(tutorialConditions).wait(800).to({x:26}, 400, createjs.Ease.cubicInOut);
+
+          createjs.Tween.get(placeholder7).wait(1200).to({alpha:.4}, 400, createjs.Ease.cubicIn);
+          createjs.Tween.get(placeholder8).wait(1200).to({alpha:.4}, 400, createjs.Ease.cubicIn);
+          createjs.Tween.get(placeholder9).wait(1200).to({alpha:.4}, 400, createjs.Ease.cubicIn);
+          createjs.Tween.get(placeholder10).wait(1200).to({alpha:.4}, 400, createjs.Ease.cubicIn);
+          createjs.Tween.get(transformTL).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn);
+          createjs.Tween.get(transformTR).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn);
+          createjs.Tween.get(flipV).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn);
+          createjs.Tween.get(rotate180cc).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn);
+
+          createjs.Tween.get(sequenceBox).wait(1400).to({x:(((canvas.width-442)/2)-96)}, 400, createjs.Ease.cubicInOut);
+          createjs.Tween.get(actionTray).wait(1800).to({alpha:1}, 400, createjs.Ease.cubicIn);
+          createjs.Tween.get(dropZone3).wait(1800).to({alpha:.25}, 400, createjs.Ease.cubicIn).call(endTween);
+
+        }
 
         // INTERACTION
 
@@ -502,6 +572,21 @@ function init() {
               item.inSlot = pos.slot;
               sequence[pos.slot] = item;
               targetGameObjectsLearn();
+
+              if (item.name == "AND") {
+                triedAnd = true;
+              } else {
+                triedOr = true;
+              }
+
+              if (triedOr && triedAnd) {
+                tutorialText3.text = "Good work. Keep playing, when you're ready let's learn about actions."
+                tutorialNextButton.alpha = 1;
+                tutorialNextLabel.alpha = 1;
+                tutorialNextButton.addEventListener("mousedown",highlightButton);
+                tutorialNextButton.addEventListener("pressup",showActionItems);
+              }
+
             } else { 
               returnToOriginLearn(item,item.originParent,item.originX,item.originY); 
             }
@@ -514,6 +599,8 @@ function init() {
               item.y = pos.y; 
               item.inSlot = pos.slot;
               sequence[pos.slot] = item;
+              console.log(sequence);
+              deliverActionLearn(targetGameObjectsLearn());
             } else { 
               returnToOriginLearn(item,item.originParent,item.originX,item.originY); 
             }
@@ -2597,7 +2684,8 @@ function loadSelectors(set) {
       obj.br = tempBR;
       obj.bl = tempBL;
 
-      createjs.Tween.get(obj, {override:true}).to({scaleY:-1}, 400, createjs.Ease.cubicInOut).call(redraw,[obj]);
+      if (obj.scaleX == 1.8)  {createjs.Tween.get(obj, {override:true}).to({scaleY:-1.8}, 400, createjs.Ease.cubicInOut).call(redraw,[obj]); }
+      else { createjs.Tween.get(obj, {override:true}).to({scaleY:-1}, 400, createjs.Ease.cubicInOut).call(redraw,[obj]); }
   }
 
   function morphWithHighlight(corner,color,x,y,tl,tr,br,bl) {
@@ -2630,8 +2718,11 @@ function loadSelectors(set) {
 
   function redraw(obj) {
     obj.rotation = 0;
-    obj.scaleX = 1;
-    obj.scaleY = 1;
+    if (obj.scaleX == 1.8 || obj.scaleX == -1.8) {
+    obj.scaleX = 1.8; obj.scaleY = 1.8;
+    } else {
+    obj.scaleX = 1; obj.scaleY = 1; 
+    }
     obj.updateCache();
     obj.uncache();
   }
