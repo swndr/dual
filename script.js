@@ -267,6 +267,7 @@ function init() {
 
         tutorialNextButton.removeAllEventListeners();
 
+        var showAction = false;
         var showLogic = false;
         var triedAnd = false;
         var triedOr = false;
@@ -332,10 +333,16 @@ function init() {
         dropZone3.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
         dropZone3.alpha = 0;
         dropZone3.slot = 3; // to determine which slot items dropped in
-  
+
+        var playButton = new createjs.Shape().set({x:675,y:40});
+        playButton.graphics.beginFill(gray).drawRoundRect(0,0,200,80,10);
+        playButton.alpha = 0;
+        var playLabel = new createjs.Text("PLAY", largeLabelStyle, pink).set({x:775,y:55});
+        playLabel.textAlign = "center";
+        playLabel.alpha = 0;
+
         dropZoneContainer.addChild(dropZone0,dropZone1,dropZone2);
-        // need to add dropZone3 when add action
-        sequenceBox.addChild(trays,dropZoneContainer);
+        sequenceBox.addChild(trays,dropZoneContainer,playButton,playLabel);
 
         var tutorialConditions = new createjs.Container().set({x:460,y:1400});
         tutorialConditions.alpha = 0;
@@ -478,10 +485,14 @@ function init() {
           createjs.Tween.get(flipV).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn);
           createjs.Tween.get(rotate180cc).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn);
 
-          createjs.Tween.get(sequenceBox).wait(1400).to({x:(((canvas.width-442)/2)-96)}, 400, createjs.Ease.cubicInOut);
+          createjs.Tween.get(sequenceBox).wait(1400).to({x:335}, 400, createjs.Ease.cubicInOut);
           createjs.Tween.get(actionTray).wait(1800).to({alpha:1}, 400, createjs.Ease.cubicIn);
-          createjs.Tween.get(dropZone3).wait(1800).to({alpha:.25}, 400, createjs.Ease.cubicIn).call(endTween);
+          createjs.Tween.get(dropZone3).wait(1800).to({alpha:.25}, 400, createjs.Ease.cubicIn);
+          createjs.Tween.get(playButton).wait(2000).to({alpha:.5}, 400, createjs.Ease.cubicIn);
+          createjs.Tween.get(playLabel).wait(2000).to({alpha:.5}, 400, createjs.Ease.cubicIn).call(endTween);
 
+          clearSequenceLearn();
+          showAction = true;
         }
 
         // INTERACTION
@@ -545,7 +556,7 @@ function init() {
 
           stage.update();
           dropPosition = null;
-          // sequenceReady();
+          sequenceReadyLearn();
         }
 
         function addToSlotLearn(item,pos) {
@@ -558,7 +569,7 @@ function init() {
               item.y = pos.y;
               item.inSlot = pos.slot;
               sequence[pos.slot] = item;
-              targetGameObjectsLearn();
+              if (showAction == false) { targetGameObjectsLearn(); }
             } else { 
               returnToOriginLearn(item,item.originParent,item.originX,item.originY); 
             }
@@ -571,7 +582,7 @@ function init() {
               item.y = pos.y; 
               item.inSlot = pos.slot;
               sequence[pos.slot] = item;
-              targetGameObjectsLearn();
+              if (showAction == false) { targetGameObjectsLearn(); }
 
               if (item.name == "AND") {
                 triedAnd = true;
@@ -579,7 +590,7 @@ function init() {
                 triedOr = true;
               }
 
-              if (triedOr && triedAnd) {
+              if (triedOr && triedAnd && (showAction == false)) {
                 tutorialText3.text = "Good work. Keep playing, when you're ready let's learn about actions."
                 tutorialNextButton.alpha = 1;
                 tutorialNextLabel.alpha = 1;
@@ -599,8 +610,6 @@ function init() {
               item.y = pos.y; 
               item.inSlot = pos.slot;
               sequence[pos.slot] = item;
-              console.log(sequence);
-              deliverActionLearn(targetGameObjectsLearn());
             } else { 
               returnToOriginLearn(item,item.originParent,item.originX,item.originY); 
             }
@@ -614,7 +623,7 @@ function init() {
           item.x = x;
           item.y = y;
           item.inSlot = false;
-          targetGameObjectsLearn();
+          if (showAction == false) { targetGameObjectsLearn(); }
           stage.update();
         }
 
@@ -661,12 +670,6 @@ function init() {
             } else {
               tutorialObjectsInPlay[i].alpha = .2;
             }
-
-            var findMorph = tutorialObjectsInPlay[i].getChildByName("morph");
-            if (findMorph != null) {
-              removeMorph(tutorialObjectsInPlay[i],findMorph);
-            }
-
           }
 
           return targets;
@@ -709,13 +712,111 @@ function init() {
 
           }
           
-          function deliverActionLearn(targets,step) {
+          function deliverActionLearn(targets) {
 
             for (i in targets) {
                 sequence[3].func(targets[i]);
             }
           }
+
+          function clearSequenceLearn() {
+
+            var toClear = [];
+
+            for (var i = 0; i < sequenceBox.children.length; i++) {
+              if (sequenceBox.children[i].type != null) {
+                toClear.push(sequenceBox.children[i]);
+              }
+            }
+
+            for (var i = 0; i < toClear.length; i++) {
+              returnToOrigin(toClear[i],toClear[i].originParent,toClear[i].originX,toClear[i].originY);
+            }
+
+            for (var i = 0; i < 4; i++) {
+              sequence[i] = null;
+            }
+
+            sequenceTray.graphics
+            .clear()
+            .beginStroke(green).setStrokeStyle(8).beginFill(black)
+            .drawRoundRect(0,0,442,154,5);
+
+            actionTray.graphics
+            .clear()
+            .beginStroke(yellow).setStrokeStyle(8).beginFill(black)
+            .drawRoundRect(0,0,160,154,5);
+
+            for (i in tutorialObjectsInPlay) {
+
+              var findMorph = tutorialObjectsInPlay[i].getChildByName("morph");
+                if (findMorph != null) {
+                  removeMorph(tutorialObjectsInPlay[i],findMorph);
+                }
+              tutorialObjectsInPlay[i].alpha = 1;
+              }
+
+            sequenceReadyLearn();
+            stage.update();
+          }
+
+          // PLAY SEQUENCE
+
+          function sequenceReadyLearn() {
+
+          playReady = false;
+
+          if ((sequence[0] != null || sequence[1] != null || sequence[2] != null) && sequence[3] != null) {
+            playReady = true;
+          } else if ((sequence[0] != null || sequence[1] != null || sequence[2] != null) && sequence[3] == null) {
+            playReady = false;
+          } else if ((sequence[0] == null || sequence[1] == null || sequence[2] == null) && sequence[3] != null) {
+            playReady = false;
+          }
+
+          if (playReady == true && showAction == true) {
+            playButton.addEventListener("mousedown",highlightButton);
+            playButton.addEventListener("pressup",playLearn);
+            playButton.alpha = 1;
+            playLabel.alpha = 1;
+          } else if (playReady == false && showAction == true) {
+            playButton.removeEventListener("mousedown",highlightButton);
+            playButton.removeEventListener("pressup",playLearn);
+            playButton.alpha = .5;
+            playLabel.alpha = .5;
+          }
+
+          stage.update();
         }
+
+
+        function playLearn() {
+
+          playButton.alpha = 1;
+          var step = 0;
+
+          playLearnSequence();
+          window.setTimeout(playLearnAction,1000);
+          window.setTimeout(clearSequenceLearn,2000);
+
+          function playLearnSequence() {
+              targetGameObjectsLearn();
+              sequenceTray.graphics
+              .clear()
+              .beginStroke(black).setStrokeStyle(8).beginFill(black)
+              .drawRoundRect(0,0,442,154,5);
+              stage.update();
+            } 
+          function playLearnAction() {
+            deliverActionLearn(targetGameObjectsLearn());
+            actionTray.graphics
+            .clear()
+            .beginStroke(black).setStrokeStyle(8).beginFill(black)
+            .drawRoundRect(0,0,160,154,5);
+            stage.update();
+          }
+        }
+      }
     }
 
     function returnToStart(event) {
