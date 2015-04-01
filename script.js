@@ -74,10 +74,10 @@ function init() {
     var startOverlayBG = new createjs.Shape();
     startOverlayBG.graphics.beginFill(green).drawRect(0,0,canvas.width,canvas.height);
 
-    var topBorder = new createjs.Shape();
-    topBorder.graphics.beginStroke(white).setStrokeStyle(10);
-    topBorder.graphics.moveTo(0,5);
-    topBorder.graphics.lineTo(canvas.width,5);
+    // var topBorder = new createjs.Shape();
+    // topBorder.graphics.beginStroke(lightGray).setStrokeStyle(10);
+    // topBorder.graphics.moveTo(0,-5);
+    // topBorder.graphics.lineTo(canvas.width,-5);
 
     var tutorialGrid = new Grid(2,380,1000,230);
     tutorialGrid.alpha = 0;
@@ -88,25 +88,21 @@ function init() {
     var D = new GameObject(0,1,1,0).set({x:centerX-450,y:0});
     D.scaleX = 1.8;
     D.scaleY = 1.8;
-    D.cache(-135,-135,270,270);
     tutorialObjectsInPlay.push(D);
 
     var U = new GameObject(0,0,1,1).set({x:centerX-150,y:0});
     U.scaleX = 1.8;
     U.scaleY = 1.8;
-    U.cache(-135,-135,270,270);
     tutorialObjectsInPlay.push(U);
 
     var A = new GameObject(1,1,0,0).set({x:centerX+150,y:0});
     A.scaleX = 1.8;
     A.scaleY = 1.8;
-    A.cache(-135,-135,270,270);
     tutorialObjectsInPlay.push(A);
 
     var L = new GameObject(0,1,0,0).set({x:centerX+450,y:0});
     L.scaleX = 1.8;
     L.scaleY = 1.8;
-    L.cache(-135,-135,270,270);
     tutorialObjectsInPlay.push(L);
 
     var pathForD = new createjs.Shape();
@@ -165,7 +161,7 @@ function init() {
     start.addEventListener("mousedown",highlightButton);
     start.addEventListener("pressup",beginGame);
 
-    startOverlay.addChild(startOverlayBG,topBorder,tutorialGrid,logo,tagline,learn,start);
+    startOverlay.addChild(startOverlayBG,tutorialGrid,logo,tagline,learn,start);
     stage.addChild(startOverlay);
     stage.update();
 
@@ -230,11 +226,15 @@ function init() {
       //createjs.Tween.get(pathForA).wait(700).to({alpha:0}, 200, createjs.Ease.cubicOut);
       //createjs.Tween.get(pathForL).wait(800).to({alpha:0}, 200, createjs.Ease.cubicOut);
 
+      D.cache(-135,-135,270,270);
+      U.cache(-135,-135,270,270);
+      A.cache(-135,-135,270,270);
+      L.cache(-135,-135,270,270);
+
       createjs.Tween.get(D).wait(1000).to({x:colVal(0,2,380),y:rowVal(0,2,380,1000)-700}, 600, createjs.Ease.backInOut);
       createjs.Tween.get(U).wait(1200).to({x:colVal(1,2,380),y:rowVal(0,2,380,1000)-700}, 600, createjs.Ease.backInOut);
       createjs.Tween.get(A).wait(1400).to({x:colVal(0,2,380),y:rowVal(1,2,380,1000)-700}, 500, createjs.Ease.backOut);
       createjs.Tween.get(L).wait(1600).to({x:colVal(1,2,380),y:rowVal(1,2,380,1000)-700}, 500, createjs.Ease.backOut).call(tutorialReady);
-
 
       function tutorialReady() {
 
@@ -747,7 +747,7 @@ function init() {
             }
 
             for (var i = 0; i < toClear.length; i++) {
-              returnToOrigin(toClear[i],toClear[i].originParent,toClear[i].originX,toClear[i].originY);
+              returnToOriginLearn(toClear[i],toClear[i].originParent,toClear[i].originX,toClear[i].originY);
             }
 
             for (var i = 0; i < 4; i++) {
@@ -870,11 +870,49 @@ function init() {
         startOverlay.removeAllChildren();
         stage.removeChild(startOverlay);
         loadSelectors(selectorsP1);
+        window.setTimeout(popSelectors,2000,selectorsP2);
       }   
     }
   }
 
   loadIntro();
+
+  function exit() {
+
+    exitLabel.alpha = 1;
+
+    createjs.Ticker.setPaused(false);
+
+    startOverlay.y = canvas.height;
+    loadIntro();
+    stage.addChild(startOverlay);
+
+    createjs.Tween.get(startOverlay, {override:true}).to({y:0}, 600, createjs.Ease.cubicOut).call(prepNewGame);
+
+    function prepNewGame() {
+
+      objectsInPlay = [];
+
+      clearSequence();
+      updateScores();
+
+      whiteTurn.visible = true;
+      blackTurn.visible = false;
+
+      selectorsBox.getChildByName("bg").graphics.beginFill("#F9F9F9");
+      selectorsBox.getChildByName("bg").graphics.drawRoundRect(0,0,336,1054,10);
+      actionsBox.getChildByName("bg").graphics.beginFill("#F9F9F9");
+      actionsBox.getChildByName("bg").graphics.drawRoundRect(0,0,336,1054,10);
+
+      endTween();
+
+    }
+  }
+
+  function exitHighlight() {
+    exitLabel.alpha = .5;
+    stage.update();
+  }
 
   // BOARD
 
@@ -894,12 +932,21 @@ function init() {
 
   // GAME MGMT & SCORES
 
-  var newGameButton = new createjs.Shape().set({x:60,y:35});
+  var newGameButton = new createjs.Shape().set({x:40,y:40});
   newGameButton.graphics.beginFill("#AAA5A5").drawRect(0,0,300,100);
-  newGameButton.addEventListener("click",newGame);
+  newGameButton.addEventListener("mousedown",newGameHighlight);
+  newGameButton.addEventListener("pressup",newGame);
   newGameButton.name = "new";
-  var newGameLabel = new createjs.Text("NEW GAME", mediumLabelStyle, white).set({x:206,y:65});
+  var newGameLabel = new createjs.Text("RESTART", mediumLabelStyle, white).set({x:185,y:70});
   newGameLabel.textAlign = "center";
+
+  var exitButton = new createjs.Shape().set({x:canvas.width-330,y:40});
+  exitButton.graphics.beginFill("#AAA5A5").drawRect(0,0,260,100);
+  exitButton.addEventListener("mousedown",exitHighlight);
+  exitButton.addEventListener("pressup",exit);
+  exitButton.name = "exit";
+  var exitLabel = new createjs.Text("EXIT", mediumLabelStyle, white).set({x:canvas.width-200,y:70});
+  exitLabel.textAlign = "center";
 
   var whiteTurn = new createjs.Shape().set({x:0,y:(445-iconRadius)});
   whiteTurn.graphics.beginFill(pink).drawRect(0,0,25,iconRadius*2);
@@ -917,7 +964,7 @@ function init() {
   var blackScore = new createjs.Text(bScore, largeLabelStyle, black).set({x:(canvas.width - 160),y:425});
   blackScore.textAlign = "right";
 
-  board.addChild(newGameButton,newGameLabel,whiteTurn,whiteIcon,blackTurn,blackIcon);
+  board.addChild(newGameButton,newGameLabel,exitButton,exitLabel,whiteTurn,whiteIcon,blackTurn,blackIcon);
 
   // PLAYER CONTROLS
 
@@ -1085,11 +1132,6 @@ function init() {
 
   var RCRC = [0,1,0,1]; shapeSelectors.push(RCRC);
   var CRCR = [1,0,1,0]; shapeSelectors.push(CRCR);
-
-  for (var i = 0; i < 10; i++) {
-    selectorsP1[i] = null;
-    selectorsP2[i] = null;
-   }
 
 function popSelectors(set) {
 
@@ -1730,12 +1772,16 @@ function loadSelectors(set) {
   // ADD BOARD & GAME OBJECTS
 
   function loadGame() {
+
+    for (var i = 0; i < 10; i++) {
+      selectorsP1[i] = null;
+      selectorsP2[i] = null;
+    }
+
     stage.addChild(board,sequenceBox,selectorsBox,actionsBox);
     popSelectors(selectorsP1);
-    popSelectors(selectorsP2);
     loadGameObjects(4);
-    //loadSelectors(selectorsP1);
-    //stage.update();
+  
   }
 
   function loadGameObjects(gridSize) {
@@ -1778,6 +1824,7 @@ function loadSelectors(set) {
           if (event.currentTarget.name == "AND") {
             andCount--;
             andCountLabel.text = andCount;
+            console.log(andCount);
         } else if (event.currentTarget.name == "OR") {
             orCount--;
             orCountLabel.text = orCount;
@@ -1919,6 +1966,7 @@ function loadSelectors(set) {
     if (item.name == "AND") {
       andCount++;
       andCountLabel.text = andCount;
+      console.log(andCount);
     } else if (item.name == "OR") {
       orCount++;
       orCountLabel.text = orCount;
@@ -2450,6 +2498,8 @@ function loadSelectors(set) {
 
   function newGame() {
 
+    newGameLabel.alpha = 1;
+
     stage.removeAllChildren();
 
     objectsInPlay = [];
@@ -2467,12 +2517,22 @@ function loadSelectors(set) {
     loadGame();
     updateScores();
 
+    selectorsBox.getChildByName("bg").graphics.beginFill("#F9F9F9");
+    selectorsBox.getChildByName("bg").graphics.drawRoundRect(0,0,336,1054,10);
+    actionsBox.getChildByName("bg").graphics.beginFill("#F9F9F9");
+    actionsBox.getChildByName("bg").graphics.drawRoundRect(0,0,336,1054,10);
+
     whiteTurn.visible = true;
     blackTurn.visible = false;
 
     stage.update();
 
     loadSelectors(selectorsP1);
+  }
+
+  function newGameHighlight() {
+    newGameLabel.alpha = .5;
+    stage.update();
   }
 
 
