@@ -110,36 +110,37 @@ function init() {
     tutorialObjectsInPlay.push(L);
 
     var pathForD = new createjs.Shape();
-    pathForD.graphics.beginStroke(lightGray).setStrokeStyle(20,"butt");
-    pathForD.graphics.moveTo((centerX-450-(75*1.8))+10,(-(75*1.8))+10);
-    pathForD.graphics.lineTo((centerX-450)+10,(-(75*1.8))+10);
-    pathForD.graphics.arc((centerX-450),0,(75*1.8)-10,270*(Math.PI/180),90*(Math.PI/180));
-    pathForD.graphics.lineTo((centerX-450-(75*1.8)+10),(75*1.8)-10);
-    pathForD.graphics.lineTo((centerX-450-(75*1.8)+10),-(75*1.8));
+    pathForD.graphics.beginStroke(lightGray).setStrokeStyle(30,"butt");
+    pathForD.graphics.moveTo((centerX-450-(75*1.8))+15,(-(75*1.8))+15);
+    pathForD.graphics.lineTo((centerX-450)+15,(-(75*1.8))+15);
+    pathForD.graphics.arc((centerX-450),0,(75*1.8)-15,270*(Math.PI/180),90*(Math.PI/180));
+    pathForD.graphics.lineTo((centerX-450-(75*1.8)+15),(75*1.8)-15);
+    pathForD.graphics.lineTo((centerX-450-(75*1.8)+15),-(75*1.8));
 
     var pathForU = new createjs.Shape();
-    pathForU.graphics.beginStroke(lightGray).setStrokeStyle(20,"butt");
-    pathForU.graphics.moveTo((centerX-150-(75*1.8))+10,-(75*1.8));
-    pathForU.graphics.lineTo((centerX-150-(75*1.8)+10),0);
-    pathForU.graphics.arc((centerX-150),0,(75*1.8)-10,180*(Math.PI/180),360*(Math.PI/180),true);
-    pathForU.graphics.lineTo((centerX-150+(75*1.8))-10,-(75*1.8));
+    pathForU.graphics.beginStroke(lightGray).setStrokeStyle(30,"butt");
+    pathForU.graphics.moveTo((centerX-150-(75*1.8))+15,-(75*1.8));
+    pathForU.graphics.lineTo((centerX-150-(75*1.8)+15),0);
+    pathForU.graphics.arc((centerX-150),0,(75*1.8)-15,180*(Math.PI/180),360*(Math.PI/180),true);
+    pathForU.graphics.lineTo((centerX-150+(75*1.8))-15,-(75*1.8));
 
     var pathForA = new createjs.Shape();
-    pathForA.graphics.beginStroke(lightGray).setStrokeStyle(20,"butt");
-    pathForA.graphics.moveTo((centerX+150-(75*1.8))+10,(75*1.8));
-    pathForA.graphics.lineTo((centerX+150-(75*1.8))+10,0);
-    pathForA.graphics.arc((centerX+150),0,(75*1.8)-10,180*(Math.PI/180),360*(Math.PI/180));
-    pathForA.graphics.lineTo((centerX+150+(75*1.8))-10,(75*1.8));
+    pathForA.graphics.beginStroke(lightGray).setStrokeStyle(30,"butt");
+    pathForA.graphics.moveTo((centerX+150-(75*1.8))+15,(75*1.8));
+    pathForA.graphics.lineTo((centerX+150-(75*1.8))+15,0);
+    pathForA.graphics.arc((centerX+150),0,(75*1.8)-15,180*(Math.PI/180),360*(Math.PI/180));
+    pathForA.graphics.lineTo((centerX+150+(75*1.8))-15,(75*1.8));
 
     var pathForL = new createjs.Shape();
-    pathForL.graphics.beginStroke(lightGray).setStrokeStyle(20,"butt");
-    pathForL.graphics.moveTo((centerX+450-(75*1.8))+10,-(75*1.8));
-    pathForL.graphics.lineTo((centerX+450-(75*1.8))+10,(75*1.8)-10);
-    pathForL.graphics.lineTo((centerX+450+(75*1.8)),(75*1.8)-10);
+    pathForL.graphics.beginStroke(lightGray).setStrokeStyle(30,"butt");
+    pathForL.graphics.moveTo((centerX+450-(75*1.8))+15,-(75*1.8));
+    pathForL.graphics.lineTo((centerX+450-(75*1.8))+15,(75*1.8)-15);
+    pathForL.graphics.lineTo((centerX+450+(75*1.8)),(75*1.8)-15);
 
-    logo.addChild(D,pathForD,U,pathForU,A,pathForA,L,pathForL);
+    logo.addChild(D,U,A,L);
+    //logo.addChild(D,pathForD,U,pathForU,A,pathForA,L,pathForL);
 
-    var tagline = new createjs.Text("A GAME ABOUT COMPUTATION","bold 60px Avenir-Heavy",black).set({x:centerX,y:900});
+    var tagline = new createjs.Text("DUAL IS A GAME ABOUT COMPUTATION","bold 50px Avenir-Heavy",black).set({x:centerX,y:900});
     tagline.textAlign = "center";
 
     var learn = new createjs.Container().set({x:centerX,y:1200});
@@ -210,8 +211,6 @@ function init() {
       var tutorialNextButton = new createjs.Shape().set({x:centerX-200,y:1790});
       tutorialNextButton.graphics.beginFill("#EAEAEA").drawRect(0,0,400,100);
       tutorialNextButton.alpha = 0;
-      // tutorialNextButton.addEventListener("mousedown",highlightButton);
-      // tutorialNextButton.addEventListener("pressup",loadTutorialItems);
       var tutorialNextLabel = new createjs.Text("NEXT", "100 60px Avenir-Heavy", green).set({x:centerX,y:1800});
       tutorialNextLabel.textAlign = "center";
       tutorialNextLabel.alpha = 0;
@@ -226,10 +225,10 @@ function init() {
       createjs.Tween.get(tutorialBG).wait(500).to({alpha:1}, 400, createjs.Ease.cubicIn);
       createjs.Tween.get(closeTutorial).wait(500).to({alpha:.9}, 400, createjs.Ease.cubicIn);
 
-      createjs.Tween.get(pathForD).wait(500).to({alpha:0}, 200, createjs.Ease.cubicOut);
-      createjs.Tween.get(pathForU).wait(600).to({alpha:0}, 200, createjs.Ease.cubicOut);
-      createjs.Tween.get(pathForA).wait(700).to({alpha:0}, 200, createjs.Ease.cubicOut);
-      createjs.Tween.get(pathForL).wait(800).to({alpha:0}, 200, createjs.Ease.cubicOut);
+      //createjs.Tween.get(pathForD).wait(500).to({alpha:0}, 200, createjs.Ease.cubicOut);
+      //createjs.Tween.get(pathForU).wait(600).to({alpha:0}, 200, createjs.Ease.cubicOut);
+      //createjs.Tween.get(pathForA).wait(700).to({alpha:0}, 200, createjs.Ease.cubicOut);
+      //createjs.Tween.get(pathForL).wait(800).to({alpha:0}, 200, createjs.Ease.cubicOut);
 
       createjs.Tween.get(D).wait(1000).to({x:colVal(0,2,380),y:rowVal(0,2,380,1000)-700}, 600, createjs.Ease.backInOut);
       createjs.Tween.get(U).wait(1200).to({x:colVal(1,2,380),y:rowVal(0,2,380,1000)-700}, 600, createjs.Ease.backInOut);
@@ -279,7 +278,7 @@ function init() {
         createjs.Tween.get(tutorialNextButton).wait(600).to({alpha:0}, 100, createjs.Ease.cubicOut);
         createjs.Tween.get(tutorialNextLabel).wait(600).to({alpha:0}, 400, createjs.Ease.cubicOut);
 
-        var tutorialText3 = new createjs.Text("Target shapes on the grid by matching specific conditions, like position or shape. Drag conditions into the sequence tray above to see what happens.", "100 60px Avenir-Book", black).set({x:centerX,y:1600});
+        var tutorialText3 = new createjs.Text("Target shapes on the grid by matching specific conditions, like position or shape. Drag conditions into the sequence tray above to see what you can target.", "100 60px Avenir-Book", black).set({x:centerX,y:1600});
         tutorialText3.textAlign = "center";
         tutorialText3.lineWidth = 1150;
         tutorialText3.lineHeight = 80;
@@ -454,7 +453,7 @@ function init() {
 
           showLogic = true;
 
-          tutorialText3.text = "If you use two conditions you need to add logic. Use AND to target shapes matching both conditions. Use OR to match either condition. Try it out!"
+          tutorialText3.text = "If you want to use two conditions you need to add logic. Use AND to target shapes matching both conditions. Use OR to match either condition. Try both out!"
           
           createjs.Tween.get(tutorialConditions).wait(800).to({x:320}, 400, createjs.Ease.cubicInOut);
           createjs.Tween.get(placeholder5).wait(1200).to({alpha:.4}, 400, createjs.Ease.cubicIn);
@@ -470,11 +469,12 @@ function init() {
 
           dropZoneContainer.addChild(dropZone3);
 
-          tutorialText3.text = "You can use one action on each set of targeted shapes. Switch corners from black to white or vice versa. Flip or rotate shapes to target them later in your sequence."
+          tutorialText3.text = "Use actions to transform targeted shapes. Switch corners between black and white. Flip or rotate shapes to target them later in your sequence."
           tutorialNextButton.alpha = 0;
+          tutorialNextButton.removeAllEventListeners();
           tutorialNextLabel.alpha = 0;
 
-          createjs.Tween.get(tutorialConditions).wait(800).to({x:26}, 400, createjs.Ease.cubicInOut);
+          createjs.Tween.get(tutorialConditions).wait(800).to({x:28}, 400, createjs.Ease.cubicInOut);
 
           createjs.Tween.get(placeholder7).wait(1200).to({alpha:.4}, 400, createjs.Ease.cubicIn);
           createjs.Tween.get(placeholder8).wait(1200).to({alpha:.4}, 400, createjs.Ease.cubicIn);
@@ -485,15 +485,32 @@ function init() {
           createjs.Tween.get(flipV).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn);
           createjs.Tween.get(rotate180cc).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn);
 
-          createjs.Tween.get(sequenceBox).wait(1400).to({x:335}, 400, createjs.Ease.cubicInOut);
-          createjs.Tween.get(actionTray).wait(1800).to({alpha:1}, 400, createjs.Ease.cubicIn);
-          createjs.Tween.get(dropZone3).wait(1800).to({alpha:.25}, 400, createjs.Ease.cubicIn);
-          createjs.Tween.get(playButton).wait(2000).to({alpha:.5}, 400, createjs.Ease.cubicIn);
-          createjs.Tween.get(playLabel).wait(2000).to({alpha:.5}, 400, createjs.Ease.cubicIn).call(endTween);
+          createjs.Tween.get(sequenceBox).wait(1200).to({x:335}, 400, createjs.Ease.cubicInOut);
+          createjs.Tween.get(actionTray).wait(1400).to({alpha:1}, 400, createjs.Ease.cubicIn);
+          createjs.Tween.get(dropZone3).wait(1400).to({alpha:.25}, 400, createjs.Ease.cubicIn);
+          createjs.Tween.get(playButton).wait(1400).to({alpha:.5}, 400, createjs.Ease.cubicIn);
+          createjs.Tween.get(playLabel).wait(1400).to({alpha:.5}, 400, createjs.Ease.cubicIn).call(endTween);
 
           clearSequenceLearn();
           showAction = true;
         }
+
+        function finishTutorial() {
+
+          tutorialText3.text = "Thinking forward is the key to sequential thinking. For each turn you can build up to four steps like this one. Good luck."
+          
+          tutorialNextLabel.text = "START";
+
+          tutorialNextButton.addEventListener("mousedown",highlightButton);
+          tutorialNextButton.addEventListener("pressup",beginGame);
+          tutorialNextButton.y = 1860;
+          tutorialNextButton.alpha = 1;
+          tutorialNextLabel.y = 1870;
+          tutorialNextLabel.alpha = 1;
+
+          stage.update();
+        }
+
 
         // INTERACTION
 
@@ -793,19 +810,20 @@ function init() {
         function playLearn() {
 
           playButton.alpha = 1;
-          var step = 0;
+          playButton.removeAllEventListeners();
 
           playLearnSequence();
           window.setTimeout(playLearnAction,1000);
           window.setTimeout(clearSequenceLearn,2000);
+          window.setTimeout(finishTutorial,2000);
 
           function playLearnSequence() {
-              targetGameObjectsLearn();
-              sequenceTray.graphics
-              .clear()
-              .beginStroke(black).setStrokeStyle(8).beginFill(black)
-              .drawRoundRect(0,0,442,154,5);
-              stage.update();
+            targetGameObjectsLearn();
+            sequenceTray.graphics
+            .clear()
+            .beginStroke(black).setStrokeStyle(8).beginFill(black)
+            .drawRoundRect(0,0,442,154,5);
+            stage.update();
             } 
           function playLearnAction() {
             deliverActionLearn(targetGameObjectsLearn());
@@ -1989,8 +2007,7 @@ function loadSelectors(set) {
       playButton.alpha = 1;
       playLabel.alpha = 1;
     } else {
-      playButton.removeEventListener("mousedown",playHighlight);
-      playButton.removeEventListener("pressup",play);
+      playButton.removeAllEventListeners();
       playButton.alpha = .5;
       playLabel.alpha = .5;
     }
@@ -2006,6 +2023,7 @@ function loadSelectors(set) {
   function play() {
 
     playButton.alpha = 1;
+    playButton.removeAllEventListeners();
 
     playSequence();
     var playing = window.setInterval(playSequence,1000);
