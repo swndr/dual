@@ -64,6 +64,8 @@ function init() {
   var bComplete = 0;
   var wScore = 0;
   var bScore = 0;
+  var wCounter = 0;
+  var bCounter = 0;
   var gameOver = false;
 
   var stage = new createjs.Stage(canvas);
@@ -1466,30 +1468,26 @@ function loadSelectors(set) {
 
   function updateScores() {
 
-  var prevBScore = bScore;
-  var prevWScore = wScore;
-
   bScore = 0;
   wScore = 0;
 
   for (var i = 0; i < objectsInPlay.length; i++) {
     if (objectsInPlay[i].tl == 0 && objectsInPlay[i].tr == 0 && objectsInPlay[i].br == 0 && objectsInPlay[i].bl == 0) {
+      if (objectsInPlay[i].complete === false) {
+        bComplete++;
+      }
       objectsInPlay[i].complete = 0;
       bScore++;
     } else if (objectsInPlay[i].tl == 1 && objectsInPlay[i].tr == 1 && objectsInPlay[i].br == 1 && objectsInPlay[i].bl == 1) {
-      objectsInPlay[i].complete = 1;
+      if (objectsInPlay[i].complete === false) {
+        wComplete++;
+      }
       wScore++;
+      objectsInPlay[i].complete = 1;
+      
     } else {
       objectsInPlay[i].complete = false;
     }
-  }
-
-  if (bScore > prevBScore) {
-    bComplete = (prevBScore + (bScore - prevBScore));
-  }
-
-  if (wScore > prevWScore) {
-    wComplete = (prevWScore + (wScore - prevWScore));
   }
 
   if (bScore > 3 && wScore > 3) {
