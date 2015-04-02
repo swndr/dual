@@ -1473,13 +1473,13 @@ function loadSelectors(set) {
 
   for (var i = 0; i < objectsInPlay.length; i++) {
     if (objectsInPlay[i].tl == 0 && objectsInPlay[i].tr == 0 && objectsInPlay[i].br == 0 && objectsInPlay[i].bl == 0) {
-      if (objectsInPlay[i].complete === false) {
+      if (objectsInPlay[i].complete === false && wTurn == false) {
         bComplete++;
       }
       objectsInPlay[i].complete = 0;
       bScore++;
     } else if (objectsInPlay[i].tl == 1 && objectsInPlay[i].tr == 1 && objectsInPlay[i].br == 1 && objectsInPlay[i].bl == 1) {
-      if (objectsInPlay[i].complete === false) {
+      if (objectsInPlay[i].complete === false && wTurn == true) {
         wComplete++;
       }
       wScore++;
