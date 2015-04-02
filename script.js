@@ -1466,6 +1466,9 @@ function loadSelectors(set) {
 
   function updateScores() {
 
+  var prevBScore = bScore;
+  var prevWScore = wScore;
+
   bScore = 0;
   wScore = 0;
 
@@ -1473,15 +1476,21 @@ function loadSelectors(set) {
     if (objectsInPlay[i].tl == 0 && objectsInPlay[i].tr == 0 && objectsInPlay[i].br == 0 && objectsInPlay[i].bl == 0) {
       objectsInPlay[i].complete = 0;
       bScore++;
-      bComplete++;
     } else if (objectsInPlay[i].tl == 1 && objectsInPlay[i].tr == 1 && objectsInPlay[i].br == 1 && objectsInPlay[i].bl == 1) {
       objectsInPlay[i].complete = 1;
       wScore++;
-      wComplete++;
     } else {
       objectsInPlay[i].complete = false;
     }
-  } 
+  }
+
+  if (bScore > prevBScore) {
+    bComplete = (prevBScore + (bScore - prevBScore));
+  }
+
+  if (wScore > prevWScore) {
+    wComplete = (prevWScore + (wScore - prevWScore));
+  }
 
   if (bScore > 3 && wScore > 3) {
     checkWin(2);
@@ -1629,26 +1638,26 @@ function loadSelectors(set) {
     var victory = new createjs.Text(winner,"bold 100px Avenir-Heavy",victoryColor).set({x:centerX,y:90});
     victory.textAlign = "center";
 
-    var whiteTitle = new createjs.Text("WHITE /","bold 55px Avenir-Heavy",white).set({x:70,y:300});
+    var whiteTitle = new createjs.Text("WHITE /","bold 55px Avenir-Heavy",white).set({x:60,y:300});
     whiteTitle.textAlign = "left";
-    var whiteTurns = new createjs.Text(wTurns + " TURNS","100 55px Avenir-Book",white).set({x:70,y:400});
+    var whiteTurns = new createjs.Text(wTurns + " TURNS","100 55px Avenir-Book",white).set({x:60,y:400});
     whiteTurns.textAlign = "left"; 
-    var whiteConditions = new createjs.Text(wConditions + " CONDITIONS USED","100 55px Avenir-Book",white).set({x:70,y:500});
+    var whiteConditions = new createjs.Text(wConditions + " CONDITIONS USED","100 55px Avenir-Book",white).set({x:60,y:500});
     whiteConditions.textAlign = "left"; 
-    var whiteActions = new createjs.Text(wActions + " ACTIONS USED","100 55px Avenir-Book",white).set({x:70,y:600});
+    var whiteActions = new createjs.Text(wActions + " ACTIONS USED","100 55px Avenir-Book",white).set({x:60,y:600});
     whiteActions.textAlign = "left";
-    var whiteComplete = new createjs.Text(wComplete + " COMPLETED CIRCLES","100 55px Avenir-Book",white).set({x:70,y:700});
+    var whiteComplete = new createjs.Text(wComplete + " COMPLETED CIRCLES","100 55px Avenir-Book",white).set({x:60,y:700});
     whiteComplete.textAlign = "left"; 
 
-    var blackTitle = new createjs.Text("BLACK /","bold 55px Avenir-Heavy",black).set({x:(canvas.width/2)+70,y:300});
+    var blackTitle = new createjs.Text("BLACK /","bold 55px Avenir-Heavy",black).set({x:(canvas.width/2)+60,y:300});
     blackTitle.textAlign = "left";
-    var blackTurns = new createjs.Text(bTurns + " TURNS","100 55px Avenir-Book",black).set({x:(canvas.width/2)+70,y:400});
+    var blackTurns = new createjs.Text(bTurns + " TURNS","100 55px Avenir-Book",black).set({x:(canvas.width/2)+60,y:400});
     blackTurns.textAlign = "left"; 
-    var blackConditions = new createjs.Text(bConditions + " CONDITIONS USED","100 55px Avenir-Book",black).set({x:(canvas.width/2)+70,y:500});
+    var blackConditions = new createjs.Text(bConditions + " CONDITIONS USED","100 55px Avenir-Book",black).set({x:(canvas.width/2)+60,y:500});
     blackConditions.textAlign = "left"; 
-    var blackActions = new createjs.Text(bActions + " ACTIONS USED","100 55px Avenir-Book",black).set({x:(canvas.width/2)+70,y:600});
+    var blackActions = new createjs.Text(bActions + " ACTIONS USED","100 55px Avenir-Book",black).set({x:(canvas.width/2)+60,y:600});
     blackActions.textAlign = "left";
-    var blackComplete = new createjs.Text(bComplete + " COMPLETED SQUARES","100 55px Avenir-Book",black).set({x:(canvas.width/2)+70,y:700});
+    var blackComplete = new createjs.Text(bComplete + " COMPLETED SQUARES","100 55px Avenir-Book",black).set({x:(canvas.width/2)+60,y:700});
     blackComplete.textAlign = "left";
 
     winOverlay.addChild(winBG,newGameBanner,newGameBannerText,victory,whiteTitle,whiteTurns,whiteConditions,whiteActions,whiteComplete,blackTitle,blackTurns,blackConditions,blackActions,blackComplete);
@@ -1732,17 +1741,6 @@ function loadSelectors(set) {
       window.setTimeout(popSelectors,2000,selectorsP2);
 
     }
-
-    console.log(wTurns);
-    console.log(bTurns);
-    console.log(wConditions);
-    console.log(bConditions);
-    console.log(wActions);
-    console.log(bActions);
-    console.log(wComplete);
-    console.log(bComplete);
-    console.log(wScore);
-    console.log(bScore);
 
     stage.update();
   }
@@ -2603,7 +2601,7 @@ function loadSelectors(set) {
 
         function finishTutorial() {
 
-          tutorialText3.text = "Thinking forward is the key to sequential thinking. For each turn you can build up to four steps like this one. Good luck."
+          tutorialText3.text = "Thinking ahead is the key to sequential thinking. For each turn you can build up to four sets of conditions and actions."
           
           tutorialNextLabel.text = "START";
 
