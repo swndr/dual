@@ -180,42 +180,25 @@ function init() {
 
   // SEQUENCE TRAY
 
-  // // fill sequence array with null
-
-  // for (var i = 0; i < 16; i++) {
-  //   sequence[i] = null;
-  // }
-
   var trays = new createjs.Container();
 
   for (var i = 0; i < 8; i++) {
 
-    if (!(i % 2)) {
-      var sequenceTray = new createjs.Shape();
-      sequenceTray.graphics.beginStroke(green).setStrokeStyle(8).beginFill(black);
-      sequenceTray.graphics.drawRoundRect(0,0,442,154,5);
-      sequenceTray.x = 36;
-      sequenceTray.y = 120 + ((i/2)*200);
-      sequenceTray.tray = i;
-      sequenceTray.type = "selectors";
-
-      trays.addChild(sequenceTray);
-      sequenceTray.cache(-4,-4,450,162);
-    
-  } else {
-
-    var actionTray = new createjs.Shape();
-    actionTray.graphics.beginStroke(yellow).setStrokeStyle(8).beginFill(black);
-    actionTray.graphics.drawRoundRect(0,0,160,154,5);
-    actionTray.x = 508;
-    actionTray.y = 20 + (i*100);
-    actionTray.tray = i;
-    actionTray.type = "action";
-
-    trays.addChild(actionTray);
-    actionTray.cache(-4,-4,168,162);
-
+    if (i < 2) {
+      if (!(i % 2)) {
+        var sequenceTray = new Tray(36,(120 + ((i/2)*200)),442,154,black,green,1,i,"selectors");
+      } else {
+        var sequenceTray = new Tray(508,(20 + (i*100)),160,154,black,yellow,1,i,"actions"); 
+      }
+    } else {
+      if (!(i % 2)) {
+        var sequenceTray = new Tray(36,(120 + ((i/2)*200)),442,154,black,lightGray,.7,i,"selectors");
+      } else {
+        var sequenceTray = new Tray(508,(20 + (i*100)),160,154,black,lightGray,.7,i,"actions"); 
+      }
     }
+
+    trays.addChild(sequenceTray);
   }
 
   var dropZoneRow = 1;
@@ -223,46 +206,32 @@ function init() {
 
   for (var i = 0; i < 16; i++) {
 
-    var dropZone = new createjs.Shape();
-
     if (i == 1 || i == 5 || i == 9 || i == 13) {
 
-    dropZone.graphics.beginFill(blue);
-    dropZone.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
-    dropZone.alpha = .25;
-    dropZone.x = 50 + buttonSize + (buttonMargin+4);
-    dropZone.y = (dropZoneRow * 200) - 68;
+      var dropZone = new DropZone((50 + buttonSize + (buttonMargin+4)),((dropZoneRow * 200) - 68),blue,0,i);
 
     } else if (i == 3 || i == 7 || i == 11 || i == 15) {
 
-    dropZone.graphics.beginFill(yellow);
-    dropZone.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
-    dropZone.alpha = .25;
-    dropZone.x = 523;
-    dropZone.y = (dropZoneRow * 200) - 68;
+      var dropZone = new DropZone(523,((dropZoneRow * 200) - 68),yellow,0,i);
 
-    dropZoneRow++;
+      dropZoneRow++;
 
     } else if (i == 0 || i == 4 || i == 8 || i == 12) {
 
-    dropZone.graphics.beginFill(green);
-    dropZone.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
-    dropZone.alpha = .25;
-    dropZone.x = 50
-    dropZone.y = (dropZoneRow * 200) - 68;
+      var dropZone = new DropZone(50,((dropZoneRow * 200) - 68),green,0,i);
 
     } else {
-    
-    dropZone.graphics.beginFill(green);
-    dropZone.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
-    dropZone.alpha = .25;
-    dropZone.x = 50 + (buttonSize*2) + ((buttonMargin+4)*2);;
-    dropZone.y = (dropZoneRow * 200) - 68;
+
+      var dropZone = new DropZone((50 + (buttonSize*2) + ((buttonMargin+4)*2)),((dropZoneRow * 200) - 68),green,0,i);
 
     }
 
-    dropZone.slot = i; // to determine which slot items dropped in
+    if (i == 0 || i == 1 || i == 2 || i == 3) {
+      dropZone.alpha = .25;
+    }
+
     dropZoneContainer.addChild(dropZone);
+
   }
 
   sequenceBox.addChild(trays,dropZoneContainer);
@@ -637,6 +606,36 @@ function loadSelectors(set) {
     box.y = y;
 
     return box;
+  }
+
+  function Tray(x,y,w,h,bgColor,borderColor,alpha,order,type) {
+
+    var tray = new createjs.Shape();
+    tray.graphics.beginStroke(borderColor).setStrokeStyle(8).beginFill(bgColor);
+    tray.graphics.drawRoundRect(0,0,w,h,5);
+
+    tray.x = x;
+    tray.y = y;
+    tray.alpha = alpha
+    tray.tray = order;
+    tray.type = type;
+
+    return tray;
+  }
+
+  function DropZone(x,y,color,alpha,slot) {
+
+    var dz = new createjs.Shape();
+    dz.graphics.beginFill(color);
+    dz.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
+    
+    dz.x = x;
+    dz.y = y;
+    dz.alpha = alpha;
+    dz.slot = slot;
+
+    return dz;
+
   }
 
   // GENERATE BUTTONS
@@ -1219,13 +1218,11 @@ function loadSelectors(set) {
           .clear()
           .beginStroke(green).setStrokeStyle(8).beginFill(black)
           .drawRoundRect(0,0,442,154,5);
-          trays.children[i].updateCache();
        } else {
           trays.children[i].graphics
           .clear()
           .beginStroke(yellow).setStrokeStyle(8).beginFill(black)
           .drawRoundRect(0,0,160,154,5);
-          trays.children[i].updateCache();
         }
     }
 
@@ -1311,13 +1308,11 @@ function loadSelectors(set) {
               .clear()
               .beginStroke(black).setStrokeStyle(8).beginFill(black)
               .drawRoundRect(0,0,442,154,5);
-              trays.children[i].updateCache();
            } else {
               trays.children[i].graphics
               .clear()
               .beginStroke(black).setStrokeStyle(8).beginFill(black)
               .drawRoundRect(0,0,160,154,5);
-              trays.children[i].updateCache();
             }
           }
         }
