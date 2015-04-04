@@ -29,6 +29,7 @@ function init() {
   var dropPosition = null;
 
   var sequence = [];
+  var steps;
   var playCount = 0;
   var playReady = false;
 
@@ -186,13 +187,13 @@ function init() {
 
     if (i < 2) {
       if (!(i % 2)) {
-        var sequenceTray = new Tray(36,(120 + ((i/2)*200)),442,154,black,green,1,i,"selectors");
+        var sequenceTray = new Tray(36,(120 + (i*100)),442,154,black,green,1,i,"selectors");
       } else {
         var sequenceTray = new Tray(508,(20 + (i*100)),160,154,black,yellow,1,i,"actions"); 
       }
     } else {
       if (!(i % 2)) {
-        var sequenceTray = new Tray(36,(120 + ((i/2)*200)),442,154,black,lightGray,.7,i,"selectors");
+        var sequenceTray = new Tray(36,(120 + (i*100)),442,154,black,lightGray,.7,i,"selectors");
       } else {
         var sequenceTray = new Tray(508,(20 + (i*100)),160,154,black,lightGray,.7,i,"actions"); 
       }
@@ -201,38 +202,45 @@ function init() {
     trays.addChild(sequenceTray);
   }
 
-  var dropZoneRow = 1;
   var dropZoneContainer = new createjs.Container();
 
-  for (var i = 0; i < 16; i++) {
+  function buildSequenceStep(row,startSlot) {
 
-    if (i == 1 || i == 5 || i == 9 || i == 13) {
+    var selectorZone0 = new DropZone(50,((row * 200) - 68),green,.25,startSlot);
+    var logicZone = new DropZone((50 + buttonSize + (buttonMargin+4)),((row * 200) - 68),blue,.25,startSlot+1);
+    var selectorZone1 = new DropZone((50 + (buttonSize*2) + ((buttonMargin+4)*2)),((row * 200) - 68),green,.25,startSlot+2);
+    var actionZone = new DropZone(523,((row * 200) - 68),yellow,.25,startSlot+3);
+    dropZoneContainer.addChild(selectorZone0,logicZone,selectorZone1,actionZone);
+  }
 
-      var dropZone = new DropZone((50 + buttonSize + (buttonMargin+4)),((dropZoneRow * 200) - 68),blue,0,i);
+  function buildNextSequenceLocked(row) {
 
-    } else if (i == 3 || i == 7 || i == 11 || i == 15) {
+    var lockStatus = new createjs.Container().set({x:80,y:((row * 200) - 20)});
+    var padlock = new Padlock(5,10);
+    var lockText = new createjs.Text("LOCKED UNTIL NEXT TURN", "100 22px Avenir-Book", white).set({x:60,y:5});
+    lockStatus.addChild(padlock,lockText);
+    lockStatus.name = row;
+    dropZoneContainer.addChild(lockStatus);
+ 
+  }
 
-      var dropZone = new DropZone(523,((dropZoneRow * 200) - 68),yellow,0,i);
 
-      dropZoneRow++;
+  function buildSequenceLocked(row) {
 
-    } else if (i == 0 || i == 4 || i == 8 || i == 12) {
-
-      var dropZone = new DropZone(50,((dropZoneRow * 200) - 68),green,0,i);
-
-    } else {
-
-      var dropZone = new DropZone((50 + (buttonSize*2) + ((buttonMargin+4)*2)),((dropZoneRow * 200) - 68),green,0,i);
-
-    }
-
-    if (i == 0 || i == 1 || i == 2 || i == 3) {
-      dropZone.alpha = .25;
-    }
-
-    dropZoneContainer.addChild(dropZone);
+    var lockStatus = new createjs.Container().set({x:80,y:((row * 200) - 20)});
+    var padlock = new Padlock(5,10);
+    var lockText = new createjs.Text("LOCKED", "100 22px Avenir-Book", white).set({x:60,y:5});
+    lockStatus.addChild(padlock,lockText);
+    lockStatus.alpha = .5;
+    lockStatus.name = row;
+    dropZoneContainer.addChild(lockStatus);
 
   }
+
+  buildSequenceStep(1,0);
+  buildNextSequenceLocked(2);
+  buildSequenceLocked(3);
+  buildSequenceLocked(4);
 
   sequenceBox.addChild(trays,dropZoneContainer);
 
@@ -638,6 +646,26 @@ function loadSelectors(set) {
 
   }
 
+  function Padlock(x,y) {
+
+    var icon = new createjs.Container();
+    
+    var lock = new createjs.Shape();
+    lock.graphics.beginStroke(white).setStrokeStyle(3);
+    lock.graphics.arc(15,-5,10,180*(Math.PI/180),0*(Math.PI/180));
+
+    var lockBase = new createjs.Shape();
+    lockBase.graphics.beginStroke(white).setStrokeStyle(3);
+    lockBase.graphics.drawRoundRect(0,0,30,30,3);
+    
+    icon.addChild(lock,lockBase);
+    icon.x = x;
+    icon.y = y;
+
+    return icon;
+
+  }
+
   // GENERATE BUTTONS
 
   function PlaceholderButton(x,y) {
@@ -947,7 +975,7 @@ function loadSelectors(set) {
       sequence[i] = null;
     }
 
-
+    steps = 2;
     wTurns = 0;
     bTurns = 0;
     wConditions = 0;
@@ -1212,7 +1240,7 @@ function loadSelectors(set) {
       sequence[i] = null;
     }
 
-    for (var i = 0; i < trays.children.length; i++) {
+    for (var i = 0; i < steps; i++) {
         if (trays.children[i].type == "selectors") {
           trays.children[i].graphics
           .clear()
@@ -1277,22 +1305,22 @@ function loadSelectors(set) {
     if (wTurn == true) { wTurns++; } else { bTurns++; }
 
     playSequence();
-    var playing = window.setInterval(playSequence,1000);
 
     function playSequence() {
 
-      highlightSequenceBox(playCount);
+      if (playCount < steps) { 
 
-      if (!(playCount % 2)) {
-        targetGameObjects(playCount);
-      } else {
-        deliverAction(targetGameObjects(playCount-1),playCount);
-      }
+        highlightSequenceBox(playCount);
 
-      if (playCount < 8) { 
-        playCount++; 
+        if (!(playCount % 2)) {
+          targetGameObjects(playCount);
+        } else {
+          deliverAction(targetGameObjects(playCount-1),playCount);
+        }
+      
+        window.setTimeout(playSequence,1000);
+        playCount++;
       } else {
-        clearInterval(playing);
         updateScores();
         if (gameOver == false) { nextTurn(); }
       }
@@ -1301,21 +1329,19 @@ function loadSelectors(set) {
 
   function highlightSequenceBox(step) {
 
-      for (var i = 0; i < trays.children.length; i++) {
-          if (trays.children[i].tray == step) {
-            if (trays.children[i].type == "selectors") {
-              trays.children[i].graphics
-              .clear()
-              .beginStroke(black).setStrokeStyle(8).beginFill(black)
-              .drawRoundRect(0,0,442,154,5);
-           } else {
-              trays.children[i].graphics
-              .clear()
-              .beginStroke(black).setStrokeStyle(8).beginFill(black)
-              .drawRoundRect(0,0,160,154,5);
-            }
-          }
-        }
+    var trayToHighlight = trays.getChildAt(step);
+
+      if (trayToHighlight.type == "selectors") {
+        trayToHighlight.graphics
+        .clear()
+        .beginStroke(black).setStrokeStyle(8).beginFill(black)
+        .drawRoundRect(0,0,442,154,5);
+      } else {
+        trayToHighlight.graphics
+        .clear()
+        .beginStroke(black).setStrokeStyle(8).beginFill(black)
+        .drawRoundRect(0,0,160,154,5);
+      }
 
     stage.update();
 
@@ -1713,6 +1739,74 @@ function loadSelectors(set) {
       window.setTimeout(popSelectors,2000,selectorsP1);
 
     } else {
+
+      if (steps == 2) {
+
+        dropZoneContainer.removeChild(dropZoneContainer.getChildByName(2));
+        dropZoneContainer.removeChild(dropZoneContainer.getChildByName(3));
+
+        trays.getChildAt(2).graphics
+        .clear()
+        .beginStroke(green).setStrokeStyle(8).beginFill(black)
+        .drawRoundRect(0,0,442,154,5);
+        trays.getChildAt(2).alpha = 1;
+      
+        trays.getChildAt(3).graphics
+        .clear()
+        .beginStroke(yellow).setStrokeStyle(8).beginFill(black)
+        .drawRoundRect(0,0,160,154,5);
+        trays.getChildAt(3).alpha = 1;
+
+        buildSequenceStep(2,4);
+        buildNextSequenceLocked(3);
+
+        steps = 4;
+
+      } else if (steps == 4) {
+
+        console.log(4);
+
+        dropZoneContainer.removeChild(dropZoneContainer.getChildByName(3));
+        dropZoneContainer.removeChild(dropZoneContainer.getChildByName(4));
+
+        trays.getChildAt(4).graphics
+        .clear()
+        .beginStroke(green).setStrokeStyle(8).beginFill(black)
+        .drawRoundRect(0,0,442,154,5);
+        trays.getChildAt(4).alpha = 1;
+      
+        trays.getChildAt(5).graphics
+        .clear()
+        .beginStroke(yellow).setStrokeStyle(8).beginFill(black)
+        .drawRoundRect(0,0,160,154,5);
+        trays.getChildAt(5).alpha = 1;
+
+        buildSequenceStep(3,8);
+        buildNextSequenceLocked(4);
+
+        steps = 6;
+
+      } else if (steps == 6) {
+
+        dropZoneContainer.removeChild(dropZoneContainer.getChildByName(4));
+
+        trays.getChildAt(6).graphics
+        .clear()
+        .beginStroke(green).setStrokeStyle(8).beginFill(black)
+        .drawRoundRect(0,0,442,154,5);
+        trays.getChildAt(6).alpha = 1;
+      
+        trays.getChildAt(7).graphics
+        .clear()
+        .beginStroke(yellow).setStrokeStyle(8).beginFill(black)
+        .drawRoundRect(0,0,160,154,5);
+        trays.getChildAt(7).alpha = 1;
+
+        buildSequenceStep(4,12);
+
+        steps = 8;
+
+      }
 
       loadSelectors(selectorsP1);
 
