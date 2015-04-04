@@ -182,27 +182,40 @@ function init() {
   // SEQUENCE TRAY
 
   var trays = new createjs.Container();
+  var dropZoneContainer = new createjs.Container();
 
-  for (var i = 0; i < 8; i++) {
+  sequenceBox.addChild(trays,dropZoneContainer);
 
-    if (i < 2) {
-      if (!(i % 2)) {
-        var sequenceTray = new Tray(36,(120 + (i*100)),442,154,black,green,1,i,"selectors");
+  function sequenceTrayStart() {
+
+    trays.removeAllChildren();
+    dropZoneContainer.removeAllChildren();
+
+    for (var i = 0; i < 8; i++) {
+
+      if (i < 2) {
+        if (!(i % 2)) {
+          var sequenceTray = new Tray(36,(120 + (i*100)),442,154,black,green,1,i,"selectors");
+        } else {
+          var sequenceTray = new Tray(508,(20 + (i*100)),160,154,black,yellow,1,i,"actions"); 
+        }
       } else {
-        var sequenceTray = new Tray(508,(20 + (i*100)),160,154,black,yellow,1,i,"actions"); 
+        if (!(i % 2)) {
+          var sequenceTray = new Tray(36,(120 + (i*100)),442,154,black,lightGray,.7,i,"selectors");
+        } else {
+          var sequenceTray = new Tray(508,(20 + (i*100)),160,154,black,lightGray,.7,i,"actions"); 
+        }
       }
-    } else {
-      if (!(i % 2)) {
-        var sequenceTray = new Tray(36,(120 + (i*100)),442,154,black,lightGray,.7,i,"selectors");
-      } else {
-        var sequenceTray = new Tray(508,(20 + (i*100)),160,154,black,lightGray,.7,i,"actions"); 
-      }
+
+      trays.addChild(sequenceTray);
     }
 
-    trays.addChild(sequenceTray);
-  }
+    buildSequenceStep(1,0);
+    buildNextSequenceLocked(2);
+    buildSequenceLocked(3);
+    buildSequenceLocked(4);
 
-  var dropZoneContainer = new createjs.Container();
+  }
 
   function buildSequenceStep(row,startSlot) {
 
@@ -236,13 +249,6 @@ function init() {
     dropZoneContainer.addChild(lockStatus);
 
   }
-
-  buildSequenceStep(1,0);
-  buildNextSequenceLocked(2);
-  buildSequenceLocked(3);
-  buildSequenceLocked(4);
-
-  sequenceBox.addChild(trays,dropZoneContainer);
 
   // SELECTOR ITEMS
 
@@ -993,6 +999,8 @@ function loadSelectors(set) {
     selectorsBox.getChildByName("bg").graphics.drawRoundRect(0,0,336,1054,10);
     actionsBox.getChildByName("bg").graphics.beginFill("#F9F9F9");
     actionsBox.getChildByName("bg").graphics.drawRoundRect(0,0,336,1054,10);
+
+    sequenceTrayStart();
 
     stage.addChild(board,sequenceBox,selectorsBox,actionsBox);
     popSelectors(selectorsP1);
