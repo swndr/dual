@@ -1640,9 +1640,6 @@ function loadSelectors(set) {
 
   function endGame(color) {
 
-    // clearButton.alpha = 1;
-    // clearButton.addEventListener("mousedown",clearHighlight);
-    // clearButton.addEventListener("pressup",clearSequence);
     newGameLabel.alpha= 1;
     newGameButton.addEventListener("mousedown",newGameHighlight);
     newGameButton.addEventListener("pressup",newGame);
@@ -2305,6 +2302,8 @@ function loadSelectors(set) {
       var triedAnd = false;
       var triedOr = false;
       var madeShape = false;
+
+      tutorialObjectsInPlay = [];
 
       var startOverlayBG = new createjs.Shape();
       startOverlayBG.graphics.beginFill(green).drawRect(0,0,canvas.width,canvas.height);
@@ -3212,6 +3211,7 @@ function loadSelectors(set) {
     window.setTimeout(clearSequenceLearn,1000);
 
     deliverActionLearn([tutorialObjectsInPlay[0],tutorialObjectsInPlay[1],tutorialObjectsInPlay[2],tutorialObjectsInPlay[3]]);
+
     actionTray.graphics
     .clear()
     .beginStroke(black).setStrokeStyle(8).beginFill(black)
