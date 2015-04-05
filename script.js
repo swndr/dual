@@ -402,7 +402,7 @@ function loadSelectors(set) {
       var placeholder = new PlaceholderButton(shuffledSelectors[i].originX,shuffledSelectors[i].originY);
 
       selectorsBox.addChild(placeholder,shuffledSelectors[i]);
-      createjs.Tween.get(shuffledSelectors[i], {override:true}).to({rotation:0,x:shuffledSelectors[i].originX,y:shuffledSelectors[i].originY}, animateDuration, createjs.Ease.backOut);
+      createjs.Tween.get(shuffledSelectors[i], {override:true}).call(addAnim,[0]).to({rotation:0,x:shuffledSelectors[i].originX,y:shuffledSelectors[i].originY}, animateDuration, createjs.Ease.backOut).call(rmAnim);
 
       set[i] = shuffledSelectors[i];
 
@@ -428,7 +428,7 @@ function loadSelectors(set) {
 
   }
     stage.update();
-    window.setTimeout(endTween,1500);
+    //window.setTimeout(endTween,1500);
   }
 
   // LOGIC ITEMS
@@ -1311,6 +1311,12 @@ function loadSelectors(set) {
 
     playButton.alpha = 1;
     playButton.removeAllEventListeners();
+    clearLabel.alpha = .5;
+    clearButton.removeAllEventListeners();
+    newGameLabel.alpha= .5;
+    newGameButton.removeAllEventListeners();
+    exitLabel.alpha = .5;
+    exitButton.removeAllEventListeners();
 
     if (wTurn == true) { wTurns++; } else { bTurns++; }
 
@@ -1411,21 +1417,21 @@ function loadSelectors(set) {
 
         if (ruleSet[1](ruleSet[0](objectsInPlay[i]),ruleSet[2](objectsInPlay[i]))) {
           targets.push(objectsInPlay[i]);
-          createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:1,}, 300, createjs.Ease.cubicIn);
+          createjs.Tween.get(objectsInPlay[i], {override:true}).call(addAnim,[0]).to({alpha:1,}, 300, createjs.Ease.cubicIn).call(rmAnim);
         } else {
-          createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:.2,}, 400, createjs.Ease.cubicOut);
+          createjs.Tween.get(objectsInPlay[i], {override:true}).call(addAnim,[0]).to({alpha:.2,}, 400, createjs.Ease.cubicOut).call(rmAnim);
         }
    
       } else if (ruleSet.length == 1) {
 
         if (ruleSet[0](objectsInPlay[i])) {
           targets.push(objectsInPlay[i]);
-          createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:1,}, 300, createjs.Ease.cubicIn);
+          createjs.Tween.get(objectsInPlay[i], {override:true}).call(addAnim,[0]).to({alpha:1,}, 300, createjs.Ease.cubicIn).call(rmAnim);
         } else {
-          createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:.2,}, 400, createjs.Ease.cubicOut);
+          createjs.Tween.get(objectsInPlay[i], {override:true}).call(addAnim,[0]).to({alpha:.2,}, 400, createjs.Ease.cubicOut).call(rmAnim);
         }
       } else {
-        createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:.2,}, 400, createjs.Ease.cubicOut);
+        createjs.Tween.get(objectsInPlay[i], {override:true}).call(addAnim,[0]).to({alpha:.2,}, 400, createjs.Ease.cubicOut).call(rmAnim);
       }
 
       var findMorph = objectsInPlay[i].getChildByName("morph");
@@ -1634,6 +1640,17 @@ function loadSelectors(set) {
 
   function endGame(color) {
 
+    // clearButton.alpha = 1;
+    // clearButton.addEventListener("mousedown",clearHighlight);
+    // clearButton.addEventListener("pressup",clearSequence);
+    newGameLabel.alpha= 1;
+    newGameButton.addEventListener("mousedown",newGameHighlight);
+    newGameButton.addEventListener("pressup",newGame);
+    exitLabel.alpha = 1;
+    exitButton.addEventListener("mousedown",exitHighlight);
+    exitButton.addEventListener("pressup",exit);
+
+
     clearSequence();
 
     gameOver = true;
@@ -1696,7 +1713,7 @@ function loadSelectors(set) {
     actionsBox.mouseEnabled = false;
     stage.update();
 
-    createjs.Tween.get(winOverlay, {override:true}).to({y:890}, 300, createjs.Ease.cubicInOut).call(endTween);
+    createjs.Tween.get(winOverlay, {override:true}).call(addAnim,[0]).to({y:890}, 300, createjs.Ease.cubicInOut).call(rmAnim);
 
     function newGameBannerHighlight() {
       newGameBanner.alpha = .9;
@@ -1708,6 +1725,16 @@ function loadSelectors(set) {
 
   function nextTurn() {
 
+    clearLabel.alpha = 1;
+    clearButton.addEventListener("mousedown",clearHighlight);
+    clearButton.addEventListener("pressup",clearSequence);
+    newGameLabel.alpha= 1;
+    newGameButton.addEventListener("mousedown",newGameHighlight);
+    newGameButton.addEventListener("pressup",newGame);
+    exitLabel.alpha = 1;
+    exitButton.addEventListener("mousedown",exitHighlight);
+    exitButton.addEventListener("pressup",exit);
+
     createjs.Ticker.setPaused(false);
 
     for (var i in objectsInPlay) {
@@ -1717,11 +1744,8 @@ function loadSelectors(set) {
         removeMorph(objectsInPlay[i],findMorph);
       }
 
-      if (i < objectsInPlay.length-1) {
-      createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:1,}, 300, createjs.Ease.cubicIn);
-      } else {
-        createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:1,}, 300, createjs.Ease.cubicIn);
-      }
+      createjs.Tween.get(objectsInPlay[i], {override:true}).call(addAnim,[0]).to({alpha:1,}, 300, createjs.Ease.cubicIn).call(rmAnim);
+
     }
 
     clearSequence();
@@ -1773,8 +1797,6 @@ function loadSelectors(set) {
         steps = 4;
 
       } else if (steps == 4) {
-
-        console.log(4);
 
         dropZoneContainer.removeChild(dropZoneContainer.getChildByName(3));
         dropZoneContainer.removeChild(dropZoneContainer.getChildByName(4));
@@ -1882,17 +1904,15 @@ function loadSelectors(set) {
     loadIntro();
     stage.addChild(startOverlay);
 
-    createjs.Tween.get(startOverlay, {override:true}).to({y:0}, 600, createjs.Ease.cubicOut).call(prepNewGame);
+    createjs.Tween.get(startOverlay, {override:true}).call(addAnim,[0]).to({y:0}, 600, createjs.Ease.cubicOut).call(prepNewGame);
 
     function prepNewGame() {
-
+      rmAnim();
       objectsInPlay = [];
       newGameLabel.alpha = 0;
       exitLabel.alpha = 0;
 
       clearSequence();
-
-      endTween();
 
     }
   }
@@ -2549,7 +2569,7 @@ function loadSelectors(set) {
 
         createjs.Ticker.setPaused(false);
 
-        createjs.Tween.get(learn).to({alpha:0}, 300, createjs.Ease.cubicIn);
+        createjs.Tween.get(learn).call(addAnim,[0]).to({alpha:0}, 300, createjs.Ease.cubicIn);
         createjs.Tween.get(start).wait(300).to({alpha:0}, 300, createjs.Ease.cubicIn);
         createjs.Tween.get(tagline).wait(300).to({alpha:0}, 300, createjs.Ease.cubicIn);
 
@@ -2587,7 +2607,7 @@ function loadSelectors(set) {
           stage.update();
 
         function readyToLoadTutorialItems() {
-          createjs.Ticker.setPaused(true);
+          rmAnim();
           addButtonEvent(trySwitchingCorners);
         }
       }
@@ -2605,14 +2625,14 @@ function loadSelectors(set) {
 
       startOverlay.addChild(seqBox,switchTutorial,arrow);
       
-      createjs.Tween.get(tutorialText1).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut);
+      createjs.Tween.get(tutorialText1).call(addAnim,[0]).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut);
       createjs.Tween.get(tutorialText2).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1600,"Drag items into the action tray and hit play to see what happens."]).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn);
       createjs.Tween.get(tutorialNextButton).wait(200).to({alpha:0}, 100, createjs.Ease.cubicOut);
       createjs.Tween.get(tutorialNextLabel).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut);
       createjs.Tween.get(tutorialTray).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
       createjs.Tween.get(switchTutorial).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn);
       createjs.Tween.get(arrow).wait(1400).to({alpha:1}, 400, createjs.Ease.cubicIn);
-      createjs.Tween.get(seqBox).wait(1600).to({alpha:1}, 400, createjs.Ease.cubicIn).call(endTween);
+      createjs.Tween.get(seqBox).wait(1600).to({alpha:1}, 400, createjs.Ease.cubicIn).wait(200).call(rmAnim);
 
     }
 
@@ -2653,7 +2673,7 @@ function loadSelectors(set) {
 
       createjs.Ticker.setPaused(false);
 
-      createjs.Tween.get(tutorialNextButton).wait(200).to({alpha:0}, 100, createjs.Ease.cubicOut);
+      createjs.Tween.get(tutorialNextButton).call(addAnim,[0]).wait(200).to({alpha:0}, 100, createjs.Ease.cubicOut);
       createjs.Tween.get(tutorialNextLabel).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut);
       createjs.Tween.get(D).wait(200).to({alpha:0}, 200, createjs.Ease.cubicOut).call(manualTransforms).to({alpha:.2}, 400, createjs.Ease.cubicIn);
       createjs.Tween.get(U).wait(200).to({alpha:0}, 200, createjs.Ease.cubicOut).to({alpha:.2}, 600, createjs.Ease.cubicIn);
@@ -2661,10 +2681,9 @@ function loadSelectors(set) {
       createjs.Tween.get(L).wait(200).to({alpha:0}, 200, createjs.Ease.cubicOut).to({alpha:.2}, 600, createjs.Ease.cubicIn);
       createjs.Tween.get(tutorialText2).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1550,"Target shapes on the grid with condition items like these. You can target by row, column, or exactly matching a shape."]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicIn);
       createjs.Tween.get(switchTutorial).wait(400).to({alpha:0}, 400, createjs.Ease.cubicOut);
-      createjs.Tween.get(arrow).wait(400).to({alpha:0}, 400, createjs.Ease.cubicOut).to({alpha:1}, 400, createjs.Ease.cubicIn);
-      createjs.Tween.get(seqBox).wait(400).to({alpha:0}, 400, createjs.Ease.cubicOut).call(loadConditions).wait(200).to({alpha:1}, 600, createjs.Ease.cubicIn).call(endTween);
       createjs.Tween.get(tutorialConditions).wait(600).to({alpha:1}, 400, createjs.Ease.cubicIn);
-
+      createjs.Tween.get(arrow).wait(400).to({alpha:0}, 400, createjs.Ease.cubicOut).to({alpha:1}, 400, createjs.Ease.cubicIn);
+      createjs.Tween.get(seqBox).wait(400).to({alpha:0}, 400, createjs.Ease.cubicOut).call(loadConditions).wait(200).to({alpha:1}, 600, createjs.Ease.cubicIn).call(rmAnim);
 
       function manualTransforms() {
         manualTransformTL();
@@ -2718,7 +2737,7 @@ function loadSelectors(set) {
       orLogic.addEventListener("pressmove",dragAndDrop);
       orLogic.addEventListener("pressup",snapToLearn);
       
-      createjs.Tween.get(tutorialConditions).wait(200).to({x:tutorialConditions.x - 60}, 400, createjs.Ease.cubicInOut);
+      createjs.Tween.get(tutorialConditions).call(addAnim,[0]).wait(200).to({x:tutorialConditions.x - 60}, 400, createjs.Ease.cubicInOut);
       createjs.Tween.get(arrow).wait(200).to({x:arrow.x + 90}, 400, createjs.Ease.cubicInOut);
       createjs.Tween.get(seqBox).wait(200).to({x:seqBox.x + 90}, 400, createjs.Ease.cubicInOut);
       createjs.Tween.get(placeholder9).wait(400).to({alpha:.7}, 400, createjs.Ease.cubicIn);
@@ -2726,7 +2745,7 @@ function loadSelectors(set) {
       createjs.Tween.get(andLogic).wait(400).to({alpha:1}, 400, createjs.Ease.cubicIn);
       createjs.Tween.get(orLogic).wait(400).to({alpha:1}, 400, createjs.Ease.cubicIn);
 
-      createjs.Tween.get(tutorialText2).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1550,"If you want to use two conditions you need to add one of these logic items. Try both out!"]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn).call(endTween);
+      createjs.Tween.get(tutorialText2).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1550,"If you want to use two conditions you need to add one of these logic items. Try both out!"]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
       tutorialNextLabel.text = "GO TO GAME"
     }
 
@@ -2752,7 +2771,7 @@ function loadSelectors(set) {
       exitButton.mouseEnabled = false;
       stage.update();
 
-      createjs.Tween.get(startOverlayBG, {override:true}).to({alpha:1}, 400, createjs.Ease.cubicIn);
+      createjs.Tween.get(startOverlayBG, {override:true}).call(addAnim,[0]).to({alpha:1}, 400, createjs.Ease.cubicIn);
       createjs.Tween.get(startOverlay, {override:true}).to({y:890}, 600, createjs.Ease.cubicIn).call(handleBeginGame);
 
       function handleBeginGame() {
@@ -2782,19 +2801,18 @@ function loadSelectors(set) {
 
         createjs.Tween.get(tutorialText3, {override:true}).to({alpha:1}, 400, createjs.Ease.cubicIn);
         createjs.Tween.get(tutorialNextButton, {override:true}).to({alpha:1}, 800, createjs.Ease.cubicIn);
-        createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:1}, 800, createjs.Ease.cubicIn).call(endTween);
+        createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:1}, 800, createjs.Ease.cubicIn).call(rmAnim);
 
         function showControls() {
 
           tutorialNextButton.removeAllEventListeners();
           createjs.Ticker.setPaused(false);
 
-          createjs.Tween.get(tutorialText3, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,550,"These are the game controls. Look familiar?"]).wait(400).to({alpha:1}, 200, createjs.Ease.cubicOut).call(loadSelectors,[selectorsP1]);
-          createjs.Tween.get(tutorialNextButton, {override:true}).to({alpha:0}, 100, createjs.Ease.cubicIn).wait(600).to({y:900},100).to({alpha:1}, 100, createjs.Ease.cubicIn);
-          createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:0}, 400, createjs.Ease.cubicIn).wait(600).call(replaceText,[tutorialNextLabel,centerX,910,"NEXT"]).to({alpha:1}, 600, createjs.Ease.cubicIn).call(addButtonEvent,[showConditions]);
-          createjs.Tween.get(startOverlay, {override:true}).wait(200).to({y:-224}, 600, createjs.Ease.cubicIn);
+          createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,550,"These are the game controls. Look familiar?"]).wait(400).to({alpha:1}, 200, createjs.Ease.cubicOut).call(loadSelectors,[selectorsP1]);
+          createjs.Tween.get(tutorialNextButton, {override:true}).to({alpha:0}, 100, createjs.Ease.cubicIn).wait(400).to({y:900},100).to({alpha:1}, 100, createjs.Ease.cubicIn);
+          createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(600).call(replaceText,[tutorialNextLabel,centerX,910,"NEXT"]).to({alpha:1}, 600, createjs.Ease.cubicIn).call(addButtonEvent,[showConditions]).wait(0).call(rmAnim);
+          createjs.Tween.get(startOverlay, {override:true}).wait(400).to({y:-224}, 600, createjs.Ease.cubicIn);
 
-          //As well as switching, you can flip and rotate shapes: this is where the power of sequential thinking comes into play. Think ahead!"
         }
 
         function showConditions() {
@@ -2802,13 +2820,13 @@ function loadSelectors(set) {
           tutorialNextButton.removeAllEventListeners();
           createjs.Ticker.setPaused(false);
 
-          createjs.Tween.get(tutorialText3, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,450,"A random set of conditions refreshes each turn. Use these to target shapes on the grid. Remember, if you use two conditions combine them with logic."]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut).call(loadSelectors,[selectorsP1]);
+          createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,450,"A random set of conditions refreshes each turn. Use these to target shapes on the grid. Remember, if you use two conditions combine them with logic."]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut);
           
           createjs.Tween.get(sequenceBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
           createjs.Tween.get(actionsBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
 
           createjs.Tween.get(tutorialNextButton, {override:true}).to({alpha:0}, 100, createjs.Ease.cubicIn).wait(200).to({alpha:1}, 100, createjs.Ease.cubicIn).call(addButtonEvent,[showSeq]);
-          createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn).call(endTween);
+          createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
 
         }
 
@@ -2817,14 +2835,14 @@ function loadSelectors(set) {
           tutorialNextButton.removeAllEventListeners();
           createjs.Ticker.setPaused(false);
 
-          createjs.Tween.get(tutorialText3, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,450,"Drop conditions and actions here then hit play. You can build longer sequences after each turn, up to four steps. With longer sequences, thinking ahead is key!"]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut).call(loadSelectors,[selectorsP1]);
+          createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,450,"Drop conditions and actions here then hit play. You can build longer sequences after each turn, up to four steps. With longer sequences, thinking ahead is key!"]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut);
           
           createjs.Tween.get(selectorsBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
           createjs.Tween.get(sequenceBox, {override:true}).to({alpha:1}, 600, createjs.Ease.cubicIn);
           createjs.Tween.get(actionsBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
 
           createjs.Tween.get(tutorialNextButton, {override:true}).to({alpha:0}, 100, createjs.Ease.cubicIn).wait(200).to({alpha:1}, 100, createjs.Ease.cubicIn).call(addButtonEvent,[showActions]);
-          createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn).call(endTween);
+          createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
 
         }
 
@@ -2833,14 +2851,14 @@ function loadSelectors(set) {
           tutorialNextButton.removeAllEventListeners();
           createjs.Ticker.setPaused(false);
 
-          createjs.Tween.get(tutorialText3, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,450,"As well as switching between round and square segments, you can flip and rotate whole shapes: with this power you can target many more shapes in a sequence."]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut).call(loadSelectors,[selectorsP1]);
+          createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,450,"As well as switching between round and square segments, you can flip and rotate whole shapes: with this power you can target many more shapes in a sequence."]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut);
           
           createjs.Tween.get(selectorsBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
           createjs.Tween.get(sequenceBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
           createjs.Tween.get(actionsBox, {override:true}).to({alpha:1}, 600, createjs.Ease.cubicIn);
 
           createjs.Tween.get(tutorialNextButton, {override:true}).to({alpha:0}, 100, createjs.Ease.cubicIn).wait(200).to({alpha:1}, 100, createjs.Ease.cubicIn).call(addButtonEvent,[closeAndBegin]);
-          createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn).call(replaceText,[tutorialNextLabel,centerX,910,"START GAME"]).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn).call(endTween);
+          createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn).call(replaceText,[tutorialNextLabel,centerX,910,"START GAME"]).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
 
         }
 
@@ -2855,7 +2873,7 @@ function loadSelectors(set) {
           newGameButton.mouseEnabled = true;
           exitButton.mouseEnabled = true;
 
-          createjs.Tween.get(tutorialText3, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn);
+          createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn);
           createjs.Tween.get(selectorsBox, {override:true}).to({alpha:1}, 600, createjs.Ease.cubicIn);
           createjs.Tween.get(sequenceBox, {override:true}).to({alpha:1}, 600, createjs.Ease.cubicIn);
           createjs.Tween.get(actionsBox, {override:true}).to({alpha:1}, 600, createjs.Ease.cubicIn);
@@ -2867,9 +2885,9 @@ function loadSelectors(set) {
           createjs.Tween.get(exitLabel, {override:true}).wait(600).to({alpha:1}, 600, createjs.Ease.cubicIn).call(removeTutorial);
 
           function removeTutorial() {
+            rmAnim();
             stage.removeChild(startOverlay);
             popSelectors(selectorsP2);
-            endTween();
           }
         }
       }
@@ -2975,9 +2993,9 @@ function loadSelectors(set) {
           if (triedOr && triedAnd) {
             
             createjs.Ticker.setPaused(false);
-            createjs.Tween.get(tutorialText2).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1520,"Using AND targets any shapes that match both conditions. Using OR targets shapes that match either condition."]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn);
-            createjs.Tween.get(tutorialNextButton).wait(800).to({alpha:1}, 100, createjs.Ease.cubicOut);
-            createjs.Tween.get(tutorialNextLabel).wait(800).to({alpha:1}, 400, createjs.Ease.cubicOut).call(endTween);
+            createjs.Tween.get(tutorialText2).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1520,"Using AND targets any shapes that match both conditions. Using OR targets shapes that match either condition."]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
+            createjs.Tween.get(tutorialNextButton).call(addAnim,[0]).wait(800).to({alpha:1}, 100, createjs.Ease.cubicOut).call(rmAnim);
+            createjs.Tween.get(tutorialNextLabel).call(addAnim,[0]).wait(800).to({alpha:1}, 400, createjs.Ease.cubicOut).call(rmAnim);
             
             addButtonEvent(finishTutorial);
           }
@@ -3138,7 +3156,7 @@ function loadSelectors(set) {
 
       if (switchCount == 1) { 
         createjs.Ticker.setPaused(false);
-        createjs.Tween.get(tutorialText2).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1520,"Player one's goal is to make complete circles. Player two's goal is to make complete squares. Try making either."]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn).call(endTween);
+        createjs.Tween.get(tutorialText2).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1520,"Player one's goal is to make complete circles. Player two's goal is to make complete squares. Try making either."]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
       }
 
       if (switchCount >= 2 && madeShape == true) { 
@@ -3150,8 +3168,8 @@ function loadSelectors(set) {
       tutorialNextLabel.text = "GOT IT!";
 
       createjs.Ticker.setPaused(false);
-      createjs.Tween.get(tutorialNextButton).wait(600).to({alpha:1}, 100, createjs.Ease.cubicIn);
-      createjs.Tween.get(tutorialNextLabel).wait(600).to({alpha:1}, 400, createjs.Ease.cubicIn).call(endTween,[50]);
+      createjs.Tween.get(tutorialNextButton).call(addAnim,[0]).wait(600).to({alpha:1}, 100, createjs.Ease.cubicIn).call(rmAnim);
+      createjs.Tween.get(tutorialNextLabel).call(addAnim,[0]).wait(600).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
     }
 
       sequenceReadyLearn();
@@ -3243,11 +3261,12 @@ function loadSelectors(set) {
       stage.addChild(startOverlay);
       stage.update();
 
-      createjs.Tween.get(startOverlay, {override:true}).to({y:canvas.height}, 600, createjs.Ease.cubicIn).call(handleBeginGame);
-      createjs.Tween.get(newGameLabel, {override:true}).to({alpha:1}, 1600, createjs.Ease.cubicIn);
-      createjs.Tween.get(exitLabel, {override:true}).to({alpha:1}, 1600, createjs.Ease.cubicIn);
+      createjs.Tween.get(startOverlay, {override:true}).call(addAnim,[0]).to({y:canvas.height}, 600, createjs.Ease.cubicIn).call(handleBeginGame);
+      createjs.Tween.get(newGameLabel, {override:true}).call(addAnim,[0]).to({alpha:1}, 1600, createjs.Ease.cubicIn).call(rmAnim);
+      createjs.Tween.get(exitLabel, {override:true}).call(addAnim,[0]).to({alpha:1}, 1600, createjs.Ease.cubicIn).call(rmAnim);
 
       function handleBeginGame() {
+        rmAnim();
         startOverlay.uncache();
         startOverlay.removeAllChildren();
         stage.removeChild(startOverlay);
@@ -3259,12 +3278,29 @@ function loadSelectors(set) {
 
   // ------------- ANIMATION -----------------
 
+
+  function addAnim(t) {
+    animations.push(t);
+  }
+
+  function rmAnim(t) {
+    animations.pop();
+    endTween();
+  }
+
   function tick(event) {
     if (!event.paused) {
       stage.update(event);
     }
   }
 
+  function endTween() {
+    if (animations.length < 1) {
+      createjs.Ticker.setPaused(true);
+      console.log("ticker paused");
+    }
+  }
+  /*
   function endTween(speed) {
     if (arguments.length == 1) {
       window.setTimeout(function() {    createjs.Ticker.setPaused(true);
@@ -3273,7 +3309,7 @@ function loadSelectors(set) {
       window.setTimeout(function() {    createjs.Ticker.setPaused(true);
       console.log("ticker paused");},1000);
     }
-  }
+  }*/
 
   // ------------- UTILITIES -----------------
 
