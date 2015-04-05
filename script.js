@@ -77,6 +77,8 @@ function init() {
   createjs.Ticker.addEventListener("tick", tick);
   createjs.Ticker.setPaused(true);
 
+  var animations = [];
+
   var startOverlay = new createjs.Container();
   loadIntro();
 
@@ -2090,7 +2092,7 @@ function loadSelectors(set) {
       }
 
     if (obj.tr == 0) {
-         morph(bl,black,-radius,0,0,0,0,0);
+        morph(bl,black,-radius,0,0,0,0,0);
         tempBL = 0;
       } else {
         morph(bl,white,-radius,0,0,0,0,radius);
@@ -2278,6 +2280,7 @@ function loadSelectors(set) {
     var learnActions = false;
     var learnConditions = false;
     var switchCount = 0;
+    var showLogic = false;
 
     var startOverlayBG = new createjs.Shape();
     startOverlayBG.graphics.beginFill(green).drawRect(0,0,canvas.width,canvas.height);
@@ -2369,9 +2372,9 @@ function loadSelectors(set) {
     tutorialText1.lineHeight = 80;
     tutorialText1.alpha = 0;
 
-    var tutorialText2 = new createjs.Text("Each shape on the board has four parts which can be switched between white / round and black / square.", "100 60px Avenir-Book", black).set({x:centerX,y:1400});
+    var tutorialText2 = new createjs.Text("Each shape has four segments. These can be switched between round (white) and square (black).", "100 60px Avenir-Book", black).set({x:centerX,y:1400});
     tutorialText2.textAlign = "center";
-    tutorialText2.lineWidth = 1050;
+    tutorialText2.lineWidth = 1100;
     tutorialText2.lineHeight = 80;
     tutorialText2.alpha = 0;
 
@@ -2389,13 +2392,33 @@ function loadSelectors(set) {
     var sequenceBox = new createjs.Container().set({x:(canvas.width/2)+10,y:1125});
     sequenceBox.alpha = 0;
 
+    var sequenceTray = new createjs.Shape();
+    sequenceTray.graphics.beginStroke(green).setStrokeStyle(8).beginFill(black);
+    sequenceTray.graphics.drawRoundRect(0,0,442,154,5);
+
     var actionTray = new createjs.Shape().set({x:0,y:0});
     actionTray.graphics.beginStroke(yellow).setStrokeStyle(8).beginFill(black);
     actionTray.graphics.drawRoundRect(0,0,160,154,5);
 
     var dropZoneContainer = new createjs.Container();
 
+    var dropZone0 = new createjs.Shape().set({x:15,y:12});
+    var dropZone1 = new createjs.Shape().set({x:15 + buttonSize + (buttonMargin+4),y:12});
+    var dropZone2 = new createjs.Shape().set({x:15 + (buttonSize*2) + ((buttonMargin+4)*2),y:12});
     var dropZone3 = new createjs.Shape().set({x:15,y:12});
+
+    dropZone0.graphics.beginFill(green);
+    dropZone0.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
+    dropZone0.alpha = .25;
+    dropZone0.slot = 0;
+    dropZone1.graphics.beginFill(blue);
+    dropZone1.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
+    dropZone1.alpha = .25;
+    dropZone1.slot = 1;
+    dropZone2.graphics.beginFill(green);
+    dropZone2.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
+    dropZone2.alpha = .25;
+    dropZone2.slot = 2;
     dropZone3.graphics.beginFill(yellow);
     dropZone3.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
     dropZone3.alpha = .25;
@@ -2456,6 +2479,57 @@ function loadSelectors(set) {
     placeholder4.alpha = .7;
 
     switchTutorial.addChild(placeholder1,placeholder2,placeholder3,placeholder4,transformTL,transformTR,transformBL,transformBR);
+
+    var tutorialConditions = new createjs.Container().set({x:310,y:1068})
+    tutorialConditions.alpha = 0;
+
+    var rowSelector = new PositionButton("row",100,30,15,50,0,0,0);
+    rowSelector.removeAllEventListeners();
+    rowSelector.addEventListener("mousedown",grabItemLearn);
+    rowSelector.addEventListener("pressmove",dragAndDrop);
+    rowSelector.addEventListener("pressup",snapToLearn);
+    rowSelector.originParent = tutorialConditions;
+    var placeholder5 = new PlaceholderButton(rowSelector.x,rowSelector.y);
+    placeholder5.alpha = .7
+    var colSelector = new PositionButton("col",30,100,50,15,1,(buttonSize + buttonMargin),0);
+    colSelector.removeAllEventListeners();
+    colSelector.addEventListener("mousedown",grabItemLearn);
+    colSelector.addEventListener("pressmove",dragAndDrop);
+    colSelector.addEventListener("pressup",snapToLearn);
+    colSelector.originParent = tutorialConditions;
+    var placeholder6 = new PlaceholderButton(colSelector.x,colSelector.y);
+    placeholder6.alpha = .7
+    var shapeSelector1 = new ShapeButton(0,1,1,0,0,(buttonSize+buttonMargin));
+    shapeSelector1.removeAllEventListeners();
+    shapeSelector1.addEventListener("mousedown",grabItemLearn);
+    shapeSelector1.addEventListener("pressmove",dragAndDrop);
+    shapeSelector1.addEventListener("pressup",snapToLearn);
+    shapeSelector1.originParent = tutorialConditions;
+    var placeholder7 = new PlaceholderButton(shapeSelector1.x,shapeSelector1.y);
+    placeholder7.alpha = .7
+    var shapeSelector2 = new ShapeButton(0,1,0,0,(buttonSize+buttonMargin),(buttonSize+buttonMargin));
+    shapeSelector2.removeAllEventListeners();
+    shapeSelector2.addEventListener("mousedown",grabItemLearn);
+    shapeSelector2.addEventListener("pressmove",dragAndDrop);
+    shapeSelector2.addEventListener("pressup",snapToLearn);
+    shapeSelector2.originParent = tutorialConditions;
+    var placeholder8 = new PlaceholderButton(shapeSelector2.x,shapeSelector2.y);
+    placeholder8.alpha = .7
+
+    var andLogic = new LogicButton("AND",(2*buttonSize) + (3*buttonMargin),0);
+    andLogic.removeAllEventListeners();
+    andLogic.originParent = tutorialConditions;
+    andLogic.alpha = 0;
+    var placeholder9 = new PlaceholderButton(andLogic.x,andLogic.y);
+    placeholder9.alpha = 0;
+    var orLogic = new LogicButton("OR",(2*buttonSize) + (3*buttonMargin),(buttonSize + buttonMargin));
+    orLogic.removeAllEventListeners();
+    orLogic.originParent = tutorialConditions;
+    orLogic.alpha = 0;
+    var placeholder10 = new PlaceholderButton(orLogic.x,orLogic.y);
+    placeholder10.alpha = 0;
+
+    tutorialConditions.addChild(placeholder5,placeholder6,placeholder7,placeholder8,placeholder9,placeholder10,rowSelector,colSelector,shapeSelector1,shapeSelector2,andLogic,orLogic);
 
     var arrow = new createjs.Shape().set({x:(canvas.width/2)-120,y:1170});
     arrow.graphics.beginFill(pink);
@@ -2528,13 +2602,137 @@ function loadSelectors(set) {
     startOverlay.addChild(sequenceBox,switchTutorial,arrow);
     
     createjs.Tween.get(tutorialText1).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut);
-    createjs.Tween.get(tutorialText2).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1600,"Drag switch items into the tray and hit play to see what happens."]).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(tutorialText2).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1600,"Drag items into the tray and hit play to see what happens."]).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn);
     createjs.Tween.get(tutorialNextButton).wait(200).to({alpha:0}, 100, createjs.Ease.cubicOut);
     createjs.Tween.get(tutorialNextLabel).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut);
-    createjs.Tween.get(tutorialTray).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(tutorialTray).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
     createjs.Tween.get(switchTutorial).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn);
     createjs.Tween.get(arrow).wait(1400).to({alpha:1}, 400, createjs.Ease.cubicIn);
     createjs.Tween.get(sequenceBox).wait(1600).to({alpha:1}, 400, createjs.Ease.cubicIn).call(endTween);
+
+  }
+
+  function tryConditions() {
+
+    learnActions = false;
+    learnConditions = true;
+
+    tutorialNextButton.removeAllEventListeners();
+
+    function manualTransformTL() {
+      morphWithHighlight(tutorialObjectsInPlay[0].getChildByName("TL"),black,-radius,-radius,0,0,0,0);
+      morphWithHighlight(tutorialObjectsInPlay[1].getChildByName("TL"),black,-radius,-radius,0,0,0,0);
+      morphWithHighlight(tutorialObjectsInPlay[2].getChildByName("TL"),white,-radius,-radius,radius,0,0,0);
+      morphWithHighlight(tutorialObjectsInPlay[3].getChildByName("TL"),black,-radius,-radius,0,0,0,0);
+    }
+
+    function manualTransformTR() {
+      clearMorph();
+      morphWithHighlight(tutorialObjectsInPlay[0].getChildByName("TR"),white,0,-radius,0,radius,0,0);
+      morphWithHighlight(tutorialObjectsInPlay[1].getChildByName("TR"),black,0,-radius,0,0,0,0);
+      morphWithHighlight(tutorialObjectsInPlay[2].getChildByName("TR"),white,0,-radius,0,radius,0,0);
+      morphWithHighlight(tutorialObjectsInPlay[3].getChildByName("TR"),white,0,-radius,0,radius,0,0);
+    }
+
+    function manualTransformBR() {
+      clearMorph();
+      morphWithHighlight(tutorialObjectsInPlay[0].getChildByName("BR"),white,0,0,0,0,radius,0);
+      morphWithHighlight(tutorialObjectsInPlay[1].getChildByName("BR"),white,0,0,0,0,radius,0);
+      morphWithHighlight(tutorialObjectsInPlay[2].getChildByName("BR"),black,0,0,0,0,0,0);
+      morphWithHighlight(tutorialObjectsInPlay[3].getChildByName("BR"),black,0,0,0,0,0,0);
+    }
+
+    function manualTransformBL() {
+      clearMorph();
+      morphWithHighlight(tutorialObjectsInPlay[0].getChildByName("BL"),black,-radius,0,0,0,0,0);
+      morphWithHighlight(tutorialObjectsInPlay[1].getChildByName("BL"),white,-radius,0,0,0,0,radius);
+      morphWithHighlight(tutorialObjectsInPlay[2].getChildByName("BL"),black,-radius,0,0,0,0,0);
+      morphWithHighlight(tutorialObjectsInPlay[3].getChildByName("BL"),black,-radius,0,0,0,0,0);
+    }
+
+    function clearMorph() {
+      for (i in tutorialObjectsInPlay) {
+        var findMorph = tutorialObjectsInPlay[i].getChildByName("morph");
+          if (findMorph != null) {
+            removeMorph(tutorialObjectsInPlay[i],findMorph);
+          }
+        }
+        stage.update();
+      }
+
+    createjs.Ticker.setPaused(false);
+
+    createjs.Tween.get(tutorialNextButton).wait(200).to({alpha:0}, 100, createjs.Ease.cubicOut);
+    createjs.Tween.get(tutorialNextLabel).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut);
+    createjs.Tween.get(tutorialText2).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1550,"Target shapes on the grid with conditions. You can target by row, column, or exactly matching a shape."]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(switchTutorial).wait(400).to({alpha:0}, 600, createjs.Ease.cubicOut);
+    createjs.Tween.get(arrow).wait(400).to({alpha:0}, 400, createjs.Ease.cubicOut).to({alpha:1}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(sequenceBox).wait(400).to({alpha:0}, 600, createjs.Ease.cubicOut).call(loadConditions).wait(200).to({alpha:1}, 600, createjs.Ease.cubicIn);
+    createjs.Tween.get(tutorialConditions).wait(600).to({alpha:1}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(D).wait(200).to({scaleX:1.2,scaleY:1.2}, 400, createjs.Ease.backInOut).wait(0).call(manualTransforms).wait(800).to({scaleX:1.8,scaleY:1.8}, 400, createjs.Ease.backInOut);
+    createjs.Tween.get(U).wait(200).to({scaleX:1.2,scaleY:1.2}, 400, createjs.Ease.backInOut).wait(800).to({scaleX:1.8,scaleY:1.8}, 400, createjs.Ease.backInOut);
+    createjs.Tween.get(A).wait(200).to({scaleX:1.2,scaleY:1.2}, 400, createjs.Ease.backInOut).wait(800).to({scaleX:1.8,scaleY:1.8}, 400, createjs.Ease.backInOut);
+    createjs.Tween.get(L).wait(200).to({scaleX:1.2,scaleY:1.2}, 400, createjs.Ease.backInOut).wait(800).to({scaleX:1.8,scaleY:1.8}, 400, createjs.Ease.backInOut).call(endTween);
+
+    function manualTransforms() {
+      manualTransformTL();
+      window.setTimeout(manualTransformTR,200);
+      window.setTimeout(manualTransformBR,400);
+      window.setTimeout(manualTransformBL,600);
+      window.setTimeout(clearMorph,800);
+
+      tutorialObjectsInPlay[0].tl = 0;
+      tutorialObjectsInPlay[0].tr = 1;
+      tutorialObjectsInPlay[0].br = 1;
+      tutorialObjectsInPlay[0].bl = 0;
+
+      tutorialObjectsInPlay[1].tl = 0;
+      tutorialObjectsInPlay[1].tr = 0;
+      tutorialObjectsInPlay[1].br = 1;
+      tutorialObjectsInPlay[1].bl = 1;
+
+      tutorialObjectsInPlay[2].tl = 1;
+      tutorialObjectsInPlay[2].tr = 1;
+      tutorialObjectsInPlay[2].br = 0;
+      tutorialObjectsInPlay[2].bl = 0;
+
+      tutorialObjectsInPlay[3].tl = 0;
+      tutorialObjectsInPlay[3].tr = 1;
+      tutorialObjectsInPlay[3].br = 0;
+      tutorialObjectsInPlay[3].bl = 0;
+    }
+
+    function loadConditions() {
+      dropZoneContainer.removeChild(dropZone3);
+      sequenceBox.removeChild(actionTray,playButton,playLabel);
+      dropZoneContainer.addChild(dropZone0,dropZone1,dropZone2);
+      sequenceBox.addChild(sequenceTray,dropZoneContainer);
+      startOverlay.addChild(tutorialConditions);
+    }
+
+  }
+
+  function showLogicItems() {
+
+    createjs.Ticker.setPaused(false);
+
+    showLogic = true;
+
+    andLogic.addEventListener("mousedown",grabItemLearn);
+    andLogic.addEventListener("pressmove",dragAndDrop);
+    andLogic.addEventListener("pressup",snapToLearn);
+
+    orLogic.addEventListener("mousedown",grabItemLearn);
+    orLogic.addEventListener("pressmove",dragAndDrop);
+    orLogic.addEventListener("pressup",snapToLearn);
+
+    //tutorialText3.text = "If you want to use two conditions you need to add logic. Use AND to target shapes matching both conditions. Use OR to match either condition. Try both out!"
+    
+    createjs.Tween.get(tutorialConditions).wait(800).to({x:160}, 400, createjs.Ease.cubicInOut);
+    createjs.Tween.get(placeholder9).wait(1200).to({alpha:.7}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(placeholder10).wait(1200).to({alpha:.7}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(andLogic).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(orLogic).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn).call(endTween);
 
   }
 
@@ -2612,9 +2810,9 @@ function loadSelectors(set) {
         item.y = pos.y;
         item.inSlot = pos.slot;
         sequence[pos.slot] = item;
-        if (showAction == false) { targetGameObjectsLearn(); }
+        targetGameObjectsLearn();
       } else { 
-        returnToOriginLearn(item,item.originParent,item.originX,item.originY); 
+        returnToOriginLearn(item,item.originParent,item.originX,item.originY);
       }
 
     } else if (item.type == "logic") {
@@ -2625,21 +2823,21 @@ function loadSelectors(set) {
         item.y = pos.y; 
         item.inSlot = pos.slot;
         sequence[pos.slot] = item;
-        if (showAction == false) { targetGameObjectsLearn(); }
+        targetGameObjectsLearn();
 
-        if (item.name == "AND") {
-          triedAnd = true;
-        } else {
-          triedOr = true;
-        }
+        // if (item.name == "AND") {
+        //   triedAnd = true;
+        // } else {
+        //   triedOr = true;
+        // }
 
-        if (triedOr && triedAnd && (showAction == false)) {
-          tutorialText3.text = "Good work. Keep playing, when you're ready let's learn about actions."
-          tutorialNextButton.alpha = 1;
-          tutorialNextLabel.alpha = 1;
-          tutorialNextButton.addEventListener("mousedown",highlightButton);
-          tutorialNextButton.addEventListener("pressup",showActionItems);
-        }
+        // if (triedOr && triedAnd) {
+        //   tutorialText3.text = "Good work. Keep playing, when you're ready let's learn about actions."
+        //   tutorialNextButton.alpha = 1;
+        //   tutorialNextLabel.alpha = 1;
+        //   tutorialNextButton.addEventListener("mousedown",highlightButton);
+        //   tutorialNextButton.addEventListener("pressup",showActionItems);
+        // }
 
       } else { 
         returnToOriginLearn(item,item.originParent,item.originX,item.originY); 
@@ -2662,20 +2860,18 @@ function loadSelectors(set) {
   }
 
   function returnToOriginLearn(item,parent,x,y) {
-    console.log(item);
-    console.log(parent);
     parent.addChild(item);
     item.x = x;
     item.y = y;
     item.inSlot = false;
-    //if (showAction == false) { targetGameObjectsLearn(); }
+    if (learnConditions == true) { targetGameObjectsLearn(); }
     stage.update();
   }
 
   function targetGameObjectsLearn() {
 
     var ruleSet = [];
-    var targets = [];
+    //var targets = [];
 
     // get items from trays
 
@@ -2693,7 +2889,7 @@ function loadSelectors(set) {
       if (ruleSet.length == 3) {
 
         if (ruleSet[1](ruleSet[0](tutorialObjectsInPlay[i]),ruleSet[2](tutorialObjectsInPlay[i]))) {
-          targets.push(tutorialObjectsInPlay[i]);
+          //targets.push(tutorialObjectsInPlay[i]);
           tutorialObjectsInPlay[i].alpha = 1;
         } else {
           tutorialObjectsInPlay[i].alpha = .2;
@@ -2707,7 +2903,7 @@ function loadSelectors(set) {
       } else if (ruleSet.length == 1) {
 
         if (ruleSet[0](tutorialObjectsInPlay[i])) {
-          targets.push(tutorialObjectsInPlay[i]);
+          //targets.push(tutorialObjectsInPlay[i]);
           tutorialObjectsInPlay[i].alpha = 1;
         } else {
           tutorialObjectsInPlay[i].alpha = .2;
@@ -2717,7 +2913,7 @@ function loadSelectors(set) {
       }
     }
 
-    return targets;
+    //return targets;
 
   }
 
@@ -2801,6 +2997,26 @@ function loadSelectors(set) {
       tutorialObjectsInPlay[i].alpha = 1;
       }
 
+    if (switchCount == 1) { 
+      createjs.Ticker.setPaused(false);
+      createjs.Tween.get(tutorialText2).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1560,"Player one's goal is to make complete circles. Player two's goal is to make complete squares. Try making either."]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn).call(endTween);
+    }
+
+    if (switchCount == 2) { 
+
+    tutorialNextButton.addEventListener("mousedown",highlightButton);
+    tutorialNextButton.addEventListener("pressup",tryConditions);
+
+    tutorialNextButton.y = 1780;
+    tutorialNextLabel.y = 1790;
+    tutorialNextLabel.text = "READY";
+
+    createjs.Ticker.setPaused(false);
+    createjs.Tween.get(tutorialText2).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1560,"When you're ready, let's learn about targeting specific shapes."]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(tutorialNextButton).wait(600).to({alpha:1}, 100, createjs.Ease.cubicIn);
+    createjs.Tween.get(tutorialNextLabel).wait(600).to({alpha:1}, 400, createjs.Ease.cubicIn).call(endTween,[50]);
+  }
+
     sequenceReadyLearn();
     stage.update();
   }
@@ -2842,17 +3058,13 @@ function loadSelectors(set) {
     playLabel.alpha = .5;
   }
 
-
-  if (switchCount == 1) { replaceText(tutorialText2,centerX,1560,"Player one's goal is to make complete circles. Player two's goal is to make complete squares.")}
-
   stage.update();
 }
 
 function playLearnAction() {
 
-  if (switchCount == 0) {switchCount++};
+  switchCount++;
 
-  playButton.alpha = 1;
   playButton.removeAllEventListeners();
 
   window.setTimeout(clearSequenceLearn,1000);
@@ -2894,8 +3106,6 @@ function playLearn() {
     stage.update();
   }
 }*/
-
-
 
   function replaceText(toReplace,x,y,newText) {
     toReplace.text = newText;
@@ -3227,9 +3437,14 @@ function playLearn() {
     }
   }
 
-  function endTween() {
-    window.setTimeout(function() {    createjs.Ticker.setPaused(true);
-    console.log("ticker paused");},1000);
+  function endTween(speed) {
+    if (arguments.length == 1) {
+      window.setTimeout(function() {    createjs.Ticker.setPaused(true);
+      console.log("ticker paused");},speed);
+    } else {
+      window.setTimeout(function() {    createjs.Ticker.setPaused(true);
+      console.log("ticker paused");},1000);
+    }
   }
 
   // ------------- UTILITIES -----------------
