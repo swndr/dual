@@ -1900,25 +1900,31 @@ function loadSelectors(set) {
 
     newGameLabel.alpha = 1;
 
-    stage.removeAllChildren();
+    showOverlay("NEW GAME",confirmNewGame);
 
-    objectsInPlay = [];
+    function confirmNewGame() {
+      stage.removeAllChildren();
 
-    for (var i = 0; i < 10; i++) {
-      selectorsP1[i] = null;
-      selectorsP2[i] = null;
+      objectsInPlay = [];
+
+      for (var i = 0; i < 10; i++) {
+        selectorsP1[i] = null;
+        selectorsP2[i] = null;
+      }
+
+      selectorsBox.mouseEnabled = true;
+      sequenceBox.mouseEnabled = true;
+      actionsBox.mouseEnabled = true;
+      newGameButton.mouseEnabled = true;
+      exitButton.mouseEnabled = true;
+
+      clearSequence();
+      loadGame();
+
+      stage.update();
+
+      loadSelectors(selectorsP1);
     }
-
-    selectorsBox.mouseEnabled = true;
-    sequenceBox.mouseEnabled = true;
-    actionsBox.mouseEnabled = true;
-
-    clearSequence();
-    loadGame();
-
-    stage.update();
-
-    loadSelectors(selectorsP1);
   }
 
   function newGameHighlight() {
@@ -1930,22 +1936,32 @@ function loadSelectors(set) {
 
     exitLabel.alpha = 1;
 
-    createjs.Ticker.setPaused(false);
+    showOverlay("QUIT GAME",confirmExit);
 
-    startOverlay.y = canvas.height;
-    loadIntro();
-    stage.addChild(startOverlay);
+    function confirmExit() {
 
-    createjs.Tween.get(startOverlay, {override:true}).call(addAnim,[0]).to({y:0}, 600, createjs.Ease.cubicOut).call(prepNewGame);
+      createjs.Ticker.setPaused(false);
 
-    function prepNewGame() {
-      rmAnim();
-      objectsInPlay = [];
-      newGameLabel.alpha = 0;
-      exitLabel.alpha = 0;
+      startOverlay.y = canvas.height;
+      loadIntro();
+      stage.addChild(startOverlay);
 
-      clearSequence();
+      createjs.Tween.get(startOverlay, {override:true}).call(addAnim,[0]).to({y:0}, 600, createjs.Ease.cubicOut).call(prepNewGame);
 
+      function prepNewGame() {
+        rmAnim();
+        objectsInPlay = [];
+        newGameLabel.alpha = 0;
+        exitLabel.alpha = 0;
+
+        selectorsBox.mouseEnabled = true;
+        sequenceBox.mouseEnabled = true;
+        actionsBox.mouseEnabled = true;
+        newGameButton.mouseEnabled = true;
+        exitButton.mouseEnabled = true;
+
+        clearSequence();
+      }
     }
   }
 
@@ -1954,6 +1970,67 @@ function loadSelectors(set) {
     stage.update();
   }
 
+  function showOverlay(confirmText,confirmAction) {
+
+    createjs.Ticker.setPaused(false);
+
+    var darkOverlay = new createjs.Container().set({x:0,y:0});
+    var darkOverlayBG = new createjs.Shape();
+    darkOverlayBG.graphics.beginFill(black).drawRect(0,0,canvas.width,canvas.height);
+    darkOverlayBG.alpha = .95;
+
+    var confirm = new createjs.Shape().set({x:0,y:500});
+    confirm.graphics.beginFill(black).drawRect(0,0,canvas.width,300);
+    confirm.alpha = 0.01;
+    confirm.addEventListener("mousedown",highlightConfirm);
+    confirm.addEventListener("pressup",confirmAction);
+
+    var confirmLabel = new createjs.Text(confirmText,"bold 100px Avenir-Heavy",white).set({x:centerX,y:600});
+    confirmLabel.textAlign = "center";
+
+    var cancel = new createjs.Shape().set({x:0,y:1200});
+    cancel.graphics.beginFill(black).drawRect(0,0,canvas.width,300);
+    cancel.alpha = 0.01;
+    cancel.addEventListener("mousedown",highlightCancel);
+    cancel.addEventListener("pressup",cancelAction);
+
+    var cancelLabel = new createjs.Text("CANCEL","bold 100px Avenir-Heavy",white).set({x:centerX,y:1300});
+    cancelLabel.textAlign = "center";
+
+    darkOverlay.addChild(darkOverlayBG,confirm,cancel,confirmLabel,cancelLabel);
+    stage.addChild(darkOverlay);
+
+    darkOverlay.mouseEnabled = true;
+    selectorsBox.mouseEnabled = false;
+    sequenceBox.mouseEnabled = false;
+    actionsBox.mouseEnabled = false;
+    newGameButton.mouseEnabled = false;
+    exitButton.mouseEnabled = false;
+
+    createjs.Tween.get(darkOverlay, {override:true}).call(addAnim,[0]).to({alpha:.95}, 200, createjs.Ease.cubicOut).call(rmAnim);
+  
+    function highlightConfirm() {
+      confirmLabel.alpha = .5;
+      stage.update();
+    }
+
+    function highlightCancel() {
+      cancelLabel.alpha = .5;
+      stage.update();
+    }
+
+    function cancelAction() {
+      createjs.Ticker.setPaused(false);
+      createjs.Tween.get(darkOverlay, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicOut).call(rmAnim);
+      stage.removeChild(darkOverlay);
+      stage.update();
+      selectorsBox.mouseEnabled = true;
+      sequenceBox.mouseEnabled = true;
+      actionsBox.mouseEnabled = true;
+      newGameButton.mouseEnabled = true;
+      exitButton.mouseEnabled = true;
+    }
+  }
 
   // ---------- ACTION FUNCTIONS ------------------
 
