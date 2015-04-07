@@ -2700,10 +2700,10 @@ function loadSelectors(set) {
       var placeholder10 = new PlaceholderButton(orLogic.x,orLogic.y);
       placeholder10.alpha = 0;
 
-      var andCheck = new createjs.Text("AND","bold 40px Avenir-Heavy",blue).set({x:centerX-50,y:(canvas.height - 225)});
+      var andCheck = new createjs.Text("AND","bold 40px Avenir-Heavy",blue).set({x:centerX+80,y:(canvas.height - 220)});
       andCheck.textAlign = "center";
       andCheck.alpha = 0;
-      var orCheck = new createjs.Text("OR","bold 40px Avenir-Heavy",blue).set({x:centerX-50,y:(canvas.height - 125)});
+      var orCheck = new createjs.Text("OR","bold 40px Avenir-Heavy",blue).set({x:centerX+80,y:(canvas.height - 140)});
       orCheck.textAlign = "center";
       orCheck.alpha = 0;
 
@@ -2716,28 +2716,27 @@ function loadSelectors(set) {
       arrow.graphics.lineTo(0,60);
       arrow.alpha = 0;
 
-      var whiteCircle = new createjs.Shape().set({x:centerX-20,y:(canvas.height - 200)});
+      var whiteCircle = new createjs.Shape().set({x:centerX+210,y:(canvas.height - 215)});
       whiteCircle.graphics.beginFill(white).drawCircle(0,0,iconRadius,iconRadius);
       whiteCircle.alpha = 0;
 
-      var whiteCheck = new createjs.Shape().set({x:centerX+60,y:(canvas.height - 240)});
+      var whiteCheck = new createjs.Shape().set({x:centerX+290,y:(canvas.height - 255)});
       whiteCheck.graphics.beginStroke(pink).setStrokeStyle(14,"round","round");
       whiteCheck.graphics.moveTo(0,40);
       whiteCheck.graphics.lineTo(20,55);
       whiteCheck.graphics.lineTo(50,20);
       whiteCheck.alpha = 0;
 
-      var blackSquare = new createjs.Shape().set({x:centerX-60,y:(canvas.height - 140)});
+      var blackSquare = new createjs.Shape().set({x:centerX+170,y:(canvas.height - 155)});
       blackSquare.graphics.beginFill(black).drawRect(0,0,iconRadius*2,iconRadius*2);
       blackSquare.alpha = 0;
 
-      var blackCheck = new createjs.Shape().set({x:centerX+60,y:(canvas.height - 140)});
+      var blackCheck = new createjs.Shape().set({x:centerX+290,y:(canvas.height - 155)});
       blackCheck.graphics.beginStroke(pink).setStrokeStyle(14,"round","round");
       blackCheck.graphics.moveTo(0,40);
       blackCheck.graphics.lineTo(20,55);
       blackCheck.graphics.lineTo(50,20);
       blackCheck.alpha = 0;
-
 
       function beginTutorial(event) {
 
@@ -2848,7 +2847,8 @@ function loadSelectors(set) {
       }
 
       createjs.Ticker.setPaused(false);
-      createjs.Tween.get(whiteCircle).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut);
+      createjs.Tween.get(tutorialText1).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut);
+      createjs.Tween.get(whiteCircle).to({alpha:0}, 400, createjs.Ease.cubicOut);
       createjs.Tween.get(blackSquare).to({alpha:0}, 400, createjs.Ease.cubicOut);
       createjs.Tween.get(whiteCheck).to({alpha:.0}, 400, createjs.Ease.cubicOut);
       createjs.Tween.get(blackCheck).to({alpha:.0}, 400, createjs.Ease.cubicOut);
@@ -2899,6 +2899,11 @@ function loadSelectors(set) {
         dropZoneContainer.addChild(dropZone0,dropZone1,dropZone2,required);
         seqBox.addChild(sequenceTray,dropZoneContainer);
         startOverlay.addChild(tutorialConditions,andCheck,orCheck);
+
+        whiteCheck.x = centerX+170;
+        whiteCheck.y = canvas.height-240;
+        blackCheck.x = centerX+170;
+        blackCheck.y = canvas.height-160;
       }
 
     }
@@ -2925,7 +2930,8 @@ function loadSelectors(set) {
       createjs.Tween.get(andLogic).wait(400).to({alpha:1}, 400, createjs.Ease.cubicIn);
       createjs.Tween.get(orLogic).wait(400).to({alpha:1}, 400, createjs.Ease.cubicIn);
 
-      createjs.Tween.get(tutorialText2).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1480,"You can use one condition or two. If you want to use two you need to add one of these logic items. Try both out!"]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn);
+      createjs.Tween.get(tutorialText2).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1480,"You can use one condition or two. If you want to use two you need to add one of these logic items."]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn);
+      createjs.Tween.get(tutorialText1).call(replaceText,[tutorialText1,centerX-120,1800,"Try both:"]).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
       createjs.Tween.get(andCheck).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
       createjs.Tween.get(orCheck).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
       createjs.Tween.get(whiteCheck).wait(800).to({alpha:.1}, 400, createjs.Ease.cubicIn);
@@ -3184,13 +3190,13 @@ function loadSelectors(set) {
               createjs.Tween.get(tutorialText2).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1480,"Using AND targets any shapes that match both conditions. Using OR targets shapes that match either condition."]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn).call(handleGoToGame);
               
               function handleGoToGame() {
-
-                createjs.Tween.get(andCheck).wait(400).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(rmAnim);;
-                createjs.Tween.get(orCheck).wait(400).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(rmAnim);;
-                createjs.Tween.get(whiteCheck).wait(400).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(rmAnim);;
-                createjs.Tween.get(blackCheck).wait(400).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(rmAnim);;
-                createjs.Tween.get(tutorialNextButton).call(addAnim,[0]).wait(1000).to({alpha:1}, 100, createjs.Ease.cubicOut).call(rmAnim);
-                createjs.Tween.get(tutorialNextLabel).call(addAnim,[0]).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicOut).call(rmAnim);
+                createjs.Tween.get(tutorialText1).wait(600).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(rmAnim);;
+                createjs.Tween.get(andCheck).wait(600).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(rmAnim);;
+                createjs.Tween.get(orCheck).wait(600).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(rmAnim);;
+                createjs.Tween.get(whiteCheck).wait(600).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(rmAnim);;
+                createjs.Tween.get(blackCheck).wait(600).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(rmAnim);;
+                createjs.Tween.get(tutorialNextButton).call(addAnim,[0]).wait(1400).to({alpha:1}, 100, createjs.Ease.cubicOut).call(rmAnim);
+                createjs.Tween.get(tutorialNextLabel).call(addAnim,[0]).wait(1400).to({alpha:1}, 400, createjs.Ease.cubicOut).call(rmAnim);
                 
                 addButtonEvent(finishTutorial);
 
@@ -3356,14 +3362,15 @@ function loadSelectors(set) {
         startOverlay.addChild(whiteCircle,whiteCheck,blackSquare,blackCheck);
 
         createjs.Ticker.setPaused(false);
-        createjs.Tween.get(tutorialText2).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1480,"Player one's goal is to make complete circles. Player two's goal is to make complete squares. Try making both."]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn);
-        createjs.Tween.get(whiteCircle).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
+        createjs.Tween.get(tutorialText2).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1470,"Player one's goal is to make complete circles. Player two's goal is to make complete squares."]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn);
+        createjs.Tween.get(tutorialText1).call(replaceText,[tutorialText1,centerX-100,1800,"Try making both:"]).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
+        createjs.Tween.get(whiteCircle).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn);
         createjs.Tween.get(blackSquare).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn);
-        createjs.Tween.get(whiteCheck).wait(1000).to({alpha:.1}, 400, createjs.Ease.cubicIn);
+        createjs.Tween.get(whiteCheck).wait(1200).to({alpha:0}, 400, createjs.Ease.cubicIn);
         if (madeSquare == true) {
-          createjs.Tween.get(blackCheck).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
+          createjs.Tween.get(blackCheck).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
         } else {
-          createjs.Tween.get(blackCheck).wait(1000).to({alpha:.1}, 400, createjs.Ease.cubicIn).call(rmAnim);
+          createjs.Tween.get(blackCheck).wait(1200).to({alpha:0}, 400, createjs.Ease.cubicIn).call(rmAnim);
         }
       }
 
@@ -3381,14 +3388,17 @@ function loadSelectors(set) {
 
         addButtonEvent(tryConditions);
 
-        tutorialNextButton.y = 1550;
-        tutorialNextLabel.y = 1560;
+        tutorialNextButton.y = 1810;
+        tutorialNextLabel.y = 1820;
         tutorialNextLabel.text = "GOT IT. NEXT?";
 
         createjs.Ticker.setPaused(false);
-        createjs.Tween.get(whiteCheck).to({alpha:1}, 400, createjs.Ease.cubicIn);
-        createjs.Tween.get(blackCheck).to({alpha:1}, 400, createjs.Ease.cubicIn);
         createjs.Tween.get(tutorialText2).call(addAnim,[0]).to({alpha:0}, 100, createjs.Ease.cubicOut);
+        createjs.Tween.get(tutorialText1).to({y:tutorialText1.y-210},400, createjs.Ease.cubicInOut);
+        createjs.Tween.get(whiteCircle).to({y:whiteCircle.y-210},400, createjs.Ease.cubicInOut);
+        createjs.Tween.get(whiteCheck).to({y:whiteCheck.y-210},400, createjs.Ease.cubicInOut).to({alpha:1}, 400, createjs.Ease.cubicIn);
+        createjs.Tween.get(blackSquare).to({y:blackSquare.y-210},400, createjs.Ease.cubicInOut);
+        createjs.Tween.get(blackCheck).to({y:blackCheck.y-210},400, createjs.Ease.cubicInOut).to({alpha:1}, 400, createjs.Ease.cubicIn);
         createjs.Tween.get(tutorialNextButton).wait(600).to({alpha:1}, 100, createjs.Ease.cubicIn);
         createjs.Tween.get(tutorialNextLabel).wait(600).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
     }
