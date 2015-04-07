@@ -229,10 +229,10 @@ function init() {
 
   function buildSequenceStep(row,startSlot) {
 
-    var selectorZone0 = new DropZone(50,((row * 200) - 68),green,.25,startSlot);
-    var logicZone = new DropZone((50 + buttonSize + (buttonMargin+4)),((row * 200) - 68),blue,.25,startSlot+1);
-    var selectorZone1 = new DropZone((50 + (buttonSize*2) + ((buttonMargin+4)*2)),((row * 200) - 68),green,.25,startSlot+2);
-    var actionZone = new DropZone(523,((row * 200) - 68),yellow,.25,startSlot+3);
+    var selectorZone0 = new DropZone(50,((row * 200) - 68),green,.25,"condition",startSlot);
+    var logicZone = new DropZone((50 + buttonSize + (buttonMargin+4)),((row * 200) - 68),blue,.25,"logic",startSlot+1);
+    var selectorZone1 = new DropZone((50 + (buttonSize*2) + ((buttonMargin+4)*2)),((row * 200) - 68),green,.25,"condition",startSlot+2);
+    var actionZone = new DropZone(523,((row * 200) - 68),yellow,.25,"action",startSlot+3);
     dropZoneContainer.addChild(selectorZone0,logicZone,selectorZone1,actionZone);
   }
 
@@ -647,7 +647,7 @@ function loadSelectors(set) {
     return tray;
   }
 
-  function DropZone(x,y,color,alpha,slot) {
+  function DropZone(x,y,color,alpha,type,slot) {
 
     var dz = new createjs.Shape();
     dz.graphics.beginFill(color);
@@ -656,6 +656,7 @@ function loadSelectors(set) {
     dz.x = x;
     dz.y = y;
     dz.alpha = alpha;
+    dz.type = type
     dz.slot = slot;
 
     return dz;
@@ -704,6 +705,7 @@ function loadSelectors(set) {
     var posButton = new createjs.Container();
 
     posButton.type = "position";
+    posButton.slotType = "condition";
     posButton.addEventListener("mousedown",grabItem);
     posButton.addEventListener("pressmove",dragAndDrop);
     posButton.addEventListener("pressup",snapTo);
@@ -742,6 +744,7 @@ function loadSelectors(set) {
     var shapeButton = new createjs.Container();
 
     shapeButton.type = "shape";
+    shapeButton.slotType = "condition";
     shapeButton.addEventListener("mousedown",grabItem);
     shapeButton.addEventListener("pressmove",dragAndDrop);
     shapeButton.addEventListener("pressup",snapTo);
@@ -815,6 +818,7 @@ function loadSelectors(set) {
     var logicButton = new createjs.Container();
 
     logicButton.type = "logic";
+    logicButton.slotType = "logic";
     logicButton.addEventListener("mousedown",grabItem);
     logicButton.addEventListener("pressmove",dragAndDrop);
     logicButton.addEventListener("pressup",snapTo);
@@ -844,6 +848,7 @@ function loadSelectors(set) {
 
     var transformButton = new createjs.Container();
     transformButton.type = "action";
+    transformButton.slotType = "action";
     transformButton.addEventListener("mousedown",grabItem);
     transformButton.addEventListener("pressmove",dragAndDrop);
     transformButton.addEventListener("pressup",snapTo);
@@ -879,6 +884,7 @@ function loadSelectors(set) {
 
     var rotateButton = new createjs.Container();
     rotateButton.type = "action";
+    rotateButton.slotType = "action";
     rotateButton.addEventListener("mousedown",grabItem);
     rotateButton.addEventListener("pressmove",dragAndDrop);
     rotateButton.addEventListener("pressup",snapTo);
@@ -944,6 +950,7 @@ function loadSelectors(set) {
 
     var flipButton = new createjs.Container();
     flipButton.type = "action";
+    flipButton.slotType = "action";
     flipButton.addEventListener("mousedown",grabItem);
     flipButton.addEventListener("pressmove",dragAndDrop);
     flipButton.addEventListener("pressup",snapTo);
@@ -1121,6 +1128,7 @@ function loadSelectors(set) {
     for (var i = 0; i < dropZoneContainer.getObjectsUnderPoint(pt.x,pt.y,0).length; i++) {
       if (dropZoneContainer.getObjectsUnderPoint(pt.x,pt.y,0)[i].slot != null) {
       dropPosition = dropZoneContainer.getObjectsUnderPoint(pt.x,pt.y,0)[i];
+      console.log(dropPosition);
       }
     }
 
@@ -1128,7 +1136,7 @@ function loadSelectors(set) {
 
     if (dropPosition != null && sequence[dropPosition.slot] == null) {
       addToSlot(event.currentTarget,dropPosition);
-    } else if (dropPosition != null && sequence[dropPosition.slot] != null) {
+    } else if (dropPosition != null && sequence[dropPosition.slot] != null && (event.currentTarget.slotType == dropPosition.type)) {
       returnToOrigin(sequence[dropPosition.slot],sequence[dropPosition.slot].originParent,sequence[dropPosition.slot].originX,sequence[dropPosition.slot].originY);
       addToSlot(event.currentTarget,dropPosition);
     } else {
@@ -2566,18 +2574,22 @@ function loadSelectors(set) {
       dropZone0.graphics.beginFill(green);
       dropZone0.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
       dropZone0.alpha = .25;
+      dropZone0.type = "condition";
       dropZone0.slot = 0;
       dropZone1.graphics.beginFill(blue);
       dropZone1.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
       dropZone1.alpha = .25;
+      dropZone1.type = "logic";
       dropZone1.slot = 1;
       dropZone2.graphics.beginFill(green);
       dropZone2.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
       dropZone2.alpha = .25;
+      dropZone2.type = "condition";
       dropZone2.slot = 2;
       dropZone3.graphics.beginFill(yellow);
       dropZone3.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
       dropZone3.alpha = .25;
+      dropZone3.type = "action";
       dropZone3.slot = 3;
 
       var required = new createjs.Text("*","bold 100px Avenir-Heavy", white).set({x:55,y:30});
@@ -2994,21 +3006,6 @@ function loadSelectors(set) {
 
         }
 
-        // function showConditions() {
-
-        //   tutorialNextButton.removeAllEventListeners();
-        //   createjs.Ticker.setPaused(false);
-
-        //   createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,450,"A random set of conditions refreshes each turn. Use these to target shapes on the grid. Remember, if you use two conditions combine them with logic."]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut);
-          
-        //   createjs.Tween.get(sequenceBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
-        //   createjs.Tween.get(actionsBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
-
-        //   createjs.Tween.get(tutorialNextButton, {override:true}).to({alpha:0}, 100, createjs.Ease.cubicIn).wait(200).to({alpha:1}, 100, createjs.Ease.cubicIn).call(addButtonEvent,[showSeq]);
-        //   createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
-
-        // }
-
         function showSeq() {
 
           tutorialNextButton.removeAllEventListeners();
@@ -3119,7 +3116,7 @@ function loadSelectors(set) {
 
       if (dropPosition != null && sequence[dropPosition.slot] == null) {
         addToSlotLearn(event.currentTarget,dropPosition);
-      } else if (dropPosition != null && sequence[dropPosition.slot] != null) {
+      } else if (dropPosition != null && sequence[dropPosition.slot] != null && (event.currentTarget.slotType == dropPosition.type)) {
         returnToOriginLearn(sequence[dropPosition.slot],sequence[dropPosition.slot].originParent,sequence[dropPosition.slot].originX,sequence[dropPosition.slot].originY);
         addToSlotLearn(event.currentTarget,dropPosition);
       } else {
