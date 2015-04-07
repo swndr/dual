@@ -95,7 +95,7 @@ function init() {
 
   // BUILD GRID
 
-  var boardGrid = new Grid(4,180,890,150);
+  var boardGrid = new Grid(4,180,890,145);
   board.addChild(bg,boardGrid);
 
   // GAME MGMT & SCORES
@@ -2413,7 +2413,8 @@ function loadSelectors(set) {
       var showLogic = false;
       var triedAnd = false;
       var triedOr = false;
-      var madeShape = false;
+      var madeCircle = false;
+      var madeSquare = false;
 
       tutorialObjectsInPlay = [];
 
@@ -2685,6 +2686,29 @@ function loadSelectors(set) {
       arrow.graphics.lineTo(0,60);
       arrow.alpha = 0;
 
+      var whiteCircle = new createjs.Shape().set({x:centerX-20,y:(canvas.height - 200)});
+      whiteCircle.graphics.beginFill(white).drawCircle(0,0,iconRadius,iconRadius);
+      whiteCircle.alpha = 0;
+
+      var whiteCheck = new createjs.Shape().set({x:centerX+60,y:(canvas.height - 240)});
+      whiteCheck.graphics.beginStroke(pink).setStrokeStyle(14,"round","round");
+      whiteCheck.graphics.moveTo(0,40);
+      whiteCheck.graphics.lineTo(20,55);
+      whiteCheck.graphics.lineTo(50,20);
+      whiteCheck.alpha = 0;
+
+      var blackSquare = new createjs.Shape().set({x:centerX-60,y:(canvas.height - 140)});
+      blackSquare.graphics.beginFill(black).drawRect(0,0,iconRadius*2,iconRadius*2);
+      blackSquare.alpha = 0;
+
+      var blackCheck = new createjs.Shape().set({x:centerX+60,y:(canvas.height - 140)});
+      blackCheck.graphics.beginStroke(pink).setStrokeStyle(14,"round","round");
+      blackCheck.graphics.moveTo(0,40);
+      blackCheck.graphics.lineTo(20,55);
+      blackCheck.graphics.lineTo(50,20);
+      blackCheck.alpha = 0;
+
+
       function beginTutorial(event) {
 
         learn.removeAllEventListeners();
@@ -2707,7 +2731,7 @@ function loadSelectors(set) {
         createjs.Tween.get(D).wait(1000).to({x:colVal(0,2,380),y:rowVal(0,2,380,1000)-700}, 600, createjs.Ease.backInOut);
         createjs.Tween.get(U).wait(1200).to({x:colVal(1,2,380),y:rowVal(0,2,380,1000)-700}, 600, createjs.Ease.backInOut);
         createjs.Tween.get(A).wait(1400).to({x:colVal(0,2,380),y:rowVal(1,2,380,1000)-700}, 500, createjs.Ease.backOut);
-        createjs.Tween.get(L).wait(1600).to({x:colVal(1,2,380),y:rowVal(1,2,380,1000)-700}, 500, createjs.Ease.backOut).call(tutorialReady);
+        createjs.Tween.get(L).wait(1600).to({x:colVal(1,2,380),y:rowVal(1,2,380,1000)-700}, 500, createjs.Ease.getBackOut(1)).call(tutorialReady);
 
         function tutorialReady() {
 
@@ -2794,8 +2818,11 @@ function loadSelectors(set) {
       }
 
       createjs.Ticker.setPaused(false);
-
-      createjs.Tween.get(tutorialNextButton).call(addAnim,[0]).wait(200).to({alpha:0}, 100, createjs.Ease.cubicOut);
+      createjs.Tween.get(whiteCircle).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut);
+      createjs.Tween.get(blackSquare).to({alpha:0}, 400, createjs.Ease.cubicOut);
+      createjs.Tween.get(whiteCheck).to({alpha:.0}, 400, createjs.Ease.cubicOut);
+      createjs.Tween.get(blackCheck).to({alpha:.0}, 400, createjs.Ease.cubicOut);
+      createjs.Tween.get(tutorialNextButton).wait(200).to({alpha:0}, 100, createjs.Ease.cubicOut);
       createjs.Tween.get(tutorialNextLabel).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut);
       createjs.Tween.get(D).wait(200).to({alpha:0}, 200, createjs.Ease.cubicOut).call(manualTransforms).to({alpha:.2}, 400, createjs.Ease.cubicIn);
       createjs.Tween.get(U).wait(200).to({alpha:0}, 200, createjs.Ease.cubicOut).to({alpha:.2}, 600, createjs.Ease.cubicIn);
@@ -2835,6 +2862,7 @@ function loadSelectors(set) {
       }
 
       function loadConditions() {
+        startOverlay.removeChild(whiteCircle,blackSquare);
         dropZoneContainer.removeChild(dropZone3);
         switchTutorial.addChild(transformTL,transformTR,transformBR,transformBL);
         seqBox.removeChild(actionTray,playButton,playLabel);
@@ -3267,9 +3295,9 @@ function loadSelectors(set) {
       for (i in tutorialObjectsInPlay) {
 
         if (tutorialObjectsInPlay[i].tl == 0 && tutorialObjectsInPlay[i].tr == 0 && tutorialObjectsInPlay[i].br == 0 && tutorialObjectsInPlay[i].bl == 0) {
-          madeShape = true;
+          madeSquare = true;
         } else if (tutorialObjectsInPlay[i].tl == 1 && tutorialObjectsInPlay[i].tr == 1 && tutorialObjectsInPlay[i].br == 1 && tutorialObjectsInPlay[i].bl == 1) {
-          madeShape = true;
+          madeCircle = true;
         }
 
         var findMorph = tutorialObjectsInPlay[i].getChildByName("morph");
@@ -3280,21 +3308,45 @@ function loadSelectors(set) {
         }
 
       if (switchCount == 1) { 
+
+        startOverlay.addChild(whiteCircle,whiteCheck,blackSquare,blackCheck);
+
         createjs.Ticker.setPaused(false);
-        createjs.Tween.get(tutorialText2).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1520,"Player one's goal is to make complete circles. Player two's goal is to make complete squares. Try making either."]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
+        createjs.Tween.get(tutorialText2).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1480,"Player one's goal is to make complete circles. Player two's goal is to make complete squares. Try making both."]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn);
+        createjs.Tween.get(whiteCircle).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
+        createjs.Tween.get(blackSquare).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn);
+        createjs.Tween.get(whiteCheck).wait(1000).to({alpha:.1}, 400, createjs.Ease.cubicIn);
+        if (madeSquare == true) {
+          createjs.Tween.get(blackCheck).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
+        } else {
+          createjs.Tween.get(blackCheck).wait(1000).to({alpha:.1}, 400, createjs.Ease.cubicIn).call(rmAnim);
+        }
       }
 
-      if (switchCount >= 2 && madeShape == true) { 
+      if (switchCount >= 2 && madeSquare == true && madeCircle == false) { 
+        createjs.Ticker.setPaused(false);
+        createjs.Tween.get(blackCheck).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
+      }
 
-      addButtonEvent(tryConditions);
+      if (switchCount >= 2 && madeSquare == false && madeCircle == true) { 
+        createjs.Ticker.setPaused(false);
+        createjs.Tween.get(whiteCheck).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
+      }
 
-      tutorialNextButton.y = 1810;
-      tutorialNextLabel.y = 1820;
-      tutorialNextLabel.text = "GOT IT!";
+      if (switchCount >= 2 && madeSquare == true && madeCircle == true) { 
 
-      createjs.Ticker.setPaused(false);
-      createjs.Tween.get(tutorialNextButton).call(addAnim,[0]).wait(600).to({alpha:1}, 100, createjs.Ease.cubicIn).call(rmAnim);
-      createjs.Tween.get(tutorialNextLabel).call(addAnim,[0]).wait(600).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
+        addButtonEvent(tryConditions);
+
+        tutorialNextButton.y = 1570;
+        tutorialNextLabel.y = 1580;
+        tutorialNextLabel.text = "GOT IT. NEXT?";
+
+        createjs.Ticker.setPaused(false);
+        createjs.Tween.get(whiteCheck).to({alpha:1}, 400, createjs.Ease.cubicIn);
+        createjs.Tween.get(blackCheck).to({alpha:1}, 400, createjs.Ease.cubicIn);
+        createjs.Tween.get(tutorialText2).call(addAnim,[0]).to({alpha:0}, 100, createjs.Ease.cubicOut);
+        createjs.Tween.get(tutorialNextButton).wait(600).to({alpha:1}, 100, createjs.Ease.cubicIn);
+        createjs.Tween.get(tutorialNextLabel).wait(600).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
     }
 
       sequenceReadyLearn();
@@ -3439,17 +3491,6 @@ function loadSelectors(set) {
       }
     }
   }
-
-  /*
-  function endTween(speed) {
-    if (arguments.length == 1) {
-      window.setTimeout(function() {    createjs.Ticker.setPaused(true);
-      console.log("ticker paused");},speed);
-    } else {
-      window.setTimeout(function() {    createjs.Ticker.setPaused(true);
-      console.log("ticker paused");},1000);
-    }
-  }*/
 
   // ------------- UTILITIES -----------------
 
