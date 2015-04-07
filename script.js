@@ -1121,9 +1121,12 @@ function loadSelectors(set) {
 
     if (dropPosition != null && sequence[dropPosition.slot] == null) {
       addToSlot(event.currentTarget,dropPosition);
+    } else if (dropPosition != null && sequence[dropPosition.slot] != null) {
+      returnToOrigin(sequence[dropPosition.slot],sequence[dropPosition.slot].originParent,sequence[dropPosition.slot].originX,sequence[dropPosition.slot].originY);
+      addToSlot(event.currentTarget,dropPosition);
     } else {
       returnToOrigin(event.currentTarget,event.currentTarget.originParent,event.currentTarget.originX,event.currentTarget.originY);
-    } 
+    }
 
     // unhighlight slots
 
@@ -1437,7 +1440,6 @@ function loadSelectors(set) {
       var findMorph = objectsInPlay[i].getChildByName("morph");
       if (findMorph != null) {
         removeMorph(objectsInPlay[i],findMorph);
-        //createjs.Tween.get(findMorph, {override:true}).to({alpha:0}, 600, createjs.Ease.cubicOut).call(removeMorph,[objectsInPlay[i],findMorph]);
       }
 
     }
@@ -1543,15 +1545,18 @@ function loadSelectors(set) {
 
     var completeRows;
     var completeCols;
+    var completeDiag;
 
     var rows = [[0,1,2,3],[4,5,6,7],[8,9,10,11],[12,13,14,15]];
     var cols = [[0,4,8,12],[1,5,9,13],[2,6,10,14],[3,7,11,15]];
+    var diag = [[0,5,10,15],[3,6,9,12]];
 
     switch(n) {
       case 0:
         if (countCompleteShapes(0)) {
           console.log(completeRows);
           console.log(completeCols);
+          console.log(completeDiag);
           endGame(0);
           console.log("black win");
         }
@@ -1560,6 +1565,7 @@ function loadSelectors(set) {
         if (countCompleteShapes(1)) {
             console.log(completeRows);
             console.log(completeCols);
+            console.log(completeDiag);
             endGame(1);
             console.log("white win");
         }
@@ -1568,22 +1574,25 @@ function loadSelectors(set) {
         if ((countCompleteShapes(0)) && !(countCompleteShapes(1))) {
             console.log(completeRows);
             console.log(completeCols);
+            console.log(completeDiag);
             endGame(0);
             console.log("black win");
         } else if (!(countCompleteShapes(0)) && (countCompleteShapes(1))) {
             console.log(completeRows);
             console.log(completeCols);
+            console.log(completeDiag);
             endGame(1);
             console.log("white win");
         } else if ((countCompleteShapes(0)) && (countCompleteShapes(1))) {
             countCompleteShapes(0);
-            var blackTotal = completeRows.length + completeCols.length;
+            var blackTotal = completeRows.length + completeCols.length + completeDiag.length;
             countCompleteShapes(1);
-            var whiteTotal = completeRows.length + completeCols.length;
+            var whiteTotal = completeRows.length + completeCols.length + completeDiag.length;
           if (blackTotal > whiteTotal) {
             countCompleteShapes(0);
             console.log(completeRows);
             console.log(completeCols);
+            console.log(completeDiag);
             endGame(0);
             console.log("black win");
           } else if (whiteTotal > blackTotal) {
@@ -1591,14 +1600,17 @@ function loadSelectors(set) {
             console.log("white win");
             console.log(completeRows);
             console.log(completeCols);
+            console.log(completeDiag);
           } else {
             endGame(2);
             console.log("draw");
             console.log(completeRows);
             console.log(completeCols);
+            console.log(completeDiag);
             countCompleteShapes(0);
             console.log(completeRows);
             console.log(completeCols);
+            console.log(completeDiag);
           }
         }
         break;
@@ -1609,8 +1621,10 @@ function loadSelectors(set) {
       var success = false;
       var rowCounter = 0;
       var colCounter = 0;
+      var diagCounter = 0;
       completeRows = [];
       completeCols = [];
+      completeDiag = [];
 
       for (var a = 0; a < 4; a++) {
         for (var b = 0; b < 4; b++) {
@@ -1619,6 +1633,11 @@ function loadSelectors(set) {
           }
           if (objectsInPlay[cols[a][b]].complete === color) {
             colCounter++;
+          }
+          if (a < 2) {
+            if (objectsInPlay[diag[a][b]].complete === color) {
+              diagCounter++;
+            }
           }
         }
 
@@ -1631,8 +1650,13 @@ function loadSelectors(set) {
           success = true;
           completeCols.push(a);
         }
+        if (diagCounter > 3) {
+          success = true;
+          completeDiag.push(a);
+        }
         rowCounter = 0;
         colCounter = 0;
+        diagCounter = 0;
       }
       return success;
     }
@@ -1653,6 +1677,17 @@ function loadSelectors(set) {
     gameOver = true;
     console.log(gameOver);
     createjs.Ticker.setPaused(false);
+
+    for (var i in objectsInPlay) {
+
+      var findMorph = objectsInPlay[i].getChildByName("morph");
+        if (findMorph != null) {
+        removeMorph(objectsInPlay[i],findMorph);
+      }
+
+      createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:1,}, 300, createjs.Ease.cubicIn);
+
+    }
 
     if (color == 0) {
       var winner = "BLACK WINS";
@@ -1710,7 +1745,7 @@ function loadSelectors(set) {
     actionsBox.mouseEnabled = false;
     stage.update();
 
-    createjs.Tween.get(winOverlay, {override:true}).call(addAnim,[0]).to({y:890}, 300, createjs.Ease.cubicInOut).call(rmAnim);
+    createjs.Tween.get(winOverlay, {override:true}).wait(50).call(addAnim,[0]).to({y:890}, 300, createjs.Ease.cubicInOut).call(rmAnim);
 
     function newGameBannerHighlight() {
       newGameBanner.alpha = .9;
@@ -1741,7 +1776,7 @@ function loadSelectors(set) {
         removeMorph(objectsInPlay[i],findMorph);
       }
 
-      createjs.Tween.get(objectsInPlay[i], {override:true}).call(addAnim,[0]).to({alpha:1,}, 300, createjs.Ease.cubicIn).call(rmAnim);
+      createjs.Tween.get(objectsInPlay[i], {override:true}).to({alpha:1,}, 300, createjs.Ease.cubicIn);
 
     }
 
@@ -2358,6 +2393,17 @@ function loadSelectors(set) {
       start.addEventListener("mousedown",highlightButton);
       start.addEventListener("pressup",beginGame);
 
+      var contact = new createjs.Container().set({x:centerX,y:1900});
+      var contactButton = new createjs.Shape().set({x:-200,y:-60});
+      contactButton.graphics.beginFill(green).drawRect(0,0,400,200);
+      contactButton.alpha = 0.1;
+      var contactText = new createjs.Text("hello@samwander.com","100 40px Avenir-Book",white).set({x:0,y:0});
+      contactText.textAlign = "center";
+
+      contact.addChild(contactButton,contactText);
+      contact.addEventListener("mousedown",highlightButton);
+      contact.addEventListener("click",contactMe);
+
       var tutorialGrid = new Grid(2,380,1000,230);
       tutorialGrid.alpha = 0;
 
@@ -2939,9 +2985,12 @@ function loadSelectors(set) {
 
       if (dropPosition != null && sequence[dropPosition.slot] == null) {
         addToSlotLearn(event.currentTarget,dropPosition);
+      } else if (dropPosition != null && sequence[dropPosition.slot] != null) {
+        returnToOriginLearn(sequence[dropPosition.slot],sequence[dropPosition.slot].originParent,sequence[dropPosition.slot].originX,sequence[dropPosition.slot].originY);
+        addToSlotLearn(event.currentTarget,dropPosition);
       } else {
         returnToOriginLearn(event.currentTarget,event.currentTarget.originParent,event.currentTarget.originX,event.currentTarget.originY);
-      } 
+      }
 
       // unhighlight slots
 
@@ -3247,6 +3296,12 @@ function loadSelectors(set) {
       loadIntro();
     }
 
+    function contactMe() {
+      contactText.alpha = 1;
+      stage.update();
+      //window.location = "mailto:hello@samwander.com";
+    }
+
     // BEGIN GAME
 
     function beginGame(event) {
@@ -3278,6 +3333,7 @@ function loadSelectors(set) {
 
   // ------------- ANIMATION -----------------
 
+  var endTweenCheck = 0;
 
   function addAnim(t) {
     animations.push(t);
@@ -3296,10 +3352,17 @@ function loadSelectors(set) {
 
   function endTween() {
     if (animations.length < 1) {
+      endTweenCheck++;
+      if (endTweenCheck < 2) {
+      window.setTimeout(endTween,500);
+      } else {
       createjs.Ticker.setPaused(true);
       console.log("ticker paused");
+      endTweenCheck = 0;
+      }
     }
   }
+
   /*
   function endTween(speed) {
     if (arguments.length == 1) {
