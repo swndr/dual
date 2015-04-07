@@ -197,15 +197,15 @@ function init() {
 
       if (i < 2) {
         if (!(i % 2)) {
-          var sequenceTray = new Tray(36,(120 + (i*100)),442,154,black,green,1,i,"selectors");
+          var sequenceTray = new Tray(36,(117 + (i*100)),442,160,black,green,1,i,"selectors");
         } else {
-          var sequenceTray = new Tray(508,(20 + (i*100)),160,154,black,yellow,1,i,"actions"); 
+          var sequenceTray = new Tray(508,(17 + (i*100)),160,160,black,yellow,1,i,"actions"); 
         }
       } else {
         if (!(i % 2)) {
-          var sequenceTray = new Tray(36,(120 + (i*100)),442,154,black,lightGray,.7,i,"selectors");
+          var sequenceTray = new Tray(36,(117 + (i*100)),442,160,black,lightGray,.7,i,"selectors");
         } else {
-          var sequenceTray = new Tray(508,(20 + (i*100)),160,154,black,lightGray,.7,i,"actions"); 
+          var sequenceTray = new Tray(508,(17 + (i*100)),160,160,black,lightGray,.7,i,"actions"); 
         }
       }
 
@@ -216,6 +216,14 @@ function init() {
     buildNextSequenceLocked(2);
     buildSequenceLocked(3);
     buildSequenceLocked(4);
+
+    var requiredCondition = new createjs.Text("*","bold 100px Avenir-Heavy", white).set({x:90,y:150});
+    requiredCondition.alpha = .1;
+
+    var requiredAction = new createjs.Text("*","bold 100px Avenir-Heavy", white).set({x:563,y:150});
+    requiredAction.alpha = .1;
+
+    dropZoneContainer.addChild(requiredCondition,requiredAction);
 
   }
 
@@ -1050,7 +1058,6 @@ function loadSelectors(set) {
           if (event.currentTarget.name == "AND") {
             andCount--;
             andCountLabel.text = andCount;
-            console.log(andCount);
         } else if (event.currentTarget.name == "OR") {
             orCount--;
             orCountLabel.text = orCount;
@@ -1070,7 +1077,7 @@ function loadSelectors(set) {
 
       for (var i = 0; i < dropZoneContainer.children.length; i++) {
         if (dropZoneContainer.children[i].slot == 1 || dropZoneContainer.children[i].slot == 5 || dropZoneContainer.children[i].slot == 9 || dropZoneContainer.children[i].slot == 13) {
-          dropZoneContainer.children[i].alpha = .5;
+          dropZoneContainer.children[i].alpha = .7;
         }
       }
 
@@ -1078,7 +1085,7 @@ function loadSelectors(set) {
 
       for (var i = 0; i < dropZoneContainer.children.length; i++) {
         if (dropZoneContainer.children[i].slot == 3 || dropZoneContainer.children[i].slot == 7 || dropZoneContainer.children[i].slot == 11 || dropZoneContainer.children[i].slot == 15) {
-          dropZoneContainer.children[i].alpha = .5;
+          dropZoneContainer.children[i].alpha = .7;
         }
       }
     
@@ -1086,7 +1093,7 @@ function loadSelectors(set) {
 
       for (var i = 0; i < dropZoneContainer.children.length; i++) {
         if ((dropZoneContainer.children[i].slot % 2) == 0) {
-          dropZoneContainer.children[i].alpha = .5;
+         dropZoneContainer.children[i].alpha = .7;
         }
       }      
     }
@@ -1258,12 +1265,12 @@ function loadSelectors(set) {
           trays.children[i].graphics
           .clear()
           .beginStroke(green).setStrokeStyle(8).beginFill(black)
-          .drawRoundRect(0,0,442,154,5);
+          .drawRoundRect(0,0,442,160,5);
        } else {
           trays.children[i].graphics
           .clear()
           .beginStroke(yellow).setStrokeStyle(8).beginFill(black)
-          .drawRoundRect(0,0,160,154,5);
+          .drawRoundRect(0,0,160,160,5);
         }
     }
 
@@ -1354,12 +1361,12 @@ function loadSelectors(set) {
         trayToHighlight.graphics
         .clear()
         .beginStroke(black).setStrokeStyle(8).beginFill(black)
-        .drawRoundRect(0,0,442,154,5);
+        .drawRoundRect(0,0,442,160,5);
       } else {
         trayToHighlight.graphics
         .clear()
         .beginStroke(black).setStrokeStyle(8).beginFill(black)
-        .drawRoundRect(0,0,160,154,5);
+        .drawRoundRect(0,0,160,160,5);
       }
 
     stage.update();
@@ -1814,13 +1821,13 @@ function loadSelectors(set) {
         trays.getChildAt(2).graphics
         .clear()
         .beginStroke(green).setStrokeStyle(8).beginFill(black)
-        .drawRoundRect(0,0,442,154,5);
+        .drawRoundRect(0,0,442,160,5);
         trays.getChildAt(2).alpha = 1;
       
         trays.getChildAt(3).graphics
         .clear()
         .beginStroke(yellow).setStrokeStyle(8).beginFill(black)
-        .drawRoundRect(0,0,160,154,5);
+        .drawRoundRect(0,0,160,160,5);
         trays.getChildAt(3).alpha = 1;
 
         buildSequenceStep(2,4);
@@ -1836,13 +1843,13 @@ function loadSelectors(set) {
         trays.getChildAt(4).graphics
         .clear()
         .beginStroke(green).setStrokeStyle(8).beginFill(black)
-        .drawRoundRect(0,0,442,154,5);
+        .drawRoundRect(0,0,442,160,5);
         trays.getChildAt(4).alpha = 1;
       
         trays.getChildAt(5).graphics
         .clear()
         .beginStroke(yellow).setStrokeStyle(8).beginFill(black)
-        .drawRoundRect(0,0,160,154,5);
+        .drawRoundRect(0,0,160,160,5);
         trays.getChildAt(5).alpha = 1;
 
         buildSequenceStep(3,8);
@@ -1857,13 +1864,13 @@ function loadSelectors(set) {
         trays.getChildAt(6).graphics
         .clear()
         .beginStroke(green).setStrokeStyle(8).beginFill(black)
-        .drawRoundRect(0,0,442,154,5);
+        .drawRoundRect(0,0,442,160,5);
         trays.getChildAt(6).alpha = 1;
       
         trays.getChildAt(7).graphics
         .clear()
         .beginStroke(yellow).setStrokeStyle(8).beginFill(black)
-        .drawRoundRect(0,0,160,154,5);
+        .drawRoundRect(0,0,160,160,5);
         trays.getChildAt(7).alpha = 1;
 
         buildSequenceStep(4,12);
@@ -2413,6 +2420,7 @@ function loadSelectors(set) {
       var showLogic = false;
       var triedAnd = false;
       var triedOr = false;
+      var triedBoth = false;
       var madeCircle = false;
       var madeSquare = false;
 
@@ -2540,13 +2548,13 @@ function loadSelectors(set) {
       var seqBox = new createjs.Container().set({x:(canvas.width/2)+10,y:1125});
       seqBox.alpha = 0;
 
-      var sequenceTray = new createjs.Shape();
+      var sequenceTray = new createjs.Shape().set({x:0,y:-3});
       sequenceTray.graphics.beginStroke(green).setStrokeStyle(8).beginFill(black);
-      sequenceTray.graphics.drawRoundRect(0,0,442,154,5);
+      sequenceTray.graphics.drawRoundRect(0,0,442,160,5);
 
-      var actionTray = new createjs.Shape().set({x:0,y:0});
+      var actionTray = new createjs.Shape().set({x:0,y:-3});
       actionTray.graphics.beginStroke(yellow).setStrokeStyle(8).beginFill(black);
-      actionTray.graphics.drawRoundRect(0,0,160,154,5);
+      actionTray.graphics.drawRoundRect(0,0,160,160,5);
 
       var dropZoneContainer = new createjs.Container();
 
@@ -2571,6 +2579,9 @@ function loadSelectors(set) {
       dropZone3.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
       dropZone3.alpha = .25;
       dropZone3.slot = 3;
+
+      var required = new createjs.Text("*","bold 100px Avenir-Heavy", white).set({x:55,y:30});
+      required.alpha = .1;
 
       dropZoneContainer.addChild(dropZone3);
 
@@ -2676,6 +2687,13 @@ function loadSelectors(set) {
       orLogic.alpha = 0;
       var placeholder10 = new PlaceholderButton(orLogic.x,orLogic.y);
       placeholder10.alpha = 0;
+
+      var andCheck = new createjs.Text("AND","bold 40px Avenir-Heavy",blue).set({x:centerX-50,y:(canvas.height - 225)});
+      andCheck.textAlign = "center";
+      andCheck.alpha = 0;
+      var orCheck = new createjs.Text("OR","bold 40px Avenir-Heavy",blue).set({x:centerX-50,y:(canvas.height - 125)});
+      orCheck.textAlign = "center";
+      orCheck.alpha = 0;
 
       tutorialConditions.addChild(placeholder5,placeholder6,placeholder7,placeholder8,placeholder9,placeholder10,rowSelector,colSelector,shapeSelector1,shapeSelector2,andLogic,orLogic);
 
@@ -2866,9 +2884,9 @@ function loadSelectors(set) {
         dropZoneContainer.removeChild(dropZone3);
         switchTutorial.addChild(transformTL,transformTR,transformBR,transformBL);
         seqBox.removeChild(actionTray,playButton,playLabel);
-        dropZoneContainer.addChild(dropZone0,dropZone1,dropZone2);
+        dropZoneContainer.addChild(dropZone0,dropZone1,dropZone2,required);
         seqBox.addChild(sequenceTray,dropZoneContainer);
-        startOverlay.addChild(tutorialConditions);
+        startOverlay.addChild(tutorialConditions,andCheck,orCheck);
       }
 
     }
@@ -2895,8 +2913,16 @@ function loadSelectors(set) {
       createjs.Tween.get(andLogic).wait(400).to({alpha:1}, 400, createjs.Ease.cubicIn);
       createjs.Tween.get(orLogic).wait(400).to({alpha:1}, 400, createjs.Ease.cubicIn);
 
-      createjs.Tween.get(tutorialText2).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1550,"If you want to use two conditions you need to add one of these logic items. Try both out!"]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
+      createjs.Tween.get(tutorialText2).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1480,"You can use one condition or two. If you want to use two you need to add one of these logic items. Try both out!"]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn);
+      createjs.Tween.get(andCheck).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
+      createjs.Tween.get(orCheck).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
+      createjs.Tween.get(whiteCheck).wait(800).to({alpha:.1}, 400, createjs.Ease.cubicIn);
+      createjs.Tween.get(blackCheck).wait(800).to({alpha:.1}, 400, createjs.Ease.cubicIn).call(rmAnim);
+
       tutorialNextLabel.text = "GO TO GAME"
+      tutorialNextButton.y = 1780;
+      tutorialNextLabel.y = 1790;
+
     }
 
 
@@ -2941,7 +2967,7 @@ function loadSelectors(set) {
         .clear()
         .beginFill(green).drawRect(0,0,400,100);
         tutorialNextButton.y = 680;
-        addButtonEvent(showControls);
+        addButtonEvent(showConditions);
         tutorialNextLabel.text = "NEXT";
         tutorialNextLabel.y = 690;
         tutorialNextLabel.color = black;
@@ -2953,32 +2979,35 @@ function loadSelectors(set) {
         createjs.Tween.get(tutorialNextButton, {override:true}).to({alpha:1}, 800, createjs.Ease.cubicIn);
         createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:1}, 800, createjs.Ease.cubicIn).call(rmAnim);
 
-        function showControls() {
-
-          tutorialNextButton.removeAllEventListeners();
-          createjs.Ticker.setPaused(false);
-
-          createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,550,"These are the game controls. Look familiar?"]).wait(400).to({alpha:1}, 200, createjs.Ease.cubicOut).call(loadSelectors,[selectorsP1]);
-          createjs.Tween.get(tutorialNextButton, {override:true}).to({alpha:0}, 100, createjs.Ease.cubicIn).wait(400).to({y:900},100).to({alpha:1}, 100, createjs.Ease.cubicIn);
-          createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(600).call(replaceText,[tutorialNextLabel,centerX,910,"NEXT"]).to({alpha:1}, 600, createjs.Ease.cubicIn).call(addButtonEvent,[showConditions]).wait(0).call(rmAnim);
-          createjs.Tween.get(startOverlay, {override:true}).wait(400).to({y:-224}, 600, createjs.Ease.cubicIn);
-
-        }
-
         function showConditions() {
 
           tutorialNextButton.removeAllEventListeners();
           createjs.Ticker.setPaused(false);
 
-          createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,450,"A random set of conditions refreshes each turn. Use these to target shapes on the grid. Remember, if you use two conditions combine them with logic."]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut);
-          
+          createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,450,"A random set of conditions refreshes each turn. Use these to target shapes on the grid. Remember, if you use two conditions combine them with logic."]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut).call(loadSelectors,[selectorsP1]);
+          createjs.Tween.get(tutorialNextButton, {override:true}).to({alpha:0}, 100, createjs.Ease.cubicIn).wait(400).to({y:900},100).to({alpha:1}, 100, createjs.Ease.cubicIn);
+          createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(600).call(replaceText,[tutorialNextLabel,centerX,910,"NEXT"]).to({alpha:1}, 600, createjs.Ease.cubicIn).call(addButtonEvent,[showSeq]).wait(0).call(rmAnim);
+          createjs.Tween.get(startOverlay, {override:true}).wait(400).to({y:-224}, 600, createjs.Ease.cubicIn);
+
           createjs.Tween.get(sequenceBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
           createjs.Tween.get(actionsBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
 
-          createjs.Tween.get(tutorialNextButton, {override:true}).to({alpha:0}, 100, createjs.Ease.cubicIn).wait(200).to({alpha:1}, 100, createjs.Ease.cubicIn).call(addButtonEvent,[showSeq]);
-          createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
-
         }
+
+        // function showConditions() {
+
+        //   tutorialNextButton.removeAllEventListeners();
+        //   createjs.Ticker.setPaused(false);
+
+        //   createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,450,"A random set of conditions refreshes each turn. Use these to target shapes on the grid. Remember, if you use two conditions combine them with logic."]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut);
+          
+        //   createjs.Tween.get(sequenceBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
+        //   createjs.Tween.get(actionsBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
+
+        //   createjs.Tween.get(tutorialNextButton, {override:true}).to({alpha:0}, 100, createjs.Ease.cubicIn).wait(200).to({alpha:1}, 100, createjs.Ease.cubicIn).call(addButtonEvent,[showSeq]);
+        //   createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
+
+        // }
 
         function showSeq() {
 
@@ -3001,7 +3030,7 @@ function loadSelectors(set) {
           tutorialNextButton.removeAllEventListeners();
           createjs.Ticker.setPaused(false);
 
-          createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,450,"As well as switching between round and square segments, you can flip and rotate whole shapes: with this power you can target many more shapes in a sequence."]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut);
+          createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,450,"As well as switching between round and square segments, you can flip and rotate whole shapes. With this power you can target many more shapes in a sequence."]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut);
           
           createjs.Tween.get(selectorsBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
           createjs.Tween.get(sequenceBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
@@ -3064,12 +3093,12 @@ function loadSelectors(set) {
       // slot highlighting
 
       if (event.currentTarget.type == "logic") {
-          dropZone1.alpha = .5;
+          dropZone1.alpha = .7;
       } else if (event.currentTarget.type == "action") {
-          dropZone3.alpha = .5;
+          dropZone3.alpha = .7;
       } else {
-          dropZone0.alpha = .5;
-          dropZone2.alpha = .5; 
+          dropZone0.alpha = .7;
+          dropZone2.alpha = .7; 
       }
       stage.update();
     }
@@ -3138,21 +3167,39 @@ function loadSelectors(set) {
           targetGameObjectsLearn();
 
           if (item.name == "AND") {
-            triedAnd = true;
+            if (triedAnd == false) {
+              triedAnd = true;
+              createjs.Ticker.setPaused(false);
+              createjs.Tween.get(whiteCheck).call(addAnim,[0]).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
+            }
           } else {
-            triedOr = true;
+            if (triedOr == false) {
+              triedOr = true;
+              createjs.Ticker.setPaused(false);
+              createjs.Tween.get(blackCheck).call(addAnim,[0]).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
+            }
           }
 
           if (triedOr && triedAnd) {
-            
-            createjs.Ticker.setPaused(false);
-            createjs.Tween.get(tutorialText2).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1520,"Using AND targets any shapes that match both conditions. Using OR targets shapes that match either condition."]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
-            createjs.Tween.get(tutorialNextButton).call(addAnim,[0]).wait(800).to({alpha:1}, 100, createjs.Ease.cubicOut).call(rmAnim);
-            createjs.Tween.get(tutorialNextLabel).call(addAnim,[0]).wait(800).to({alpha:1}, 400, createjs.Ease.cubicOut).call(rmAnim);
-            
-            addButtonEvent(finishTutorial);
-          }
+            if (triedBoth == false) {
+              triedBoth = true;
+              createjs.Ticker.setPaused(false);
+              createjs.Tween.get(tutorialText2).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1480,"Using AND targets any shapes that match both conditions. Using OR targets shapes that match either condition."]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn).call(handleGoToGame);
+              
+              function handleGoToGame() {
 
+                createjs.Tween.get(andCheck).wait(400).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(rmAnim);;
+                createjs.Tween.get(orCheck).wait(400).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(rmAnim);;
+                createjs.Tween.get(whiteCheck).wait(400).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(rmAnim);;
+                createjs.Tween.get(blackCheck).wait(400).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(rmAnim);;
+                createjs.Tween.get(tutorialNextButton).call(addAnim,[0]).wait(1000).to({alpha:1}, 100, createjs.Ease.cubicOut).call(rmAnim);
+                createjs.Tween.get(tutorialNextLabel).call(addAnim,[0]).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicOut).call(rmAnim);
+                
+                addButtonEvent(finishTutorial);
+
+              }
+            }
+          }
         } else { 
           returnToOriginLearn(item,item.originParent,item.originX,item.originY); 
         }
@@ -3289,7 +3336,7 @@ function loadSelectors(set) {
       actionTray.graphics
       .clear()
       .beginStroke(yellow).setStrokeStyle(8).beginFill(black)
-      .drawRoundRect(0,0,160,154,5);
+      .drawRoundRect(0,0,160,160,5);
 
 
       for (i in tutorialObjectsInPlay) {
@@ -3337,8 +3384,8 @@ function loadSelectors(set) {
 
         addButtonEvent(tryConditions);
 
-        tutorialNextButton.y = 1570;
-        tutorialNextLabel.y = 1580;
+        tutorialNextButton.y = 1550;
+        tutorialNextLabel.y = 1560;
         tutorialNextLabel.text = "GOT IT. NEXT?";
 
         createjs.Ticker.setPaused(false);
@@ -3393,7 +3440,7 @@ function loadSelectors(set) {
     actionTray.graphics
     .clear()
     .beginStroke(black).setStrokeStyle(8).beginFill(black)
-    .drawRoundRect(0,0,160,154,5);
+    .drawRoundRect(0,0,160,160,5);
     stage.update();
 
   }
