@@ -3012,7 +3012,7 @@ function loadSelectors(set) {
           tutorialNextButton.removeAllEventListeners();
           createjs.Ticker.setPaused(false);
 
-          createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,450,"A random set of conditions refreshes each turn. Use these to target shapes on the grid. Remember, if you use two conditions combine them with logic."]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut).call(loadSelectors,[selectorsP1]);
+          createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,500,"You\'ll get a random set of conditions to play with each turn. Use these to target shapes on the grid."]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut).call(loadSelectors,[selectorsP1]);
           createjs.Tween.get(tutorialNextButton, {override:true}).to({alpha:0}, 100, createjs.Ease.cubicIn).wait(400).to({y:900},100).to({alpha:1}, 100, createjs.Ease.cubicIn);
           createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(600).call(replaceText,[tutorialNextLabel,centerX,910,"NEXT"]).to({alpha:1}, 600, createjs.Ease.cubicIn).call(addButtonEvent,[showSeq]).wait(0).call(rmAnim);
           createjs.Tween.get(startOverlay, {override:true}).wait(400).to({y:-224}, 600, createjs.Ease.cubicIn);
@@ -3113,7 +3113,7 @@ function loadSelectors(set) {
       nTitle.lineWidth = 1200;
       nTitle.textAlign = "center";
 
-      var nSubTitle = new createjs.Text("All computer programs are built from three basic structures: loop, selection and sequence (and now you know about all of them).","200 40px Avenir-Medium", white).set({x:centerX,y:450});
+      var nSubTitle = new createjs.Text("All computer programs are built from three simple structures: loop, selection and sequence (and now you know about them all).","200 40px Avenir-Medium", white).set({x:centerX,y:450});
       nSubTitle.lineWidth = 1200;
       nSubTitle.lineHeight = 55;
       nSubTitle.textAlign = "center";
@@ -3121,7 +3121,7 @@ function loadSelectors(set) {
       var nLoop = new createjs.Text("LOOP","200 60px Avenir-Medium", white).set({x:170,y:650});
       nLoop.textAlign = "left";
 
-      var nLoopText = new createjs.Text("When you hit play, the program loops through every shape on the grid:  once to check if each shape meets your set of conditions and once to perform each action in your sequence.","200 40px Avenir-Medium", white).set({x:650,y:650});
+      var nLoopText = new createjs.Text("When you hit play, the program loops through every shape on the grid: first to check if each shape meets your set of conditions and then to perform each action in your sequence.","200 40px Avenir-Medium", white).set({x:650,y:650});
       nLoopText.lineWidth = 700;
       nLoopText.lineHeight = 55;
       nLoopText.textAlign = "left";
@@ -3162,7 +3162,7 @@ function loadSelectors(set) {
 
         function cleanNext() {
           rmAnim();
-          nextOverlay,removeAllChildren();
+          nextOverlay.removeAllChildren();
           stage.removeChild(nextOverlay);
         }
       }
