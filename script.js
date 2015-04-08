@@ -2476,16 +2476,27 @@ function loadSelectors(set) {
       learn.addEventListener("mousedown",highlightButton);
       learn.addEventListener("pressup",beginTutorial);
 
-      var start = new createjs.Container().set({x:centerX,y:1500});
+      var start = new createjs.Container().set({x:centerX,y:1450});
       var startButton = new createjs.Shape().set({x:-200,y:-60});
       startButton.graphics.beginFill(green).drawRect(0,0,400,200);
       startButton.alpha = 0.1;
-      var startText = new createjs.Text("START","bold 60px Avenir-Heavy",white).set({x:0,y:0});
+      var startText = new createjs.Text("PLAY","bold 60px Avenir-Heavy",white).set({x:0,y:0});
       startText.textAlign = "center";
 
       start.addChild(startButton,startText);
       start.addEventListener("mousedown",highlightButton);
       start.addEventListener("pressup",beginGame);
+
+      var next = new createjs.Container().set({x:centerX,y:1700});
+      var nextButton = new createjs.Shape().set({x:-200,y:-60});
+      nextButton.graphics.beginFill(green).drawRect(0,0,400,200);
+      nextButton.alpha = 0.1;
+      var nextText = new createjs.Text("NEXT","bold 60px Avenir-Heavy",white).set({x:0,y:0});
+      nextText.textAlign = "center";
+
+      next.addChild(nextButton,nextText);
+      next.addEventListener("mousedown",highlightButton);
+      next.addEventListener("pressup",showNext);
 
       var contact = new createjs.Container().set({x:centerX,y:1900});
       var contactButton = new createjs.Shape().set({x:-200,y:-60});
@@ -2501,7 +2512,7 @@ function loadSelectors(set) {
       var tutorialGrid = new Grid(2,380,1000,230);
       tutorialGrid.alpha = 0;
 
-      startOverlay.addChild(startOverlayBG,tutorialGrid,logo,tagline,learn,start);
+      startOverlay.addChild(startOverlayBG,tutorialGrid,logo,tagline,learn,start,next);
 
       stage.addChild(startOverlay);
       stage.update();
@@ -2931,18 +2942,17 @@ function loadSelectors(set) {
       createjs.Tween.get(orLogic).wait(400).to({alpha:1}, 400, createjs.Ease.cubicIn);
 
       createjs.Tween.get(tutorialText2).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1480,"You can use one condition or two. If you want to use two you need to add one of these logic items."]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn);
-      createjs.Tween.get(tutorialText1).call(replaceText,[tutorialText1,centerX-120,1800,"Try both:"]).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
+      createjs.Tween.get(tutorialText1).call(replaceText,[tutorialText1,centerX-120,1810,"Try both:"]).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
       createjs.Tween.get(andCheck).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
       createjs.Tween.get(orCheck).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
-      createjs.Tween.get(whiteCheck).wait(800).to({alpha:.1}, 400, createjs.Ease.cubicIn);
-      createjs.Tween.get(blackCheck).wait(800).to({alpha:.1}, 400, createjs.Ease.cubicIn).call(rmAnim);
+      createjs.Tween.get(whiteCheck).wait(800).to({alpha:.05}, 400, createjs.Ease.cubicIn);
+      createjs.Tween.get(blackCheck).wait(800).to({alpha:.05}, 400, createjs.Ease.cubicIn).call(rmAnim);
 
       tutorialNextLabel.text = "GO TO GAME"
       tutorialNextButton.y = 1780;
       tutorialNextLabel.y = 1790;
 
     }
-
 
     function finishTutorial() {
 
@@ -3071,6 +3081,89 @@ function loadSelectors(set) {
             stage.removeChild(startOverlay);
             popSelectors(selectorsP2);
           }
+        }
+      }
+    }
+
+    function showNext() {
+
+      createjs.Ticker.setPaused(false);
+
+      next.alpha = 1;
+
+      var nextOverlay = new createjs.Container().set({x:0,y:canvas.height});
+
+      var nextOverlayBG = new createjs.Shape();
+      nextOverlayBG.graphics.beginFill(blue).drawRect(0,0,canvas.width,canvas.height);
+
+      var closeNext = new createjs.Container().set({x:centerX-60,y:100});
+      var closeNextButton = new createjs.Shape();
+      closeNextButton.graphics.beginFill(blue).drawRect(-25,-25,200,125);
+      var closeArrow = new createjs.Shape();
+      closeArrow.graphics.beginStroke(white).setStrokeStyle(20,"round", "round");
+      closeArrow.graphics.moveTo(0,60);
+      closeArrow.graphics.lineTo(60,0);
+      closeArrow.graphics.lineTo(120,60);
+      closeNext.addChild(closeNextButton,closeArrow);
+      closeNext.addEventListener("mousedown",highlightButton);
+      closeNext.addEventListener("pressup",nextToStart);
+
+
+      var nTitle = new createjs.Text("DUAL was designed to introduce some basic programming concepts.","bold 60px Avenir-Book", white).set({x:centerX,y:250});
+      nTitle.lineWidth = 1200;
+      nTitle.textAlign = "center";
+
+      var nSubTitle = new createjs.Text("All computer programs are built from three basic structures: loop, selection and sequence (and now you know about all of them).","200 40px Avenir-Medium", white).set({x:centerX,y:450});
+      nSubTitle.lineWidth = 1200;
+      nSubTitle.lineHeight = 55;
+      nSubTitle.textAlign = "center";
+
+      var nLoop = new createjs.Text("LOOP","200 60px Avenir-Medium", white).set({x:170,y:650});
+      nLoop.textAlign = "left";
+
+      var nLoopText = new createjs.Text("When you hit play, the program loops through every shape on the grid:  once to check if each shape meets your set of conditions and once to perform each action in your sequence.","200 40px Avenir-Medium", white).set({x:650,y:650});
+      nLoopText.lineWidth = 700;
+      nLoopText.lineHeight = 55;
+      nLoopText.textAlign = "left";
+
+      var nSelection = new createjs.Text("SELECTION","200 60px Avenir-Medium", white).set({x:170,y:1000});
+      nSelection.textAlign = "left";
+
+      var nSelectionText = new createjs.Text("When you use conditions you\'re testing to see if shapes return TRUE or FALSE. In code these are called conditional statements. You also learned about logical operators: when you use AND a program returns true if both conditions are met. OR returns true if either condition is met.","200 40px Avenir-Medium", white).set({x:650,y:1000});
+      nSelectionText.lineWidth = 700;
+      nSelectionText.lineHeight = 55;
+      nSelectionText.textAlign = "left";
+
+      var nSequence = new createjs.Text("SEQUENCE","200 60px Avenir-Medium", white).set({x:170,y:1500});
+      nSequence.textAlign = "left";
+
+      var nSeqText = new createjs.Text("A program reads code in sequential order, responding to changing states as it goes along. This is exactly how your sequences work each turn.","200 40px Avenir-Medium", white).set({x:650,y:1500});
+      nSeqText.lineWidth = 700;
+      nSeqText.lineHeight = 55;
+      nSeqText.textAlign = "left";
+
+      var nConclusion = new createjs.Text("If you enjoy playing DUAL you might like to learn more about programming.","200 40px Avenir-Medium", white).set({x:centerX,y:1800});
+      nConclusion.lineWidth = 800;
+      nConclusion.lineHeight = 55;
+      nConclusion.textAlign = "center";
+
+      nextOverlay.addChild(nextOverlayBG,closeNext,nTitle,nSubTitle,nLoop,nLoopText,nSelection,nSelectionText,nSequence,nSeqText,nConclusion);
+      stage.addChild(nextOverlay);
+
+      createjs.Tween.get(startOverlay, {override:true}).call(addAnim,[0]).to({y:-canvas.height}, 600, createjs.Ease.cubicIn);
+      createjs.Tween.get(nextOverlay, {override:true}).to({y:0}, 600, createjs.Ease.cubicIn).call(rmAnim);
+
+
+      function nextToStart() {
+
+        createjs.Ticker.setPaused(false);
+        createjs.Tween.get(startOverlay, {override:true}).call(addAnim,[0]).to({y:0}, 600, createjs.Ease.cubicIn);
+        createjs.Tween.get(nextOverlay, {override:true}).to({y:canvas.height}, 600, createjs.Ease.cubicIn).call(cleanNext);
+
+        function cleanNext() {
+          rmAnim();
+          nextOverlay,removeAllChildren();
+          stage.removeChild(nextOverlay);
         }
       }
     }
@@ -3366,11 +3459,11 @@ function loadSelectors(set) {
         createjs.Tween.get(tutorialText1).call(replaceText,[tutorialText1,centerX-100,1800,"Try making both:"]).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
         createjs.Tween.get(whiteCircle).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn);
         createjs.Tween.get(blackSquare).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn);
-        createjs.Tween.get(whiteCheck).wait(1200).to({alpha:0}, 400, createjs.Ease.cubicIn);
+        createjs.Tween.get(whiteCheck).wait(1200).to({alpha:.05}, 400, createjs.Ease.cubicIn);
         if (madeSquare == true) {
           createjs.Tween.get(blackCheck).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
         } else {
-          createjs.Tween.get(blackCheck).wait(1200).to({alpha:0}, 400, createjs.Ease.cubicIn).call(rmAnim);
+          createjs.Tween.get(blackCheck).wait(1200).to({alpha:.05}, 400, createjs.Ease.cubicIn).call(rmAnim);
         }
       }
 
@@ -3390,7 +3483,7 @@ function loadSelectors(set) {
 
         tutorialNextButton.y = 1810;
         tutorialNextLabel.y = 1820;
-        tutorialNextLabel.text = "GOT IT. NEXT?";
+        tutorialNextLabel.text = "GOT IT";
 
         createjs.Ticker.setPaused(false);
         createjs.Tween.get(tutorialText2).call(addAnim,[0]).to({alpha:0}, 100, createjs.Ease.cubicOut);
