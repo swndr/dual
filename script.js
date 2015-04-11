@@ -82,8 +82,6 @@ function init() {
   var startOverlay = new createjs.Container();
   var darkOverlay = new createjs.Container();
 
-  loadIntro();
-
   // BOARD
 
   var board = new createjs.Container();
@@ -2463,1274 +2461,1461 @@ function loadSelectors(set) {
 
   // ------------ INTRO AND TUTORIAL -----------------------
 
-    function loadIntro() {
+  var startOverlayBG = new createjs.Shape();
+  startOverlayBG.graphics.beginFill(green).drawRect(0,0,canvas.width,canvas.height);
 
-      var learnActions = false;
-      var learnConditions = false;
-      var switchCount = 0;
-      var targetCount = 0;
-      var showLogic = false;
-      var triedAnd = false;
-      var triedOr = false;
-      var triedBoth = false;
-      var madeCircle = false;
-      var madeSquare = false;
+  var logo = new createjs.Container();
 
-      tutorialObjectsInPlay = [];
+  var tagline = new createjs.Text("DUAL IS A GAME ABOUT COMPUTATION","bold 50px Avenir-Heavy",black).set({x:centerX,y:900});
+  tagline.textAlign = "center";
 
-      var startOverlayBG = new createjs.Shape();
-      startOverlayBG.graphics.beginFill(green).drawRect(0,0,canvas.width,canvas.height);
+  var learn = new createjs.Container().set({x:centerX,y:1200});
+  var learnButton = new createjs.Shape().set({x:-200,y:-60});
+  learnButton.graphics.beginFill(green).drawRect(0,0,400,200);
+  learnButton.alpha = 0.1;
+  var learnText = new createjs.Text("LEARN","bold 60px Avenir-Heavy",white).set({x:0,y:0});
+  learnText.textAlign = "center";
 
-      var logo = new createjs.Container();
-      logo.y = 700;
+  learn.addChild(learnButton,learnText);
 
-      var D = new GameObject(0,1,1,0).set({x:centerX-450,y:0});
-      D.scaleX = 1.8;
-      D.scaleY = 1.8;
-      tutorialObjectsInPlay.push(D);
+  var start = new createjs.Container().set({x:centerX,y:1450});
+  var startButton = new createjs.Shape().set({x:-200,y:-60});
+  startButton.graphics.beginFill(green).drawRect(0,0,400,200);
+  startButton.alpha = 0.1;
+  var startText = new createjs.Text("PLAY","bold 60px Avenir-Heavy",white).set({x:0,y:0});
+  startText.textAlign = "center";
 
-      var U = new GameObject(0,0,1,1).set({x:centerX-150,y:0});
-      U.scaleX = 1.8;
-      U.scaleY = 1.8;
-      tutorialObjectsInPlay.push(U);
+  start.addChild(startButton,startText);
 
-      var A = new GameObject(1,1,0,0).set({x:centerX+150,y:0});
-      A.scaleX = 1.8;
-      A.scaleY = 1.8;
-      tutorialObjectsInPlay.push(A);
+  var next = new createjs.Container().set({x:centerX,y:1700});
+  var nextButton = new createjs.Shape().set({x:-200,y:-60});
+  nextButton.graphics.beginFill(green).drawRect(0,0,400,200);
+  nextButton.alpha = 0.1;
+  var nextText = new createjs.Text("NEXT","bold 60px Avenir-Heavy",white).set({x:0,y:0});
+  nextText.textAlign = "center";
 
-      var L = new GameObject(0,1,0,0).set({x:centerX+450,y:0});
-      L.scaleX = 1.8;
-      L.scaleY = 1.8;
-      tutorialObjectsInPlay.push(L);
+  next.addChild(nextButton,nextText);
 
-      logo.addChild(D,U,A,L);
+  var contact = new createjs.Container().set({x:centerX,y:1900});
+  var contactButton = new createjs.Shape().set({x:-200,y:-60});
+  contactButton.graphics.beginFill(green).drawRect(0,0,400,200);
+  contactButton.alpha = 0.1;
+  var contactText = new createjs.Text("hello@samwander.com","100 40px Avenir-Book",white).set({x:0,y:0});
+  contactText.textAlign = "center";
 
-      var tagline = new createjs.Text("DUAL IS A GAME ABOUT COMPUTATION","bold 50px Avenir-Heavy",black).set({x:centerX,y:900});
-      tagline.textAlign = "center";
+  contact.addChild(contactButton,contactText);
 
-      var learn = new createjs.Container().set({x:centerX,y:1200});
-      var learnButton = new createjs.Shape().set({x:-200,y:-60});
-      learnButton.graphics.beginFill(green).drawRect(0,0,400,200);
-      learnButton.alpha = 0.1;
-      var learnText = new createjs.Text("LEARN","bold 60px Avenir-Heavy",white).set({x:0,y:0});
-      learnText.textAlign = "center";
+  var tutorialGrid = new Grid(2,380,1000,230);
 
-      learn.addChild(learnButton,learnText);
-      learn.addEventListener("mousedown",highlightButton);
-      learn.addEventListener("pressup",beginTutorial);
+  // TUTORIAL
 
-      var start = new createjs.Container().set({x:centerX,y:1450});
-      var startButton = new createjs.Shape().set({x:-200,y:-60});
-      startButton.graphics.beginFill(green).drawRect(0,0,400,200);
-      startButton.alpha = 0.1;
-      var startText = new createjs.Text("PLAY","bold 60px Avenir-Heavy",white).set({x:0,y:0});
-      startText.textAlign = "center";
+  var closeTutorial = new createjs.Container().set({x:100,y:100});
+  var closeButton = new createjs.Shape();
+  closeButton.graphics.beginFill(green).drawRect(-25,-25,125,125);
+  var closeX = new createjs.Shape();
+  closeX.graphics.beginStroke(white).setStrokeStyle(20,"round");
+  closeX.graphics.moveTo(0,0);
+  closeX.graphics.lineTo(75,75);
+  closeX.graphics.moveTo(0,75);
+  closeX.graphics.lineTo(75,0);
+  closeTutorial.addChild(closeButton,closeX);
+  closeTutorial.alpha = 0;
 
-      start.addChild(startButton,startText);
-      start.addEventListener("mousedown",highlightButton);
-      start.addEventListener("pressup",beginGame);
+  var tutorialBG = new createjs.Shape().set({x:0,y:1000});
+  tutorialBG.graphics.beginFill("#EAEAEA").drawRect(0,0,canvas.width,canvas.height-1000);
+  tutorialBG.alpha = 0;
+  var tutorialTray = new createjs.Shape().set({x:0,y:1000});
+  tutorialTray.graphics.beginFill("#616060").drawRect(0,0,canvas.width,400);
+  tutorialTray.alpha = 0;
 
-      var next = new createjs.Container().set({x:centerX,y:1700});
-      var nextButton = new createjs.Shape().set({x:-200,y:-60});
-      nextButton.graphics.beginFill(green).drawRect(0,0,400,200);
-      nextButton.alpha = 0.1;
-      var nextText = new createjs.Text("NEXT","bold 60px Avenir-Heavy",white).set({x:0,y:0});
-      nextText.textAlign = "center";
+  var tutorialText1 = new createjs.Text("DUAL is a two player game about sequential thinking.", "100 60px Avenir-Book", black).set({x:centerX,y:1150});
+  tutorialText1.textAlign = "center";
+  tutorialText1.lineWidth = 1100;
+  tutorialText1.lineHeight = 80;
+  tutorialText1.alpha = 0;
 
-      next.addChild(nextButton,nextText);
+  var tutorialText2 = new createjs.Text("Each shape has four segments. These can be switched between round (white) and square (black).", "100 60px Avenir-Book", black).set({x:centerX,y:1400});
+  tutorialText2.textAlign = "center";
+  tutorialText2.lineWidth = 1100;
+  tutorialText2.lineHeight = 80;
+  tutorialText2.alpha = 0;
+
+  var tutorialNextButton = new createjs.Shape().set({x:centerX-200,y:1740});
+  tutorialNextButton.graphics.beginFill("#EAEAEA").drawRect(0,0,400,100);
+  tutorialNextButton.alpha = 0;
+  tutorialNextButton.name = "next";
+  var tutorialNextLabel = new createjs.Text("LET'S TRY IT", "100 60px Avenir-Heavy", green).set({x:centerX,y:1750});
+  tutorialNextLabel.textAlign = "center";
+  tutorialNextLabel.alpha = 0;
+
+  // SWITCH ITEMS
+
+  var seqBox = new createjs.Container().set({x:(canvas.width/2)+10,y:1125});
+
+  var seqTray = new createjs.Shape().set({x:0,y:-3});
+  seqTray.graphics.beginStroke(green).setStrokeStyle(8).beginFill(black);
+  seqTray.graphics.drawRoundRect(0,0,442,160,5);
+
+  var actTray = new createjs.Shape().set({x:0,y:-3});
+  actTray.graphics.beginStroke(yellow).setStrokeStyle(8).beginFill(black);
+  actTray.graphics.drawRoundRect(0,0,160,160,5);
+
+  var dzContainer = new createjs.Container();
+
+  var dropZone0 = new createjs.Shape().set({x:15,y:12});
+  var dropZone1 = new createjs.Shape().set({x:15 + buttonSize + (buttonMargin+4),y:12});
+  var dropZone2 = new createjs.Shape().set({x:15 + (buttonSize*2) + ((buttonMargin+4)*2),y:12});
+  var dropZone3 = new createjs.Shape().set({x:15,y:12});
+
+  dropZone0.graphics.beginFill(green);
+  dropZone0.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
+  dropZone0.alpha = .25;
+  dropZone0.type = "condition";
+  dropZone0.slot = 0;
+  dropZone1.graphics.beginFill(blue);
+  dropZone1.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
+  dropZone1.alpha = .25;
+  dropZone1.type = "logic";
+  dropZone1.slot = 1;
+  dropZone2.graphics.beginFill(green);
+  dropZone2.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
+  dropZone2.alpha = .25;
+  dropZone2.type = "condition";
+  dropZone2.slot = 2;
+  dropZone3.graphics.beginFill(yellow);
+  dropZone3.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
+  dropZone3.alpha = .25;
+  dropZone3.type = "action";
+  dropZone3.slot = 3;
+
+  var required = new createjs.Text("*","bold 100px Avenir-Heavy", white).set({x:55,y:30});
+  required.alpha = .1;
+
+  dzContainer.addChild(dropZone0,dropZone1,dropZone2,dropZone3,required);
+
+  var playButtonLearn = new createjs.Shape().set({x:200,y:40});
+  playButtonLearn.graphics.beginFill(gray).drawRoundRect(0,0,200,80,10);
+  playButtonLearn.alpha = .5;
+  var playLabelLearn = new createjs.Text("PLAY", largeLabelStyle, pink).set({x:300,y:54});
+  playLabelLearn.textAlign = "center";
+
+  seqBox.addChild(actTray,seqTray,dzContainer,playButtonLearn,playLabelLearn);
+
+  var switchTutorial = new createjs.Container().set({x:310,y:1068})
+  switchTutorial.alpha = 0;
+
+  var transformTLLearn = new TransformButton(50,50,iconRadius,0,0,0,35,35,0,0);
+  transformTLLearn.removeAllEventListeners();
+  transformTLLearn.originParent = switchTutorial;
+  transformTLLearn.name = "transTL";
+  transformTLLearn.func = transTL;
+  var placeholder1 = new PlaceholderButton(transformTLLearn.x,transformTLLearn.y);
+  placeholder1.alpha = .7;
+  var transformTRLearn = new TransformButton(35,50,0,iconRadius,0,0,50,35,(buttonSize+buttonMargin),0);
+  transformTRLearn.removeAllEventListeners();
+  transformTRLearn.originParent = switchTutorial;
+  transformTRLearn.name = "transTR";
+  transformTRLearn.func = transTR;
+  var placeholder2 = new PlaceholderButton(transformTRLearn.x,transformTRLearn.y);
+  placeholder2.alpha = .7;
+  var transformBLLearn = new TransformButton(50,35,0,0,0,iconRadius,35,50,0,(buttonSize+buttonMargin));
+  transformBLLearn.removeAllEventListeners();
+  transformBLLearn.originParent = switchTutorial;
+  transformBLLearn.name = "transBL";
+  transformBLLearn.func = transBL;
+  var placeholder3 = new PlaceholderButton(transformBLLearn.x,transformBLLearn.y);
+  placeholder3.alpha = .7;
+  var transformBRLearn = new TransformButton(35,35,0,0,iconRadius,0,50,50,(buttonSize + buttonMargin),(buttonSize + buttonMargin));
+  transformBRLearn.removeAllEventListeners();
+  transformBRLearn.originParent = switchTutorial;
+  transformBRLearn.name = "transBR";
+  transformBRLearn.func = transBR;
+  var placeholder4 = new PlaceholderButton(transformBRLearn.x,transformBRLearn.y);
+  placeholder4.alpha = .7;
+
+  switchTutorial.addChild(placeholder1,placeholder2,placeholder3,placeholder4,transformTLLearn,transformTRLearn,transformBLLearn,transformBRLearn);
+
+  var tutorialConditions = new createjs.Container().set({x:310,y:1068})
+  tutorialConditions.alpha = 0;
+
+  var rowSelectorLearn = new PositionButton("row",100,30,15,50,0,0,0);
+  rowSelectorLearn.removeAllEventListeners();
+  rowSelectorLearn.originParent = tutorialConditions;
+  var placeholder5 = new PlaceholderButton(rowSelectorLearn.x,rowSelectorLearn.y);
+  placeholder5.alpha = .7
+  var colSelectorLearn = new PositionButton("col",30,100,50,15,1,(buttonSize + buttonMargin),0);
+  colSelectorLearn.removeAllEventListeners();
+  colSelectorLearn.originParent = tutorialConditions;
+  var placeholder6 = new PlaceholderButton(colSelectorLearn.x,colSelectorLearn.y);
+  placeholder6.alpha = .7
+  var shapeSelector1 = new ShapeButton(0,1,1,0,0,(buttonSize+buttonMargin));
+  shapeSelector1.removeAllEventListeners();
+  shapeSelector1.originParent = tutorialConditions;
+  var placeholder7 = new PlaceholderButton(shapeSelector1.x,shapeSelector1.y);
+  placeholder7.alpha = .7
+  var shapeSelector2 = new ShapeButton(0,1,0,0,(buttonSize+buttonMargin),(buttonSize+buttonMargin));
+  shapeSelector2.removeAllEventListeners();
+  shapeSelector2.originParent = tutorialConditions;
+  var placeholder8 = new PlaceholderButton(shapeSelector2.x,shapeSelector2.y);
+  placeholder8.alpha = .7
+
+  var andLogicLearn = new LogicButton("AND",(2*buttonSize) + (2*buttonMargin),0);
+  andLogicLearn.removeAllEventListeners();
+  andLogicLearn.originParent = tutorialConditions;
+  andLogicLearn.alpha = 0;
+  var placeholder9 = new PlaceholderButton(andLogicLearn.x,andLogicLearn.y);
+  placeholder9.alpha = 0;
+  var orLogicLearn = new LogicButton("OR",(2*buttonSize) + (2*buttonMargin),(buttonSize + buttonMargin));
+  orLogicLearn.removeAllEventListeners();
+  orLogicLearn.originParent = tutorialConditions;
+  orLogicLearn.alpha = 0;
+  var placeholder10 = new PlaceholderButton(orLogicLearn.x,orLogicLearn.y);
+  placeholder10.alpha = 0;
+
+  var andCheck = new createjs.Text("AND","bold 40px Avenir-Heavy",blue).set({x:centerX+80,y:(canvas.height - 220)});
+  andCheck.textAlign = "center";
+  andCheck.alpha = 0;
+  var orCheck = new createjs.Text("OR","bold 40px Avenir-Heavy",blue).set({x:centerX+80,y:(canvas.height - 140)});
+  orCheck.textAlign = "center";
+  orCheck.alpha = 0;
+
+  tutorialConditions.addChild(placeholder5,placeholder6,placeholder7,placeholder8,placeholder9,placeholder10,rowSelectorLearn,colSelectorLearn,shapeSelector1,shapeSelector2,andLogicLearn,orLogicLearn);
+
+  var arrow = new createjs.Shape().set({x:(canvas.width/2)-120,y:1170});
+  arrow.graphics.beginFill(pink);
+  arrow.graphics.moveTo(0,0);
+  arrow.graphics.lineTo(60,30);
+  arrow.graphics.lineTo(0,60);
+  arrow.alpha = 0;
+
+  var whiteCircle = new createjs.Shape().set({x:centerX+210,y:(canvas.height - 215)});
+  whiteCircle.graphics.beginFill(white).drawCircle(0,0,iconRadius,iconRadius);
+  whiteCircle.alpha = 0;
+
+  var whiteCheck = new createjs.Shape().set({x:centerX+290,y:(canvas.height - 255)});
+  whiteCheck.graphics.beginStroke(pink).setStrokeStyle(14,"round","round");
+  whiteCheck.graphics.moveTo(0,40);
+  whiteCheck.graphics.lineTo(20,55);
+  whiteCheck.graphics.lineTo(50,20);
+  whiteCheck.alpha = 0;
+
+  var blackSquare = new createjs.Shape().set({x:centerX+170,y:(canvas.height - 155)});
+  blackSquare.graphics.beginFill(black).drawRect(0,0,iconRadius*2,iconRadius*2);
+  blackSquare.alpha = 0;
+
+  var blackCheck = new createjs.Shape().set({x:centerX+290,y:(canvas.height - 155)});
+  blackCheck.graphics.beginStroke(pink).setStrokeStyle(14,"round","round");
+  blackCheck.graphics.moveTo(0,40);
+  blackCheck.graphics.lineTo(20,55);
+  blackCheck.graphics.lineTo(50,20);
+  blackCheck.alpha = 0;
+
+  startOverlay.visible = false;
+  stage.addChild(startOverlay);
+
+  loadIntro();
+
+  function loadIntro() {
+
+    var learnActions = false;
+    var learnConditions = false;
+    var switchCount = 0;
+    var targetCount = 0;
+    var showLogic = false;
+    var triedAnd = false;
+    var triedOr = false;
+    var triedBoth = false;
+    var madeCircle = false;
+    var madeSquare = false;
+
+    tutorialObjectsInPlay = [];
+    clearSequenceLearn();
+
+    andCheck.visible = false;
+    orCheck.visible = false;
+    whiteCircle.visible = false;
+    whiteCheck.visible = false;
+    blackSquare.visible = false;
+    blackCheck.visible = false;
+    dropZone0.visible = false;
+    dropZone1.visible = false;
+    dropZone2.visible = false;
+    dropZone3.visible = false;
+    required.visible = false;
+    actTray.visible = false;
+    seqTray.visible = false;
+    tutorialConditions.visible = false;
+    transformTLLearn.visible = false;
+    transformTRLearn.visible = false;
+    transformBRLearn.visible = false;
+    transformBLLearn.visible = false;
+    andLogicLearn.visible = false;
+    orLogicLearn.visible = false;
+
+    startOverlay.addChild(startOverlayBG,tutorialGrid,logo,tagline,learn,start,next,closeTutorial,tutorialBG,tutorialTray,tutorialText1,tutorialText2,tutorialNextButton,tutorialNextLabel,seqBox,switchTutorial,tutorialConditions,arrow,whiteCircle,whiteCheck,andCheck,orCheck,blackSquare,blackCheck);
+
+    var D = new GameObject(0,1,1,0).set({x:centerX-450,y:0});
+    D.scaleX = 1.8;
+    D.scaleY = 1.8;
+    tutorialObjectsInPlay.push(D);
+
+    var U = new GameObject(0,0,1,1).set({x:centerX-150,y:0});
+    U.scaleX = 1.8;
+    U.scaleY = 1.8;
+    tutorialObjectsInPlay.push(U);
+
+    var A = new GameObject(1,1,0,0).set({x:centerX+150,y:0});
+    A.scaleX = 1.8;
+    A.scaleY = 1.8;
+    tutorialObjectsInPlay.push(A);
+
+    var L = new GameObject(0,1,0,0).set({x:centerX+450,y:0});
+    L.scaleX = 1.8;
+    L.scaleY = 1.8;
+    tutorialObjectsInPlay.push(L);
+
+    logo.y = 700;
+    logo.alpha = 1;
+    logo.addChild(D,U,A,L);
+
+    tagline.alpha = 1;
+
+    tutorialGrid.alpha = 0;
+    tutorialBG.alpha = 0;
+    tutorialTray.alpha = 0;
+    closeTutorial.alpha = 0;
+    // tutorialText1.alpha = 0;
+    // tutorialText1.x = centerX;
+    // tutorialText1.y = 1150;
+    // tutorialText1.text = "DUAL is a two player game about sequential thinking.";
+    // tutorialText1.lineWidth = 1100;
+    // tutorialText1.lineHeight = 80;
+    // tutorialText2.alpha = 0;
+    // tutorialText2.x = centerX;
+    // tutorialText2.y = 1400;
+    // tutorialText2.text = "Each shape has four segments. These can be switched between round (white) and square (black).";
+    // tutorialText2.lineWidth = 1100;
+    // tutorialText2.lineHeight = 80;
+    // //tutorialText3.alpha = 0;
+    // tutorialNextButton.alpha = 0;
+    // tutorialNextButton.x = centerX-200;
+    // tutorialNextButton.y = 1740;
+    // tutorialNextButton.removeAllEventListeners();
+    // tutorialNextLabel.alpha = 0;
+    // tutorialNextLabel.text = "LET'S TRY IT";
+    // tutorialNextLabel.x = centerX;
+    // tutorialNextLabel.y = 1750;
+
+    tutorialText1.visible = false;
+    tutorialText2.visible = false;
+    tutorialNextButton.visible = false;
+    tutorialNextLabel.visible = false;
+
+    seqBox.alpha = 0;
+    arrow.alpha = 0;
+
+    whiteCircle.x = centerX+210;
+    whiteCircle.y = canvas.height-215;
+    whiteCircle.alpha = 0;
+    whiteCheck.x = centerX+290;
+    whiteCheck.y = canvas.height-255;
+    whiteCheck.alpha = 0;
+    blackSquare.x = centerX+170;
+    blackSquare.alpha = 0;
+    blackSquare.y = canvas.height-155;
+    blackCheck.x = centerX+290;
+    blackCheck.y = canvas.height-155;
+    blackCheck.alpha = 0;
+
+    learn.addEventListener("mousedown",highlightButton);
+    learn.addEventListener("pressup",beginTutorial);
+    learn.alpha = 1;
+
+    start.addEventListener("mousedown",highlightButton);
+    start.addEventListener("pressup",beginGame);
+    start.alpha = 1;
+
+    next.addEventListener("mousedown",highlightButton);
+    next.addEventListener("pressup",showNext);
+    next.alpha = 1;
+
+    contact.addEventListener("mousedown",highlightButton);
+    contact.addEventListener("click",contactMe);
+    contact.alpha = 1;
+
+    seqBox.x = (canvas.width/2)+10;
+    seqBox.y = 1125;
+    arrow.x = (canvas.width/2)-120;
+    arrow.y = 1170;
+
+    tutorialConditions.x = 310;
+    tutorialConditions.alpha = 0;
+
+    seqBox.visible = false;
+    switchTutorial.visible = false;
+    tutorialConditions.visible = false;
+    arrow.visible = false;
+
+    startOverlay.visible = true;
+    stage.update();
+
+    // TUTORIAL
+
+    closeTutorial.addEventListener("mousedown",highlightButton);
+    closeTutorial.addEventListener("pressup",returnToStart);
+
+    // SWITCH ITEMS
+
+    transformTLLearn.addEventListener("mousedown",grabItemLearn);
+    transformTLLearn.addEventListener("pressmove",dragAndDrop);
+    transformTLLearn.addEventListener("pressup",snapToLearn);
+   
+    transformTRLearn.addEventListener("mousedown",grabItemLearn);
+    transformTRLearn.addEventListener("pressmove",dragAndDrop);
+    transformTRLearn.addEventListener("pressup",snapToLearn);
+ 
+    transformBLLearn.addEventListener("mousedown",grabItemLearn);
+    transformBLLearn.addEventListener("pressmove",dragAndDrop);
+    transformBLLearn.addEventListener("pressup",snapToLearn);
+   
+    transformBRLearn.addEventListener("mousedown",grabItemLearn);
+    transformBRLearn.addEventListener("pressmove",dragAndDrop);
+    transformBRLearn.addEventListener("pressup",snapToLearn);
+  
+    rowSelectorLearn.addEventListener("mousedown",grabItemLearn);
+    rowSelectorLearn.addEventListener("pressmove",dragAndDrop);
+    rowSelectorLearn.addEventListener("pressup",snapToLearn);
+  
+    colSelectorLearn.addEventListener("mousedown",grabItemLearn);
+    colSelectorLearn.addEventListener("pressmove",dragAndDrop);
+    colSelectorLearn.addEventListener("pressup",snapToLearn);
+    
+    shapeSelector1.addEventListener("mousedown",grabItemLearn);
+    shapeSelector1.addEventListener("pressmove",dragAndDrop);
+    shapeSelector1.addEventListener("pressup",snapToLearn);
+   
+    shapeSelector2.addEventListener("mousedown",grabItemLearn);
+    shapeSelector2.addEventListener("pressmove",dragAndDrop);
+    shapeSelector2.addEventListener("pressup",snapToLearn);
+   
+    function beginTutorial(event) {
+
+      learn.removeAllEventListeners();
+      start.removeAllEventListeners();
+      next.removeAllEventListeners();
+
+      tutorialText1.alpha = 0;
+      tutorialText1.x = centerX;
+      tutorialText1.y = 1150;
+      tutorialText1.text = "DUAL is a two player game about sequential thinking.";
+      tutorialText1.lineWidth = 1100;
+      tutorialText1.lineHeight = 80;
+      tutorialText2.alpha = 0;
+      tutorialText2.x = centerX;
+      tutorialText2.y = 1400;
+      tutorialText2.text = "Each shape has four segments. These can be switched between round (white) and square (black).";
+      tutorialText2.lineWidth = 1100;
+      tutorialText2.lineHeight = 80;
+      //tutorialText3.alpha = 0;
+      tutorialNextButton.alpha = 0;
+      tutorialNextButton.x = centerX-200;
+      tutorialNextButton.y = 1740;
+      tutorialNextButton.removeAllEventListeners();
+      tutorialNextLabel.alpha = 0;
+      tutorialNextLabel.text = "LET'S TRY IT";
+      tutorialNextLabel.x = centerX;
+      tutorialNextLabel.y = 1750;
+
+      tutorialText1.visible = true;
+      tutorialText2.visible = true;
+      tutorialNextButton.visible = true;
+      tutorialNextLabel.visible = true;
+
+      createjs.Ticker.setPaused(false);
+
+      createjs.Tween.get(learn).call(addAnim,[0]).to({alpha:0}, 300, createjs.Ease.cubicIn);
+      createjs.Tween.get(start).wait(300).to({alpha:0}, 300, createjs.Ease.cubicIn);
+      createjs.Tween.get(next).wait(300).to({alpha:0}, 300, createjs.Ease.cubicIn);
+      createjs.Tween.get(tagline).wait(300).to({alpha:0}, 300, createjs.Ease.cubicIn);
+
+      createjs.Tween.get(tutorialGrid).wait(300).to({alpha:1}, 300, createjs.Ease.cubicIn);
+      createjs.Tween.get(tutorialBG).wait(500).to({alpha:1}, 400, createjs.Ease.cubicIn);
+
+      D.cache(-135,-135,270,270);
+      U.cache(-135,-135,270,270);
+      A.cache(-135,-135,270,270);
+      L.cache(-135,-135,270,270);
+
+      createjs.Tween.get(D).wait(1000).to({x:colVal(0,2,380),y:rowVal(0,2,380,1000)-700}, 600, createjs.Ease.backInOut);
+      createjs.Tween.get(U).wait(1200).to({x:colVal(1,2,380),y:rowVal(0,2,380,1000)-700}, 600, createjs.Ease.backInOut);
+      createjs.Tween.get(A).wait(1400).to({x:colVal(0,2,380),y:rowVal(1,2,380,1000)-700}, 500, createjs.Ease.backOut);
+      createjs.Tween.get(L).wait(1600).to({x:colVal(1,2,380),y:rowVal(1,2,380,1000)-700}, 500, createjs.Ease.getBackOut(1)).call(tutorialReady);
+
+      function tutorialReady() {
+
+        addButtonEvent(trySwitchingCorners);
+
+        createjs.Tween.get(tutorialText1).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn);
+        createjs.Tween.get(tutorialText2).wait(400).to({alpha:1}, 400, createjs.Ease.cubicIn);
+        createjs.Tween.get(tutorialNextButton).wait(200).to({alpha:1}, 100, createjs.Ease.cubicIn);
+        createjs.Tween.get(tutorialNextLabel).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn);
+        createjs.Tween.get(closeTutorial).wait(1400).to({alpha:.9}, 400, createjs.Ease.cubicIn).call(readyToLoadTutorialItems);
+
+        logo.y = 0;
+        D.y = rowVal(0,2,380,1000);
+        D.uncache();
+        U.y = rowVal(0,2,380,1000);
+        U.uncache();
+        A.y = rowVal(1,2,380,1000);
+        A.uncache();
+
+        L.y = rowVal(1,2,380,1000);
+        L.uncache();
+        stage.update();
+
+      function readyToLoadTutorialItems() {
+        rmAnim();
+        // addButtonEvent(trySwitchingCorners);
+      }
+    }
+  }
+
+  function trySwitchingCorners() {
+
+    learnActions = true;
+
+    tutorialNextButton.removeAllEventListeners();
+
+    createjs.Ticker.setPaused(false);
+
+    sequence[3] = null;
+
+    seqBox.visible = true;
+    switchTutorial.visible = true;
+    arrow.visible = true;
+
+    whiteCircle.visible = true;
+    whiteCheck.visible = true;
+    blackSquare.visible = true;
+    blackCheck.visible = true;
+
+    dropZone3.visible = true;
+    actTray.visible = true;
+    playButtonLearn.visible = true;
+    playLabelLearn.visible = true;
+
+    transformTLLearn.visible = true;
+    transformTRLearn.visible = true;
+    transformBRLearn.visible = true;
+    transformBLLearn.visible = true;
+    
+    createjs.Tween.get(tutorialText1).call(addAnim,[0]).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut);
+    createjs.Tween.get(tutorialText2).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1600,"Drag items into the action tray and hit play to see what happens."]).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(tutorialNextButton).wait(200).to({alpha:0}, 100, createjs.Ease.cubicOut);
+    createjs.Tween.get(tutorialNextLabel).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut);
+    createjs.Tween.get(tutorialTray).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(switchTutorial).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(arrow).wait(1400).to({alpha:1}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(seqBox).wait(1600).to({alpha:1}, 400, createjs.Ease.cubicIn).wait(200).call(rmAnim);
+
+  }
+
+  function tryConditions() {
+
+    learnActions = false;
+    learnConditions = true;
+
+    andLogicLearn.alpha = 0;
+    placeholder9.alpha = 0;
+    orLogicLearn.alpha = 0;
+    placeholder10.alpha = 0;
+    andCheck.alpha = 0;
+    orCheck.alpha = 0;
+
+    tutorialNextButton.removeAllEventListeners();
+    tutorialConditions.visible = true;
+
+    function manualTransformTL() {
+      morph(tutorialObjectsInPlay[0].getChildByName("TL"),black,-radius,-radius,0,0,0,0);
+      morph(tutorialObjectsInPlay[1].getChildByName("TL"),black,-radius,-radius,0,0,0,0);
+      morph(tutorialObjectsInPlay[2].getChildByName("TL"),white,-radius,-radius,radius,0,0,0);
+      morph(tutorialObjectsInPlay[3].getChildByName("TL"),black,-radius,-radius,0,0,0,0);
+    }
+
+    function manualTransformTR() {
+      morph(tutorialObjectsInPlay[0].getChildByName("TR"),white,0,-radius,0,radius,0,0);
+      morph(tutorialObjectsInPlay[1].getChildByName("TR"),black,0,-radius,0,0,0,0);
+      morph(tutorialObjectsInPlay[2].getChildByName("TR"),white,0,-radius,0,radius,0,0);
+      morph(tutorialObjectsInPlay[3].getChildByName("TR"),white,0,-radius,0,radius,0,0);
+    }
+
+    function manualTransformBR() {
+      morph(tutorialObjectsInPlay[0].getChildByName("BR"),white,0,0,0,0,radius,0);
+      morph(tutorialObjectsInPlay[1].getChildByName("BR"),white,0,0,0,0,radius,0);
+      morph(tutorialObjectsInPlay[2].getChildByName("BR"),black,0,0,0,0,0,0);
+      morph(tutorialObjectsInPlay[3].getChildByName("BR"),black,0,0,0,0,0,0);
+    }
+
+    function manualTransformBL() {
+      morph(tutorialObjectsInPlay[0].getChildByName("BL"),black,-radius,0,0,0,0,0);
+      morph(tutorialObjectsInPlay[1].getChildByName("BL"),white,-radius,0,0,0,0,radius);
+      morph(tutorialObjectsInPlay[2].getChildByName("BL"),black,-radius,0,0,0,0,0);
+      morph(tutorialObjectsInPlay[3].getChildByName("BL"),black,-radius,0,0,0,0,0);
+    }
+
+    createjs.Ticker.setPaused(false);
+    createjs.Tween.get(tutorialText1).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut);
+    createjs.Tween.get(whiteCircle).to({alpha:0}, 400, createjs.Ease.cubicOut);
+    createjs.Tween.get(blackSquare).to({alpha:0}, 400, createjs.Ease.cubicOut);
+    createjs.Tween.get(whiteCheck).to({alpha:.0}, 400, createjs.Ease.cubicOut);
+    createjs.Tween.get(blackCheck).to({alpha:.0}, 400, createjs.Ease.cubicOut);
+    createjs.Tween.get(tutorialNextButton).wait(200).to({alpha:0}, 100, createjs.Ease.cubicOut);
+    createjs.Tween.get(tutorialNextLabel).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut);
+    createjs.Tween.get(D).wait(200).to({alpha:0}, 200, createjs.Ease.cubicOut).call(manualTransforms).to({alpha:.2}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(U).wait(200).to({alpha:0}, 200, createjs.Ease.cubicOut).to({alpha:.2}, 600, createjs.Ease.cubicIn);
+    createjs.Tween.get(A).wait(200).to({alpha:0}, 200, createjs.Ease.cubicOut).to({alpha:.2}, 600, createjs.Ease.cubicIn);
+    createjs.Tween.get(L).wait(200).to({alpha:0}, 200, createjs.Ease.cubicOut).to({alpha:.2}, 600, createjs.Ease.cubicIn);
+    createjs.Tween.get(tutorialText2).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1550,"Target shapes on the grid with condition items like these. You can target by row, column, or exactly matching a shape."]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(switchTutorial).wait(400).to({alpha:0}, 400, createjs.Ease.cubicOut);
+    createjs.Tween.get(tutorialConditions).wait(600).to({alpha:1}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(arrow).wait(400).to({alpha:0}, 400, createjs.Ease.cubicOut).to({alpha:1}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(seqBox).wait(400).to({alpha:0}, 400, createjs.Ease.cubicOut).call(loadConditions).wait(200).to({alpha:1}, 600, createjs.Ease.cubicIn).call(rmAnim);
+
+    function manualTransforms() {
+      manualTransformTL();
+      manualTransformTR();
+      manualTransformBR();
+      manualTransformBL();
+
+      tutorialObjectsInPlay[0].tl = 0;
+      tutorialObjectsInPlay[0].tr = 1;
+      tutorialObjectsInPlay[0].br = 1;
+      tutorialObjectsInPlay[0].bl = 0;
+
+      tutorialObjectsInPlay[1].tl = 0;
+      tutorialObjectsInPlay[1].tr = 0;
+      tutorialObjectsInPlay[1].br = 1;
+      tutorialObjectsInPlay[1].bl = 1;
+
+      tutorialObjectsInPlay[2].tl = 1;
+      tutorialObjectsInPlay[2].tr = 1;
+      tutorialObjectsInPlay[2].br = 0;
+      tutorialObjectsInPlay[2].bl = 0;
+
+      tutorialObjectsInPlay[3].tl = 0;
+      tutorialObjectsInPlay[3].tr = 1;
+      tutorialObjectsInPlay[3].br = 0;
+      tutorialObjectsInPlay[3].bl = 0;
+    }
+
+    function loadConditions() {
+
+      whiteCircle.visible = false;
+      blackSquare.visible = false;
+      dropZone3.visible = false;
+      actTray.visible = false;
+      playButtonLearn.visible = false;
+      playLabelLearn.visible = false;
+      transformTLLearn.visible = false;
+      transformTRLearn.visible = false;
+      transformBRLearn.visible = false;
+      transformBLLearn.visible = false;
+
+      andCheck.visible = true;
+      orCheck.visible = true;
+      dropZone0.visible = true;
+      dropZone1.visible = true;
+      dropZone2.visible = true;
+      required.visible = true;
+      seqTray.visible = true;
+      andLogicLearn.visible = true;
+      orLogicLearn.visible = true;
+
+      // startOverlay.removeChild(whiteCircle,blackSquare);
+      // dzContainer.removeChild(dropZone3);
+      // switchTutorial.addChild(transformTLLearn,transformTRLearn,transformBRLearn,transformBLLearn);
+      // seqBox.removeChild(actTray,playButtonLearn,playLabelLearn);
+      // dzContainer.addChild(dropZone0,dropZone1,dropZone2,required);
+      // seqBox.addChild(seqTray,dzContainer);
+      // startOverlay.addChild(tutorialConditions,andCheck,orCheck);
+
+      whiteCheck.x = centerX+170;
+      whiteCheck.y = canvas.height-240;
+      blackCheck.x = centerX+170;
+      blackCheck.y = canvas.height-160;
+    }
+
+  }
+
+  function showLogicItems() {
+
+    createjs.Ticker.setPaused(false);
+
+    showLogic = true;
+
+    andLogicLearn.addEventListener("mousedown",grabItemLearn);
+    andLogicLearn.addEventListener("pressmove",dragAndDrop);
+    andLogicLearn.addEventListener("pressup",snapToLearn);
+
+    orLogicLearn.addEventListener("mousedown",grabItemLearn);
+    orLogicLearn.addEventListener("pressmove",dragAndDrop);
+    orLogicLearn.addEventListener("pressup",snapToLearn);
+    
+    createjs.Tween.get(tutorialConditions).call(addAnim,[0]).wait(200).to({x:tutorialConditions.x - 60}, 400, createjs.Ease.cubicInOut);
+    createjs.Tween.get(arrow).wait(200).to({x:arrow.x + 90}, 400, createjs.Ease.cubicInOut);
+    createjs.Tween.get(seqBox).wait(200).to({x:seqBox.x + 90}, 400, createjs.Ease.cubicInOut);
+    createjs.Tween.get(placeholder9).wait(400).to({alpha:.7}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(placeholder10).wait(400).to({alpha:.7}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(andLogicLearn).wait(400).to({alpha:1}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(orLogicLearn).wait(400).to({alpha:1}, 400, createjs.Ease.cubicIn);
+
+    createjs.Tween.get(tutorialText2).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1480,"You can use one condition or two. If you want to use two you need to add one of these logic items."]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(tutorialText1).call(replaceText,[tutorialText1,centerX-120,1810,"Try both:"]).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(andCheck).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(orCheck).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(whiteCheck).wait(800).to({alpha:.05}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(blackCheck).wait(800).to({alpha:.05}, 400, createjs.Ease.cubicIn).call(rmAnim);
+
+    tutorialNextLabel.text = "GO TO GAME"
+    tutorialNextButton.y = 1780;
+    tutorialNextLabel.y = 1790;
+
+  }
+
+  function finishTutorial() {
+
+    tutorialNextButton.removeAllEventListeners();
+    createjs.Ticker.setPaused(false);
+
+    var startOverlayBG = new createjs.Shape();
+    startOverlayBG.graphics.beginFill(green).drawRect(0,0,canvas.width,canvas.height);
+    startOverlayBG.alpha = 0;
+
+    //startOverlay.addChild(startOverlayBG);
+    //stage.removeAllChildren();
+    sequence = [];
+    loadGame();
+    //stage.addChild(startOverlay);
+    selectorsBox.mouseEnabled = false;
+    sequenceBox.mouseEnabled = false;
+    actionsBox.mouseEnabled = false;
+    newGameButton.mouseEnabled = false;
+    exitButton.mouseEnabled = false;
+    stage.update();
+
+    createjs.Tween.get(startOverlayBG, {override:true}).call(addAnim,[0]).to({alpha:1}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(startOverlay, {override:true}).to({y:890}, 600, createjs.Ease.cubicIn).call(handleBeginGame);
+
+    function handleBeginGame() {
+      startOverlay.removeAllChildren();
+
+      startOverlayBG.graphics
+      .clear()
+      .beginFill(green).drawRect(0,0,canvas.width,(canvas.height-890));
+
+      var tutorialText3 = new createjs.Text("This is the game grid. To win you need to connect four white circles (player one) or black squares (player two) in a row, column or diagonal line.", "100 60px Avenir-Book", white).set({x:centerX,y:280});
+      tutorialText3.textAlign = "center";
+      tutorialText3.lineWidth = 1100;
+      tutorialText3.lineHeight = 80;
+      tutorialText3.alpha = 0;
+
+      tutorialNextButton.graphics
+      .clear()
+      .beginFill(green).drawRect(0,0,400,100);
+      tutorialNextButton.y = 680;
+      addButtonEvent(showConditions);
+      tutorialNextLabel.text = "NEXT";
+      tutorialNextLabel.y = 690;
+      tutorialNextLabel.color = black;
+      tutorialNextLabel.alpha = 0;
+
+      startOverlay.addChild(startOverlayBG,tutorialText3,tutorialNextButton,tutorialNextLabel);
+
+      createjs.Tween.get(tutorialText3, {override:true}).to({alpha:1}, 400, createjs.Ease.cubicIn);
+      createjs.Tween.get(tutorialNextButton, {override:true}).to({alpha:1}, 800, createjs.Ease.cubicIn);
+      createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:1}, 800, createjs.Ease.cubicIn).call(rmAnim);
+
+      function showConditions() {
+
+        tutorialNextButton.removeAllEventListeners();
+        createjs.Ticker.setPaused(false);
+
+        createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,500,"You\'ll get a random set of conditions to play with each turn. Use these to target shapes on the grid."]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut).call(loadSelectors,[selectorsP1]);
+        createjs.Tween.get(tutorialNextButton, {override:true}).to({alpha:0}, 100, createjs.Ease.cubicIn).wait(400).to({y:900},100).to({alpha:1}, 100, createjs.Ease.cubicIn);
+        createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(600).call(replaceText,[tutorialNextLabel,centerX,910,"NEXT"]).to({alpha:1}, 600, createjs.Ease.cubicIn).call(addButtonEvent,[showSeq]).wait(0).call(rmAnim);
+        createjs.Tween.get(startOverlay, {override:true}).wait(400).to({y:-224}, 600, createjs.Ease.cubicIn);
+
+        createjs.Tween.get(sequenceBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
+        createjs.Tween.get(actionsBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
+
+      }
+
+      function showSeq() {
+
+        tutorialNextButton.removeAllEventListeners();
+        createjs.Ticker.setPaused(false);
+
+        createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,450,"Drop conditions and actions here then hit play. You can build longer sequences after each turn, up to four steps. With longer sequences, thinking ahead is key!"]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut);
+        
+        createjs.Tween.get(selectorsBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
+        createjs.Tween.get(sequenceBox, {override:true}).to({alpha:1}, 600, createjs.Ease.cubicIn);
+        createjs.Tween.get(actionsBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
+
+        createjs.Tween.get(tutorialNextButton, {override:true}).to({alpha:0}, 100, createjs.Ease.cubicIn).wait(200).to({alpha:1}, 100, createjs.Ease.cubicIn).call(addButtonEvent,[showActions]);
+        createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
+
+      }
+
+      function showActions() {
+
+        tutorialNextButton.removeAllEventListeners();
+        createjs.Ticker.setPaused(false);
+
+        createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,450,"As well as switching between round and square segments, you can flip and rotate whole shapes. With this power you can target many more shapes in a sequence."]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut);
+        
+        createjs.Tween.get(selectorsBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
+        createjs.Tween.get(sequenceBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
+        createjs.Tween.get(actionsBox, {override:true}).to({alpha:1}, 600, createjs.Ease.cubicIn);
+
+        createjs.Tween.get(tutorialNextButton, {override:true}).to({alpha:0}, 100, createjs.Ease.cubicIn).wait(200).to({alpha:1}, 100, createjs.Ease.cubicIn).call(addButtonEvent,[closeAndBegin]);
+        createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn).call(replaceText,[tutorialNextLabel,centerX,910,"START GAME"]).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
+
+      }
+
+      function closeAndBegin() {
+
+        tutorialNextButton.removeAllEventListeners();
+        createjs.Ticker.setPaused(false);
+
+        selectorsBox.mouseEnabled = true;
+        sequenceBox.mouseEnabled = true;
+        actionsBox.mouseEnabled = true;
+        newGameButton.mouseEnabled = true;
+        exitButton.mouseEnabled = true;
+
+        createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn);
+        createjs.Tween.get(selectorsBox, {override:true}).to({alpha:1}, 600, createjs.Ease.cubicIn);
+        createjs.Tween.get(sequenceBox, {override:true}).to({alpha:1}, 600, createjs.Ease.cubicIn);
+        createjs.Tween.get(actionsBox, {override:true}).to({alpha:1}, 600, createjs.Ease.cubicIn);
+
+        createjs.Tween.get(tutorialNextButton, {override:true}).to({alpha:0}, 100, createjs.Ease.cubicIn);
+        createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn);
+        createjs.Tween.get(startOverlay, {override:true}).wait(200).to({y:-1120}, 600, createjs.Ease.cubicIn);
+        createjs.Tween.get(newGameLabel, {override:true}).wait(600).to({alpha:1}, 600, createjs.Ease.cubicIn);
+        createjs.Tween.get(exitLabel, {override:true}).wait(600).to({alpha:1}, 600, createjs.Ease.cubicIn).call(removeTutorial);
+
+        function removeTutorial() {
+          rmAnim();
+          stage.removeChild(startOverlay);
+          popSelectors(selectorsP2);
+        }
+      }
+    }
+  }
+
+  function showNext() {
+
+    next.removeAllEventListeners();
+
+    createjs.Ticker.setPaused(false);
+
+    next.alpha = 1;
+
+    var nextOverlay = new createjs.Container().set({x:0,y:canvas.height});
+
+    var nextOverlayBG = new createjs.Shape();
+    nextOverlayBG.graphics.beginFill(blue).drawRect(0,0,canvas.width,canvas.height);
+
+    var closeNext = new createjs.Container().set({x:centerX-60,y:100});
+    var closeNextButton = new createjs.Shape();
+    closeNextButton.graphics.beginFill(blue).drawRect(-25,-25,200,125);
+    var closeArrow = new createjs.Shape();
+    closeArrow.graphics.beginStroke(white).setStrokeStyle(20,"round", "round");
+    closeArrow.graphics.moveTo(0,60);
+    closeArrow.graphics.lineTo(60,0);
+    closeArrow.graphics.lineTo(120,60);
+    closeNext.addChild(closeNextButton,closeArrow);
+    closeNext.addEventListener("mousedown",highlightButton);
+    closeNext.addEventListener("pressup",nextToStart);
+
+    var nTitle = new createjs.Text("DUAL was designed to introduce some basic programming concepts.","bold 60px Avenir-Book", white).set({x:centerX,y:250});
+    nTitle.lineWidth = 1200;
+    nTitle.textAlign = "center";
+
+    var nSubTitle = new createjs.Text("All computer programs are built from three simple structures: loop, selection and sequence (and now you know about them all).","200 40px Avenir-Medium", white).set({x:centerX,y:450});
+    nSubTitle.lineWidth = 1200;
+    nSubTitle.lineHeight = 55;
+    nSubTitle.textAlign = "center";
+
+    var nSelection = new createjs.Text("SELECTION","200 60px Avenir-Medium", white).set({x:170,y:650});
+    nSelection.textAlign = "left";
+
+    var nSelectionText = new createjs.Text("When you use conditions you\'re testing to see if shapes return TRUE or FALSE. In code these are called conditional statements. You also learned about logical operators: when you use AND a program returns true if both conditions are met. OR returns true if either condition is met.","200 40px Avenir-Medium", white).set({x:650,y:650});
+    nSelectionText.lineWidth = 700;
+    nSelectionText.lineHeight = 55;
+    nSelectionText.textAlign = "left";
+
+    var nSequence = new createjs.Text("SEQUENCE","200 60px Avenir-Medium", white).set({x:170,y:1150});
+    nSequence.textAlign = "left";
+
+    var nSeqText = new createjs.Text("A program reads code in sequential order, responding to changing states as it goes along. This is exactly how your sequences work each turn.","200 40px Avenir-Medium", white).set({x:650,y:1150});
+    nSeqText.lineWidth = 700;
+    nSeqText.lineHeight = 55;
+    nSeqText.textAlign = "left";
+
+    var nLoop = new createjs.Text("LOOP","200 60px Avenir-Medium", white).set({x:170,y:1430});
+    nLoop.textAlign = "left";
+
+    var nLoopText = new createjs.Text("When you hit play, the program loops through every shape on the grid: first to check if each shape meets your set of conditions and then to perform each action in your sequence.","200 40px Avenir-Medium", white).set({x:650,y:1430});
+    nLoopText.lineWidth = 700;
+    nLoopText.lineHeight = 55;
+    nLoopText.textAlign = "left";
+
+    var nConclusion = new createjs.Text("If you enjoy playing DUAL you might like to learn more about programming.","200 40px Avenir-Medium", white).set({x:centerX,y:1800});
+    nConclusion.lineWidth = 800;
+    nConclusion.lineHeight = 55;
+    nConclusion.textAlign = "center";
+
+    nextOverlay.addChild(nextOverlayBG,closeNext,nTitle,nSubTitle,nSelection,nSelectionText,nSequence,nSeqText,nLoop,nLoopText,nConclusion);
+    stage.addChild(nextOverlay);
+
+    createjs.Tween.get(startOverlay, {override:true}).call(addAnim,[0]).to({y:-canvas.height}, 600, createjs.Ease.cubicIn);
+    createjs.Tween.get(nextOverlay, {override:true}).to({y:0}, 600, createjs.Ease.cubicIn).call(rmAnim);
+
+
+    function nextToStart() {
+
       next.addEventListener("mousedown",highlightButton);
       next.addEventListener("pressup",showNext);
 
-      var contact = new createjs.Container().set({x:centerX,y:1900});
-      var contactButton = new createjs.Shape().set({x:-200,y:-60});
-      contactButton.graphics.beginFill(green).drawRect(0,0,400,200);
-      contactButton.alpha = 0.1;
-      var contactText = new createjs.Text("hello@samwander.com","100 40px Avenir-Book",white).set({x:0,y:0});
-      contactText.textAlign = "center";
-
-      contact.addChild(contactButton,contactText);
-      contact.addEventListener("mousedown",highlightButton);
-      contact.addEventListener("click",contactMe);
-
-      var tutorialGrid = new Grid(2,380,1000,230);
-      tutorialGrid.alpha = 0;
-
-      startOverlay.addChild(startOverlayBG,tutorialGrid,logo,tagline,learn,start,next);
-
-      stage.addChild(startOverlay);
-      stage.update();
-
-      // TUTORIAL
-
-      var closeTutorial = new createjs.Container().set({x:100,y:100});
-      var closeButton = new createjs.Shape();
-      closeButton.graphics.beginFill(green).drawRect(-25,-25,125,125);
-      var closeX = new createjs.Shape();
-      closeX.graphics.beginStroke(white).setStrokeStyle(20,"round");
-      closeX.graphics.moveTo(0,0);
-      closeX.graphics.lineTo(75,75);
-      closeX.graphics.moveTo(0,75);
-      closeX.graphics.lineTo(75,0);
-      closeTutorial.addChild(closeButton,closeX);
-      closeTutorial.alpha = 0;
-      closeTutorial.addEventListener("mousedown",highlightButton);
-      closeTutorial.addEventListener("pressup",returnToStart);
-
-      var tutorialBG = new createjs.Shape().set({x:0,y:1000});
-      tutorialBG.graphics.beginFill("#EAEAEA").drawRect(0,0,canvas.width,canvas.height-1000);
-      tutorialBG.alpha = 0;
-      var tutorialTray = new createjs.Shape().set({x:0,y:1000});
-      tutorialTray.graphics.beginFill("#616060").drawRect(0,0,canvas.width,400);
-      tutorialTray.alpha = 0;
-
-      var tutorialText1 = new createjs.Text("DUAL is a two player game about sequential thinking.", "100 60px Avenir-Book", black).set({x:centerX,y:1150});
-      tutorialText1.textAlign = "center";
-      tutorialText1.lineWidth = 1100;
-      tutorialText1.lineHeight = 80;
-      tutorialText1.alpha = 0;
-
-      var tutorialText2 = new createjs.Text("Each shape has four segments. These can be switched between round (white) and square (black).", "100 60px Avenir-Book", black).set({x:centerX,y:1400});
-      tutorialText2.textAlign = "center";
-      tutorialText2.lineWidth = 1100;
-      tutorialText2.lineHeight = 80;
-      tutorialText2.alpha = 0;
-
-      var tutorialNextButton = new createjs.Shape().set({x:centerX-200,y:1740});
-      tutorialNextButton.graphics.beginFill("#EAEAEA").drawRect(0,0,400,100);
-      tutorialNextButton.alpha = 0;
-      tutorialNextButton.name = "next";
-      var tutorialNextLabel = new createjs.Text("LET'S TRY IT", "100 60px Avenir-Heavy", green).set({x:centerX,y:1750});
-      tutorialNextLabel.textAlign = "center";
-      tutorialNextLabel.alpha = 0;
-
-      startOverlay.addChild(closeTutorial,tutorialBG,tutorialTray,tutorialText1,tutorialText2,tutorialNextButton,tutorialNextLabel);
-
-      // SWITCH ITEMS
-
-      var seqBox = new createjs.Container().set({x:(canvas.width/2)+10,y:1125});
-      seqBox.alpha = 0;
-
-      var sequenceTray = new createjs.Shape().set({x:0,y:-3});
-      sequenceTray.graphics.beginStroke(green).setStrokeStyle(8).beginFill(black);
-      sequenceTray.graphics.drawRoundRect(0,0,442,160,5);
-
-      var actionTray = new createjs.Shape().set({x:0,y:-3});
-      actionTray.graphics.beginStroke(yellow).setStrokeStyle(8).beginFill(black);
-      actionTray.graphics.drawRoundRect(0,0,160,160,5);
-
-      var dropZoneContainer = new createjs.Container();
-
-      var dropZone0 = new createjs.Shape().set({x:15,y:12});
-      var dropZone1 = new createjs.Shape().set({x:15 + buttonSize + (buttonMargin+4),y:12});
-      var dropZone2 = new createjs.Shape().set({x:15 + (buttonSize*2) + ((buttonMargin+4)*2),y:12});
-      var dropZone3 = new createjs.Shape().set({x:15,y:12});
-
-      dropZone0.graphics.beginFill(green);
-      dropZone0.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
-      dropZone0.alpha = .25;
-      dropZone0.type = "condition";
-      dropZone0.slot = 0;
-      dropZone1.graphics.beginFill(blue);
-      dropZone1.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
-      dropZone1.alpha = .25;
-      dropZone1.type = "logic";
-      dropZone1.slot = 1;
-      dropZone2.graphics.beginFill(green);
-      dropZone2.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
-      dropZone2.alpha = .25;
-      dropZone2.type = "condition";
-      dropZone2.slot = 2;
-      dropZone3.graphics.beginFill(yellow);
-      dropZone3.graphics.drawRoundRect(0,0,buttonSize,buttonSize,5);
-      dropZone3.alpha = .25;
-      dropZone3.type = "action";
-      dropZone3.slot = 3;
-
-      var required = new createjs.Text("*","bold 100px Avenir-Heavy", white).set({x:55,y:30});
-      required.alpha = .1;
-
-      dropZoneContainer.addChild(dropZone3);
-
-      var playButton = new createjs.Shape().set({x:200,y:40});
-      playButton.graphics.beginFill(gray).drawRoundRect(0,0,200,80,10);
-      playButton.alpha = .5;
-      var playLabel = new createjs.Text("PLAY", largeLabelStyle, pink).set({x:300,y:54});
-      playLabel.textAlign = "center";
-
-      seqBox.addChild(actionTray,dropZoneContainer,playButton,playLabel);
-
-      var switchTutorial = new createjs.Container().set({x:310,y:1068})
-      switchTutorial.alpha = 0;
-
-      var transformTL = new TransformButton(50,50,iconRadius,0,0,0,35,35,0,0);
-      transformTL.removeAllEventListeners();
-      transformTL.addEventListener("mousedown",grabItemLearn);
-      transformTL.addEventListener("pressmove",dragAndDrop);
-      transformTL.addEventListener("pressup",snapToLearn);
-      transformTL.originParent = switchTutorial;
-      transformTL.name = "transTL";
-      transformTL.func = transTL;
-      var placeholder1 = new PlaceholderButton(transformTL.x,transformTL.y);
-      placeholder1.alpha = .7;
-      var transformTR = new TransformButton(35,50,0,iconRadius,0,0,50,35,(buttonSize+buttonMargin),0);
-      transformTR.removeAllEventListeners();
-      transformTR.addEventListener("mousedown",grabItemLearn);
-      transformTR.addEventListener("pressmove",dragAndDrop);
-      transformTR.addEventListener("pressup",snapToLearn);
-      transformTR.originParent = switchTutorial;
-      transformTR.name = "transTR";
-      transformTR.func = transTR;
-      var placeholder2 = new PlaceholderButton(transformTR.x,transformTR.y);
-      placeholder2.alpha = .7;
-      var transformBL = new TransformButton(50,35,0,0,0,iconRadius,35,50,0,(buttonSize+buttonMargin));
-      transformBL.removeAllEventListeners();
-      transformBL.addEventListener("mousedown",grabItemLearn);
-      transformBL.addEventListener("pressmove",dragAndDrop);
-      transformBL.addEventListener("pressup",snapToLearn);
-      transformBL.originParent = switchTutorial;
-      transformBL.name = "transBL";
-      transformBL.func = transBL;
-      var placeholder3 = new PlaceholderButton(transformBL.x,transformBL.y);
-      placeholder3.alpha = .7;
-      var transformBR = new TransformButton(35,35,0,0,iconRadius,0,50,50,(buttonSize + buttonMargin),(buttonSize + buttonMargin));
-      transformBR.removeAllEventListeners();
-      transformBR.addEventListener("mousedown",grabItemLearn);
-      transformBR.addEventListener("pressmove",dragAndDrop);
-      transformBR.addEventListener("pressup",snapToLearn);
-      transformBR.originParent = switchTutorial;
-      transformBR.name = "transBR";
-      transformBR.func = transBR;
-      var placeholder4 = new PlaceholderButton(transformBR.x,transformBR.y);
-      placeholder4.alpha = .7;
-
-      switchTutorial.addChild(placeholder1,placeholder2,placeholder3,placeholder4,transformTL,transformTR,transformBL,transformBR);
-
-      var tutorialConditions = new createjs.Container().set({x:310,y:1068})
-      tutorialConditions.alpha = 0;
-
-      var rowSelector = new PositionButton("row",100,30,15,50,0,0,0);
-      rowSelector.removeAllEventListeners();
-      rowSelector.addEventListener("mousedown",grabItemLearn);
-      rowSelector.addEventListener("pressmove",dragAndDrop);
-      rowSelector.addEventListener("pressup",snapToLearn);
-      rowSelector.originParent = tutorialConditions;
-      var placeholder5 = new PlaceholderButton(rowSelector.x,rowSelector.y);
-      placeholder5.alpha = .7
-      var colSelector = new PositionButton("col",30,100,50,15,1,(buttonSize + buttonMargin),0);
-      colSelector.removeAllEventListeners();
-      colSelector.addEventListener("mousedown",grabItemLearn);
-      colSelector.addEventListener("pressmove",dragAndDrop);
-      colSelector.addEventListener("pressup",snapToLearn);
-      colSelector.originParent = tutorialConditions;
-      var placeholder6 = new PlaceholderButton(colSelector.x,colSelector.y);
-      placeholder6.alpha = .7
-      var shapeSelector1 = new ShapeButton(0,1,1,0,0,(buttonSize+buttonMargin));
-      shapeSelector1.removeAllEventListeners();
-      shapeSelector1.addEventListener("mousedown",grabItemLearn);
-      shapeSelector1.addEventListener("pressmove",dragAndDrop);
-      shapeSelector1.addEventListener("pressup",snapToLearn);
-      shapeSelector1.originParent = tutorialConditions;
-      var placeholder7 = new PlaceholderButton(shapeSelector1.x,shapeSelector1.y);
-      placeholder7.alpha = .7
-      var shapeSelector2 = new ShapeButton(0,1,0,0,(buttonSize+buttonMargin),(buttonSize+buttonMargin));
-      shapeSelector2.removeAllEventListeners();
-      shapeSelector2.addEventListener("mousedown",grabItemLearn);
-      shapeSelector2.addEventListener("pressmove",dragAndDrop);
-      shapeSelector2.addEventListener("pressup",snapToLearn);
-      shapeSelector2.originParent = tutorialConditions;
-      var placeholder8 = new PlaceholderButton(shapeSelector2.x,shapeSelector2.y);
-      placeholder8.alpha = .7
-
-      var andLogic = new LogicButton("AND",(2*buttonSize) + (2*buttonMargin),0);
-      andLogic.removeAllEventListeners();
-      andLogic.originParent = tutorialConditions;
-      andLogic.alpha = 0;
-      var placeholder9 = new PlaceholderButton(andLogic.x,andLogic.y);
-      placeholder9.alpha = 0;
-      var orLogic = new LogicButton("OR",(2*buttonSize) + (2*buttonMargin),(buttonSize + buttonMargin));
-      orLogic.removeAllEventListeners();
-      orLogic.originParent = tutorialConditions;
-      orLogic.alpha = 0;
-      var placeholder10 = new PlaceholderButton(orLogic.x,orLogic.y);
-      placeholder10.alpha = 0;
-
-      var andCheck = new createjs.Text("AND","bold 40px Avenir-Heavy",blue).set({x:centerX+80,y:(canvas.height - 220)});
-      andCheck.textAlign = "center";
-      andCheck.alpha = 0;
-      var orCheck = new createjs.Text("OR","bold 40px Avenir-Heavy",blue).set({x:centerX+80,y:(canvas.height - 140)});
-      orCheck.textAlign = "center";
-      orCheck.alpha = 0;
-
-      tutorialConditions.addChild(placeholder5,placeholder6,placeholder7,placeholder8,placeholder9,placeholder10,rowSelector,colSelector,shapeSelector1,shapeSelector2,andLogic,orLogic);
-
-      var arrow = new createjs.Shape().set({x:(canvas.width/2)-120,y:1170});
-      arrow.graphics.beginFill(pink);
-      arrow.graphics.moveTo(0,0);
-      arrow.graphics.lineTo(60,30);
-      arrow.graphics.lineTo(0,60);
-      arrow.alpha = 0;
-
-      var whiteCircle = new createjs.Shape().set({x:centerX+210,y:(canvas.height - 215)});
-      whiteCircle.graphics.beginFill(white).drawCircle(0,0,iconRadius,iconRadius);
-      whiteCircle.alpha = 0;
-
-      var whiteCheck = new createjs.Shape().set({x:centerX+290,y:(canvas.height - 255)});
-      whiteCheck.graphics.beginStroke(pink).setStrokeStyle(14,"round","round");
-      whiteCheck.graphics.moveTo(0,40);
-      whiteCheck.graphics.lineTo(20,55);
-      whiteCheck.graphics.lineTo(50,20);
-      whiteCheck.alpha = 0;
-
-      var blackSquare = new createjs.Shape().set({x:centerX+170,y:(canvas.height - 155)});
-      blackSquare.graphics.beginFill(black).drawRect(0,0,iconRadius*2,iconRadius*2);
-      blackSquare.alpha = 0;
-
-      var blackCheck = new createjs.Shape().set({x:centerX+290,y:(canvas.height - 155)});
-      blackCheck.graphics.beginStroke(pink).setStrokeStyle(14,"round","round");
-      blackCheck.graphics.moveTo(0,40);
-      blackCheck.graphics.lineTo(20,55);
-      blackCheck.graphics.lineTo(50,20);
-      blackCheck.alpha = 0;
-
-      function beginTutorial(event) {
-
-        learn.removeAllEventListeners();
-
-        createjs.Ticker.setPaused(false);
-
-        createjs.Tween.get(learn).call(addAnim,[0]).to({alpha:0}, 300, createjs.Ease.cubicIn);
-        createjs.Tween.get(start).wait(300).to({alpha:0}, 300, createjs.Ease.cubicIn);
-        createjs.Tween.get(tagline).wait(300).to({alpha:0}, 300, createjs.Ease.cubicIn);
-
-        createjs.Tween.get(tutorialGrid).wait(300).to({alpha:1}, 300, createjs.Ease.cubicIn);
-        createjs.Tween.get(tutorialBG).wait(500).to({alpha:1}, 400, createjs.Ease.cubicIn);
-        createjs.Tween.get(closeTutorial).wait(1800).to({alpha:.9}, 400, createjs.Ease.cubicIn);
-
-        D.cache(-135,-135,270,270);
-        U.cache(-135,-135,270,270);
-        A.cache(-135,-135,270,270);
-        L.cache(-135,-135,270,270);
-
-        createjs.Tween.get(D).wait(1000).to({x:colVal(0,2,380),y:rowVal(0,2,380,1000)-700}, 600, createjs.Ease.backInOut);
-        createjs.Tween.get(U).wait(1200).to({x:colVal(1,2,380),y:rowVal(0,2,380,1000)-700}, 600, createjs.Ease.backInOut);
-        createjs.Tween.get(A).wait(1400).to({x:colVal(0,2,380),y:rowVal(1,2,380,1000)-700}, 500, createjs.Ease.backOut);
-        createjs.Tween.get(L).wait(1600).to({x:colVal(1,2,380),y:rowVal(1,2,380,1000)-700}, 500, createjs.Ease.getBackOut(1)).call(tutorialReady);
-
-        function tutorialReady() {
-
-          createjs.Tween.get(tutorialText1).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn);
-          createjs.Tween.get(tutorialText2).wait(400).to({alpha:1}, 400, createjs.Ease.cubicIn);
-          createjs.Tween.get(tutorialNextButton).wait(200).to({alpha:1}, 100, createjs.Ease.cubicIn);
-          createjs.Tween.get(tutorialNextLabel).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn).call(readyToLoadTutorialItems);
-
-          logo.y = 0;
-          D.y = rowVal(0,2,380,1000);
-          D.uncache();
-          U.y = rowVal(0,2,380,1000);
-          U.uncache();
-          A.y = rowVal(1,2,380,1000);
-          A.uncache();
-
-          L.y = rowVal(1,2,380,1000);
-          L.uncache();
-          stage.update();
-
-        function readyToLoadTutorialItems() {
-          rmAnim();
-          addButtonEvent(trySwitchingCorners);
-        }
-      }
-    }
-
-    function trySwitchingCorners() {
-
-      learnActions = true;
-
-      tutorialNextButton.removeAllEventListeners();
-
       createjs.Ticker.setPaused(false);
+      createjs.Tween.get(startOverlay, {override:true}).call(addAnim,[0]).to({y:0}, 600, createjs.Ease.cubicIn);
+      createjs.Tween.get(nextOverlay, {override:true}).to({y:canvas.height}, 600, createjs.Ease.cubicIn).call(cleanNext);
 
-      sequence[3] = null;
-
-      startOverlay.addChild(seqBox,switchTutorial,arrow);
-      
-      createjs.Tween.get(tutorialText1).call(addAnim,[0]).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut);
-      createjs.Tween.get(tutorialText2).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1600,"Drag items into the action tray and hit play to see what happens."]).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn);
-      createjs.Tween.get(tutorialNextButton).wait(200).to({alpha:0}, 100, createjs.Ease.cubicOut);
-      createjs.Tween.get(tutorialNextLabel).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut);
-      createjs.Tween.get(tutorialTray).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
-      createjs.Tween.get(switchTutorial).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn);
-      createjs.Tween.get(arrow).wait(1400).to({alpha:1}, 400, createjs.Ease.cubicIn);
-      createjs.Tween.get(seqBox).wait(1600).to({alpha:1}, 400, createjs.Ease.cubicIn).wait(200).call(rmAnim);
-
-    }
-
-    function tryConditions() {
-
-      learnActions = false;
-      learnConditions = true;
-
-      tutorialNextButton.removeAllEventListeners();
-
-      function manualTransformTL() {
-        morph(tutorialObjectsInPlay[0].getChildByName("TL"),black,-radius,-radius,0,0,0,0);
-        morph(tutorialObjectsInPlay[1].getChildByName("TL"),black,-radius,-radius,0,0,0,0);
-        morph(tutorialObjectsInPlay[2].getChildByName("TL"),white,-radius,-radius,radius,0,0,0);
-        morph(tutorialObjectsInPlay[3].getChildByName("TL"),black,-radius,-radius,0,0,0,0);
-      }
-
-      function manualTransformTR() {
-        morph(tutorialObjectsInPlay[0].getChildByName("TR"),white,0,-radius,0,radius,0,0);
-        morph(tutorialObjectsInPlay[1].getChildByName("TR"),black,0,-radius,0,0,0,0);
-        morph(tutorialObjectsInPlay[2].getChildByName("TR"),white,0,-radius,0,radius,0,0);
-        morph(tutorialObjectsInPlay[3].getChildByName("TR"),white,0,-radius,0,radius,0,0);
-      }
-
-      function manualTransformBR() {
-        morph(tutorialObjectsInPlay[0].getChildByName("BR"),white,0,0,0,0,radius,0);
-        morph(tutorialObjectsInPlay[1].getChildByName("BR"),white,0,0,0,0,radius,0);
-        morph(tutorialObjectsInPlay[2].getChildByName("BR"),black,0,0,0,0,0,0);
-        morph(tutorialObjectsInPlay[3].getChildByName("BR"),black,0,0,0,0,0,0);
-      }
-
-      function manualTransformBL() {
-        morph(tutorialObjectsInPlay[0].getChildByName("BL"),black,-radius,0,0,0,0,0);
-        morph(tutorialObjectsInPlay[1].getChildByName("BL"),white,-radius,0,0,0,0,radius);
-        morph(tutorialObjectsInPlay[2].getChildByName("BL"),black,-radius,0,0,0,0,0);
-        morph(tutorialObjectsInPlay[3].getChildByName("BL"),black,-radius,0,0,0,0,0);
-      }
-
-      createjs.Ticker.setPaused(false);
-      createjs.Tween.get(tutorialText1).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut);
-      createjs.Tween.get(whiteCircle).to({alpha:0}, 400, createjs.Ease.cubicOut);
-      createjs.Tween.get(blackSquare).to({alpha:0}, 400, createjs.Ease.cubicOut);
-      createjs.Tween.get(whiteCheck).to({alpha:.0}, 400, createjs.Ease.cubicOut);
-      createjs.Tween.get(blackCheck).to({alpha:.0}, 400, createjs.Ease.cubicOut);
-      createjs.Tween.get(tutorialNextButton).wait(200).to({alpha:0}, 100, createjs.Ease.cubicOut);
-      createjs.Tween.get(tutorialNextLabel).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut);
-      createjs.Tween.get(D).wait(200).to({alpha:0}, 200, createjs.Ease.cubicOut).call(manualTransforms).to({alpha:.2}, 400, createjs.Ease.cubicIn);
-      createjs.Tween.get(U).wait(200).to({alpha:0}, 200, createjs.Ease.cubicOut).to({alpha:.2}, 600, createjs.Ease.cubicIn);
-      createjs.Tween.get(A).wait(200).to({alpha:0}, 200, createjs.Ease.cubicOut).to({alpha:.2}, 600, createjs.Ease.cubicIn);
-      createjs.Tween.get(L).wait(200).to({alpha:0}, 200, createjs.Ease.cubicOut).to({alpha:.2}, 600, createjs.Ease.cubicIn);
-      createjs.Tween.get(tutorialText2).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1550,"Target shapes on the grid with condition items like these. You can target by row, column, or exactly matching a shape."]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicIn);
-      createjs.Tween.get(switchTutorial).wait(400).to({alpha:0}, 400, createjs.Ease.cubicOut);
-      createjs.Tween.get(tutorialConditions).wait(600).to({alpha:1}, 400, createjs.Ease.cubicIn);
-      createjs.Tween.get(arrow).wait(400).to({alpha:0}, 400, createjs.Ease.cubicOut).to({alpha:1}, 400, createjs.Ease.cubicIn);
-      createjs.Tween.get(seqBox).wait(400).to({alpha:0}, 400, createjs.Ease.cubicOut).call(loadConditions).wait(200).to({alpha:1}, 600, createjs.Ease.cubicIn).call(rmAnim);
-
-      function manualTransforms() {
-        manualTransformTL();
-        manualTransformTR();
-        manualTransformBR();
-        manualTransformBL();
-
-        tutorialObjectsInPlay[0].tl = 0;
-        tutorialObjectsInPlay[0].tr = 1;
-        tutorialObjectsInPlay[0].br = 1;
-        tutorialObjectsInPlay[0].bl = 0;
-
-        tutorialObjectsInPlay[1].tl = 0;
-        tutorialObjectsInPlay[1].tr = 0;
-        tutorialObjectsInPlay[1].br = 1;
-        tutorialObjectsInPlay[1].bl = 1;
-
-        tutorialObjectsInPlay[2].tl = 1;
-        tutorialObjectsInPlay[2].tr = 1;
-        tutorialObjectsInPlay[2].br = 0;
-        tutorialObjectsInPlay[2].bl = 0;
-
-        tutorialObjectsInPlay[3].tl = 0;
-        tutorialObjectsInPlay[3].tr = 1;
-        tutorialObjectsInPlay[3].br = 0;
-        tutorialObjectsInPlay[3].bl = 0;
-      }
-
-      function loadConditions() {
-        startOverlay.removeChild(whiteCircle,blackSquare);
-        dropZoneContainer.removeChild(dropZone3);
-        switchTutorial.addChild(transformTL,transformTR,transformBR,transformBL);
-        seqBox.removeChild(actionTray,playButton,playLabel);
-        dropZoneContainer.addChild(dropZone0,dropZone1,dropZone2,required);
-        seqBox.addChild(sequenceTray,dropZoneContainer);
-        startOverlay.addChild(tutorialConditions,andCheck,orCheck);
-
-        whiteCheck.x = centerX+170;
-        whiteCheck.y = canvas.height-240;
-        blackCheck.x = centerX+170;
-        blackCheck.y = canvas.height-160;
-      }
-
-    }
-
-    function showLogicItems() {
-
-      createjs.Ticker.setPaused(false);
-
-      showLogic = true;
-
-      andLogic.addEventListener("mousedown",grabItemLearn);
-      andLogic.addEventListener("pressmove",dragAndDrop);
-      andLogic.addEventListener("pressup",snapToLearn);
-
-      orLogic.addEventListener("mousedown",grabItemLearn);
-      orLogic.addEventListener("pressmove",dragAndDrop);
-      orLogic.addEventListener("pressup",snapToLearn);
-      
-      createjs.Tween.get(tutorialConditions).call(addAnim,[0]).wait(200).to({x:tutorialConditions.x - 60}, 400, createjs.Ease.cubicInOut);
-      createjs.Tween.get(arrow).wait(200).to({x:arrow.x + 90}, 400, createjs.Ease.cubicInOut);
-      createjs.Tween.get(seqBox).wait(200).to({x:seqBox.x + 90}, 400, createjs.Ease.cubicInOut);
-      createjs.Tween.get(placeholder9).wait(400).to({alpha:.7}, 400, createjs.Ease.cubicIn);
-      createjs.Tween.get(placeholder10).wait(400).to({alpha:.7}, 400, createjs.Ease.cubicIn);
-      createjs.Tween.get(andLogic).wait(400).to({alpha:1}, 400, createjs.Ease.cubicIn);
-      createjs.Tween.get(orLogic).wait(400).to({alpha:1}, 400, createjs.Ease.cubicIn);
-
-      createjs.Tween.get(tutorialText2).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1480,"You can use one condition or two. If you want to use two you need to add one of these logic items."]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn);
-      createjs.Tween.get(tutorialText1).call(replaceText,[tutorialText1,centerX-120,1810,"Try both:"]).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
-      createjs.Tween.get(andCheck).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
-      createjs.Tween.get(orCheck).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
-      createjs.Tween.get(whiteCheck).wait(800).to({alpha:.05}, 400, createjs.Ease.cubicIn);
-      createjs.Tween.get(blackCheck).wait(800).to({alpha:.05}, 400, createjs.Ease.cubicIn).call(rmAnim);
-
-      tutorialNextLabel.text = "GO TO GAME"
-      tutorialNextButton.y = 1780;
-      tutorialNextLabel.y = 1790;
-
-    }
-
-    function finishTutorial() {
-
-      tutorialNextButton.removeAllEventListeners();
-      createjs.Ticker.setPaused(false);
-
-      var startOverlayBG = new createjs.Shape();
-      startOverlayBG.graphics.beginFill(green).drawRect(0,0,canvas.width,canvas.height);
-      startOverlayBG.alpha = 0;
-
-      startOverlay.addChild(startOverlayBG);
-      stage.removeAllChildren();
-      sequence = [];
-      loadGame();
-      stage.addChild(startOverlay);
-      selectorsBox.mouseEnabled = false;
-      sequenceBox.mouseEnabled = false;
-      actionsBox.mouseEnabled = false;
-      newGameButton.mouseEnabled = false;
-      exitButton.mouseEnabled = false;
-      stage.update();
-
-      createjs.Tween.get(startOverlayBG, {override:true}).call(addAnim,[0]).to({alpha:1}, 400, createjs.Ease.cubicIn);
-      createjs.Tween.get(startOverlay, {override:true}).to({y:890}, 600, createjs.Ease.cubicIn).call(handleBeginGame);
-
-      function handleBeginGame() {
-        startOverlay.removeAllChildren();
-
-        startOverlayBG.graphics
-        .clear()
-        .beginFill(green).drawRect(0,0,canvas.width,(canvas.height-890));
-
-        var tutorialText3 = new createjs.Text("This is the game grid. To win you need to connect four white circles (player one) or black squares (player two) in a row, column or diagonal line.", "100 60px Avenir-Book", white).set({x:centerX,y:280});
-        tutorialText3.textAlign = "center";
-        tutorialText3.lineWidth = 1100;
-        tutorialText3.lineHeight = 80;
-        tutorialText3.alpha = 0;
-
-        tutorialNextButton.graphics
-        .clear()
-        .beginFill(green).drawRect(0,0,400,100);
-        tutorialNextButton.y = 680;
-        addButtonEvent(showConditions);
-        tutorialNextLabel.text = "NEXT";
-        tutorialNextLabel.y = 690;
-        tutorialNextLabel.color = black;
-        tutorialNextLabel.alpha = 0;
-
-        startOverlay.addChild(startOverlayBG,tutorialText3,tutorialNextButton,tutorialNextLabel);
-
-        createjs.Tween.get(tutorialText3, {override:true}).to({alpha:1}, 400, createjs.Ease.cubicIn);
-        createjs.Tween.get(tutorialNextButton, {override:true}).to({alpha:1}, 800, createjs.Ease.cubicIn);
-        createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:1}, 800, createjs.Ease.cubicIn).call(rmAnim);
-
-        function showConditions() {
-
-          tutorialNextButton.removeAllEventListeners();
-          createjs.Ticker.setPaused(false);
-
-          createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,500,"You\'ll get a random set of conditions to play with each turn. Use these to target shapes on the grid."]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut).call(loadSelectors,[selectorsP1]);
-          createjs.Tween.get(tutorialNextButton, {override:true}).to({alpha:0}, 100, createjs.Ease.cubicIn).wait(400).to({y:900},100).to({alpha:1}, 100, createjs.Ease.cubicIn);
-          createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(600).call(replaceText,[tutorialNextLabel,centerX,910,"NEXT"]).to({alpha:1}, 600, createjs.Ease.cubicIn).call(addButtonEvent,[showSeq]).wait(0).call(rmAnim);
-          createjs.Tween.get(startOverlay, {override:true}).wait(400).to({y:-224}, 600, createjs.Ease.cubicIn);
-
-          createjs.Tween.get(sequenceBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
-          createjs.Tween.get(actionsBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
-
-        }
-
-        function showSeq() {
-
-          tutorialNextButton.removeAllEventListeners();
-          createjs.Ticker.setPaused(false);
-
-          createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,450,"Drop conditions and actions here then hit play. You can build longer sequences after each turn, up to four steps. With longer sequences, thinking ahead is key!"]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut);
-          
-          createjs.Tween.get(selectorsBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
-          createjs.Tween.get(sequenceBox, {override:true}).to({alpha:1}, 600, createjs.Ease.cubicIn);
-          createjs.Tween.get(actionsBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
-
-          createjs.Tween.get(tutorialNextButton, {override:true}).to({alpha:0}, 100, createjs.Ease.cubicIn).wait(200).to({alpha:1}, 100, createjs.Ease.cubicIn).call(addButtonEvent,[showActions]);
-          createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
-
-        }
-
-        function showActions() {
-
-          tutorialNextButton.removeAllEventListeners();
-          createjs.Ticker.setPaused(false);
-
-          createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,450,"As well as switching between round and square segments, you can flip and rotate whole shapes. With this power you can target many more shapes in a sequence."]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut);
-          
-          createjs.Tween.get(selectorsBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
-          createjs.Tween.get(sequenceBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
-          createjs.Tween.get(actionsBox, {override:true}).to({alpha:1}, 600, createjs.Ease.cubicIn);
-
-          createjs.Tween.get(tutorialNextButton, {override:true}).to({alpha:0}, 100, createjs.Ease.cubicIn).wait(200).to({alpha:1}, 100, createjs.Ease.cubicIn).call(addButtonEvent,[closeAndBegin]);
-          createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn).call(replaceText,[tutorialNextLabel,centerX,910,"START GAME"]).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
-
-        }
-
-        function closeAndBegin() {
-
-          tutorialNextButton.removeAllEventListeners();
-          createjs.Ticker.setPaused(false);
-
-          selectorsBox.mouseEnabled = true;
-          sequenceBox.mouseEnabled = true;
-          actionsBox.mouseEnabled = true;
-          newGameButton.mouseEnabled = true;
-          exitButton.mouseEnabled = true;
-
-          createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn);
-          createjs.Tween.get(selectorsBox, {override:true}).to({alpha:1}, 600, createjs.Ease.cubicIn);
-          createjs.Tween.get(sequenceBox, {override:true}).to({alpha:1}, 600, createjs.Ease.cubicIn);
-          createjs.Tween.get(actionsBox, {override:true}).to({alpha:1}, 600, createjs.Ease.cubicIn);
-
-          createjs.Tween.get(tutorialNextButton, {override:true}).to({alpha:0}, 100, createjs.Ease.cubicIn);
-          createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn);
-          createjs.Tween.get(startOverlay, {override:true}).wait(200).to({y:-1120}, 600, createjs.Ease.cubicIn);
-          createjs.Tween.get(newGameLabel, {override:true}).wait(600).to({alpha:1}, 600, createjs.Ease.cubicIn);
-          createjs.Tween.get(exitLabel, {override:true}).wait(600).to({alpha:1}, 600, createjs.Ease.cubicIn).call(removeTutorial);
-
-          function removeTutorial() {
-            rmAnim();
-            stage.removeChild(startOverlay);
-            popSelectors(selectorsP2);
-          }
-        }
-      }
-    }
-
-    function showNext() {
-
-      next.removeAllEventListeners();
-
-      createjs.Ticker.setPaused(false);
-
-      next.alpha = 1;
-
-      var nextOverlay = new createjs.Container().set({x:0,y:canvas.height});
-
-      var nextOverlayBG = new createjs.Shape();
-      nextOverlayBG.graphics.beginFill(blue).drawRect(0,0,canvas.width,canvas.height);
-
-      var closeNext = new createjs.Container().set({x:centerX-60,y:100});
-      var closeNextButton = new createjs.Shape();
-      closeNextButton.graphics.beginFill(blue).drawRect(-25,-25,200,125);
-      var closeArrow = new createjs.Shape();
-      closeArrow.graphics.beginStroke(white).setStrokeStyle(20,"round", "round");
-      closeArrow.graphics.moveTo(0,60);
-      closeArrow.graphics.lineTo(60,0);
-      closeArrow.graphics.lineTo(120,60);
-      closeNext.addChild(closeNextButton,closeArrow);
-      closeNext.addEventListener("mousedown",highlightButton);
-      closeNext.addEventListener("pressup",nextToStart);
-
-      var nTitle = new createjs.Text("DUAL was designed to introduce some basic programming concepts.","bold 60px Avenir-Book", white).set({x:centerX,y:250});
-      nTitle.lineWidth = 1200;
-      nTitle.textAlign = "center";
-
-      var nSubTitle = new createjs.Text("All computer programs are built from three simple structures: loop, selection and sequence (and now you know about them all).","200 40px Avenir-Medium", white).set({x:centerX,y:450});
-      nSubTitle.lineWidth = 1200;
-      nSubTitle.lineHeight = 55;
-      nSubTitle.textAlign = "center";
-
-      var nSelection = new createjs.Text("SELECTION","200 60px Avenir-Medium", white).set({x:170,y:650});
-      nSelection.textAlign = "left";
-
-      var nSelectionText = new createjs.Text("When you use conditions you\'re testing to see if shapes return TRUE or FALSE. In code these are called conditional statements. You also learned about logical operators: when you use AND a program returns true if both conditions are met. OR returns true if either condition is met.","200 40px Avenir-Medium", white).set({x:650,y:650});
-      nSelectionText.lineWidth = 700;
-      nSelectionText.lineHeight = 55;
-      nSelectionText.textAlign = "left";
-
-      var nSequence = new createjs.Text("SEQUENCE","200 60px Avenir-Medium", white).set({x:170,y:1150});
-      nSequence.textAlign = "left";
-
-      var nSeqText = new createjs.Text("A program reads code in sequential order, responding to changing states as it goes along. This is exactly how your sequences work each turn.","200 40px Avenir-Medium", white).set({x:650,y:1150});
-      nSeqText.lineWidth = 700;
-      nSeqText.lineHeight = 55;
-      nSeqText.textAlign = "left";
-
-      var nLoop = new createjs.Text("LOOP","200 60px Avenir-Medium", white).set({x:170,y:1430});
-      nLoop.textAlign = "left";
-
-      var nLoopText = new createjs.Text("When you hit play, the program loops through every shape on the grid: first to check if each shape meets your set of conditions and then to perform each action in your sequence.","200 40px Avenir-Medium", white).set({x:650,y:1430});
-      nLoopText.lineWidth = 700;
-      nLoopText.lineHeight = 55;
-      nLoopText.textAlign = "left";
-
-      var nConclusion = new createjs.Text("If you enjoy playing DUAL you might like to learn more about programming.","200 40px Avenir-Medium", white).set({x:centerX,y:1800});
-      nConclusion.lineWidth = 800;
-      nConclusion.lineHeight = 55;
-      nConclusion.textAlign = "center";
-
-      nextOverlay.addChild(nextOverlayBG,closeNext,nTitle,nSubTitle,nSelection,nSelectionText,nSequence,nSeqText,nLoop,nLoopText,nConclusion);
-      stage.addChild(nextOverlay);
-
-      createjs.Tween.get(startOverlay, {override:true}).call(addAnim,[0]).to({y:-canvas.height}, 600, createjs.Ease.cubicIn);
-      createjs.Tween.get(nextOverlay, {override:true}).to({y:0}, 600, createjs.Ease.cubicIn).call(rmAnim);
-
-
-      function nextToStart() {
-
-        next.addEventListener("mousedown",highlightButton);
-        next.addEventListener("pressup",showNext);
-
-        createjs.Ticker.setPaused(false);
-        createjs.Tween.get(startOverlay, {override:true}).call(addAnim,[0]).to({y:0}, 600, createjs.Ease.cubicIn);
-        createjs.Tween.get(nextOverlay, {override:true}).to({y:canvas.height}, 600, createjs.Ease.cubicIn).call(cleanNext);
-
-        function cleanNext() {
-          rmAnim();
-          nextOverlay.removeAllChildren();
-          stage.removeChild(nextOverlay);
-        }
-      }
-    }
-
-    // INTERACTION
-
-    function grabItemLearn(event) {
-
-      // re-opening sequence slot
-
-      if (event.currentTarget.parent == seqBox) {
-          sequence[event.currentTarget.inSlot] = null;
-          event.currentTarget.inSlot = false;
-        } 
-
-      // translate local to global, re-parent to stage
-
-      var pt = event.currentTarget.localToGlobal(event.currentTarget.x,event.currentTarget.y);
-      event.currentTarget.x = (pt.x - event.currentTarget.x);
-      event.currentTarget.y = (pt.y - event.currentTarget.y);
-      stage.addChild(event.currentTarget);
-
-      // slot highlighting
-
-      if (event.currentTarget.type == "logic") {
-          dropZone1.alpha = .7;
-      } else if (event.currentTarget.type == "action") {
-          dropZone3.alpha = .7;
-      } else {
-          dropZone0.alpha = .7;
-          dropZone2.alpha = .7; 
-      }
-      stage.update();
-    }
-
-    function snapToLearn(event) {
-
-      var pt = dropZoneContainer.globalToLocal(event.stageX,event.stageY);
-
-      // determine if dragged over a sequence slot, record which one
-
-      for (var i = 0; i < dropZoneContainer.getObjectsUnderPoint(pt.x,pt.y,0).length; i++) {
-        if (dropZoneContainer.getObjectsUnderPoint(pt.x,pt.y,0)[i].slot != null) {
-        dropPosition = dropZoneContainer.getObjectsUnderPoint(pt.x,pt.y,0)[i];
-        }
-      }
-
-      // if slot is open, drop in (otherwise return to item's original position)
-
-      if (dropPosition != null && sequence[dropPosition.slot] == null) {
-        addToSlotLearn(event.currentTarget,dropPosition);
-      } else if (dropPosition != null && sequence[dropPosition.slot] != null && (event.currentTarget.slotType == dropPosition.type)) {
-        returnToOriginLearn(sequence[dropPosition.slot],sequence[dropPosition.slot].originParent,sequence[dropPosition.slot].originX,sequence[dropPosition.slot].originY);
-        addToSlotLearn(event.currentTarget,dropPosition);
-      } else {
-        returnToOriginLearn(event.currentTarget,event.currentTarget.originParent,event.currentTarget.originX,event.currentTarget.originY);
-      }
-
-      // unhighlight slots
-
-      for (var i = 0; i < dropZoneContainer.children.length; i++) {
-        if (dropZoneContainer.children[i].slot != null) {
-          dropZoneContainer.children[i].alpha = .25;
-        }
-      }
-
-      stage.update();
-      dropPosition = null;
-      sequenceReadyLearn();
-    }
-
-    function addToSlotLearn(item,pos) {
-
-      if (item.type == "position" || item.type == "shape") {
-
-        if (pos.slot % 2 == 0) { 
-          seqBox.addChild(item);
-          item.x = pos.x; 
-          item.y = pos.y;
-          item.inSlot = pos.slot;
-          sequence[pos.slot] = item;
-          targetGameObjectsLearn();
-          targetCount++;
-          if (showLogic == false && targetCount > 2) { showLogicItems(); }
-        } else { 
-          returnToOriginLearn(item,item.originParent,item.originX,item.originY);
-        }
-
-      } else if (item.type == "logic") {
-
-        if (pos.slot == 1) { 
-          seqBox.addChild(item);
-          item.x = pos.x; 
-          item.y = pos.y; 
-          item.inSlot = pos.slot;
-          sequence[pos.slot] = item;
-          targetGameObjectsLearn();
-
-          if (item.name == "AND") {
-            if (triedAnd == false) {
-              triedAnd = true;
-              createjs.Ticker.setPaused(false);
-              createjs.Tween.get(whiteCheck).call(addAnim,[0]).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
-            }
-          } else {
-            if (triedOr == false) {
-              triedOr = true;
-              createjs.Ticker.setPaused(false);
-              createjs.Tween.get(blackCheck).call(addAnim,[0]).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
-            }
-          }
-
-          if (triedOr && triedAnd) {
-            if (triedBoth == false) {
-              triedBoth = true;
-              createjs.Ticker.setPaused(false);
-              createjs.Tween.get(tutorialText2).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1480,"Using AND targets any shapes that match both conditions. Using OR targets shapes that match either condition."]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn).call(handleGoToGame);
-              
-              function handleGoToGame() {
-                createjs.Tween.get(tutorialText1).wait(600).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(rmAnim);;
-                createjs.Tween.get(andCheck).wait(600).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(rmAnim);;
-                createjs.Tween.get(orCheck).wait(600).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(rmAnim);;
-                createjs.Tween.get(whiteCheck).wait(600).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(rmAnim);;
-                createjs.Tween.get(blackCheck).wait(600).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(rmAnim);;
-                createjs.Tween.get(tutorialNextButton).call(addAnim,[0]).wait(1400).to({alpha:1}, 100, createjs.Ease.cubicOut).call(rmAnim);
-                createjs.Tween.get(tutorialNextLabel).call(addAnim,[0]).wait(1400).to({alpha:1}, 400, createjs.Ease.cubicOut).call(rmAnim);
-                
-                addButtonEvent(finishTutorial);
-
-              }
-            }
-          }
-        } else { 
-          returnToOriginLearn(item,item.originParent,item.originX,item.originY); 
-        }
-
-      } else {
-
-        if (pos.slot == 3) { 
-          seqBox.addChild(item);
-          item.x = pos.x; 
-          item.y = pos.y; 
-          item.inSlot = pos.slot;
-          sequence[pos.slot] = item;
-        } else { 
-          returnToOriginLearn(item,item.originParent,item.originX,item.originY); 
-        }
-
-      }
-      stage.update();
-    }
-
-    function returnToOriginLearn(item,parent,x,y) {
-      parent.addChild(item);
-      item.x = x;
-      item.y = y;
-      item.inSlot = false;
-      if (learnConditions == true) { targetGameObjectsLearn(); }
-      stage.update();
-    }
-
-    function targetGameObjectsLearn() {
-
-      var ruleSet = [];
-
-      // get items from trays
-
-      for (var i = 0; i < 3; i++) {
-        if (sequence[i] != null) {
-        var rule = extractRuleLearn(sequence[i]);
-        ruleSet.push(rule);
-        }
-      }
-
-      // loop through objects and test for matches
-
-      for (i in tutorialObjectsInPlay) {
-
-        if (ruleSet.length == 3) {
-
-          if (ruleSet[1](ruleSet[0](tutorialObjectsInPlay[i]),ruleSet[2](tutorialObjectsInPlay[i]))) {
-            tutorialObjectsInPlay[i].alpha = 1;
-          } else {
-            tutorialObjectsInPlay[i].alpha = .2;
-          }
-
-        } else if (ruleSet.length == 2) {
-
-          if (showLogic == false) { showLogicItems(); }
-          tutorialObjectsInPlay[i].alpha = .2;
-     
-        } else if (ruleSet.length == 1) {
-
-          if (ruleSet[0](tutorialObjectsInPlay[i])) {
-            tutorialObjectsInPlay[i].alpha = 1;
-          } else {
-            tutorialObjectsInPlay[i].alpha = .2;
-          }
-        } else {
-          tutorialObjectsInPlay[i].alpha = .2;
-        }
-      }
-    }
-
-    function extractRuleLearn(rule) {
-
-      var ruleComponents;
-
-      if (rule.type == "position") {
-
-        if (rule.name == "col") {
-          ruleComponents = function(obj) {
-            if (obj.x == colVal(rule.val,2,380)) {return true;}
-          }
-        } else {
-          ruleComponents = function(obj) {
-          if (obj.y == rowVal(rule.val,2,380,1000)) {return true;}
-          }
-        }
-
-      } else if (rule.type == "shape") {
-
-          ruleComponents = function(obj) {
-            var shape = [obj.tl,obj.tr,obj.br,obj.bl];
-            if (arraysEqual(shape,rule.val)) {return true;}
-          }
-
-      } else if (rule.type == "logic") {
-
-          if (rule.name == "AND") {
-            ruleComponents = function(a,b) {if (a && b) {return true;}}
-          } else {
-            ruleComponents = function(a,b) {if (a || b) {return true;}}
-          }
-      }
-
-      return ruleComponents;
-
-    }
-    
-    function deliverActionLearn(targets) {
-
-      for (i in targets) {
-          sequence[3].func(targets[i]);
-      }
-    }
-
-    function clearSequenceLearn() {
-
-      var toClear = [];
-
-      for (var i = 0; i < seqBox.children.length; i++) {
-        if (seqBox.children[i].type != null) {
-          toClear.push(seqBox.children[i]);
-        }
-      }
-
-      for (var i = 0; i < toClear.length; i++) {
-        returnToOriginLearn(toClear[i],toClear[i].originParent,toClear[i].originX,toClear[i].originY);
-      }
-
-      for (var i = 0; i < 4; i++) {
-        sequence[i] = null;
-      }
-
-      actionTray.graphics
-      .clear()
-      .beginStroke(yellow).setStrokeStyle(8).beginFill(black)
-      .drawRoundRect(0,0,160,160,5);
-
-
-      for (i in tutorialObjectsInPlay) {
-
-        if (tutorialObjectsInPlay[i].tl == 0 && tutorialObjectsInPlay[i].tr == 0 && tutorialObjectsInPlay[i].br == 0 && tutorialObjectsInPlay[i].bl == 0) {
-          madeSquare = true;
-        } else if (tutorialObjectsInPlay[i].tl == 1 && tutorialObjectsInPlay[i].tr == 1 && tutorialObjectsInPlay[i].br == 1 && tutorialObjectsInPlay[i].bl == 1) {
-          madeCircle = true;
-        }
-
-        var findMorph = tutorialObjectsInPlay[i].getChildByName("morph");
-          if (findMorph != null) {
-            removeMorph(tutorialObjectsInPlay[i],findMorph);
-          }
-        tutorialObjectsInPlay[i].alpha = 1;
-        }
-
-      if (switchCount == 1) { 
-
-        startOverlay.addChild(whiteCircle,whiteCheck,blackSquare,blackCheck);
-
-        createjs.Ticker.setPaused(false);
-        createjs.Tween.get(tutorialText2).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1470,"Player one's goal is to make complete circles. Player two's goal is to make complete squares."]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn);
-        createjs.Tween.get(tutorialText1).call(replaceText,[tutorialText1,centerX-100,1800,"Try making both:"]).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
-        createjs.Tween.get(whiteCircle).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn);
-        createjs.Tween.get(blackSquare).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn);
-        createjs.Tween.get(whiteCheck).wait(1200).to({alpha:.05}, 400, createjs.Ease.cubicIn);
-        if (madeSquare == true) {
-          createjs.Tween.get(blackCheck).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
-        } else {
-          createjs.Tween.get(blackCheck).wait(1200).to({alpha:.05}, 400, createjs.Ease.cubicIn).call(rmAnim);
-        }
-      }
-
-      if (switchCount >= 2 && madeSquare == true && madeCircle == false) { 
-        createjs.Ticker.setPaused(false);
-        createjs.Tween.get(blackCheck).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
-      }
-
-      if (switchCount >= 2 && madeSquare == false && madeCircle == true) { 
-        createjs.Ticker.setPaused(false);
-        createjs.Tween.get(whiteCheck).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
-      }
-
-      if (switchCount >= 2 && madeSquare == true && madeCircle == true) { 
-
-        addButtonEvent(tryConditions);
-
-        tutorialNextButton.y = 1810;
-        tutorialNextLabel.y = 1820;
-        tutorialNextLabel.text = "GOT IT";
-
-        createjs.Ticker.setPaused(false);
-        createjs.Tween.get(tutorialText2).call(addAnim,[0]).to({alpha:0}, 100, createjs.Ease.cubicOut);
-        createjs.Tween.get(tutorialText1).to({y:tutorialText1.y-210},400, createjs.Ease.cubicInOut);
-        createjs.Tween.get(whiteCircle).to({y:whiteCircle.y-210},400, createjs.Ease.cubicInOut);
-        createjs.Tween.get(whiteCheck).to({y:whiteCheck.y-210},400, createjs.Ease.cubicInOut).to({alpha:1}, 400, createjs.Ease.cubicIn);
-        createjs.Tween.get(blackSquare).to({y:blackSquare.y-210},400, createjs.Ease.cubicInOut);
-        createjs.Tween.get(blackCheck).to({y:blackCheck.y-210},400, createjs.Ease.cubicInOut).to({alpha:1}, 400, createjs.Ease.cubicIn);
-        createjs.Tween.get(tutorialNextButton).wait(600).to({alpha:1}, 100, createjs.Ease.cubicIn);
-        createjs.Tween.get(tutorialNextLabel).wait(600).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
-    }
-
-      sequenceReadyLearn();
-      stage.update();
-    }
-
-    // PLAY SEQUENCE
-
-    function sequenceReadyLearn() {
-
-    playReady = false;
-
-    if (learnActions == true) {
-      if (sequence[3] != null) {
-        playReady = true;
-        playButton.addEventListener("mousedown",highlightButton);
-        playButton.addEventListener("pressup",playLearnAction);
-        playButton.alpha = 1;
-        playLabel.alpha = 1;
-      } else {
-        playReady = false;
-      }
-    }
-
-    if (playReady == false) {
-      playButton.removeAllEventListeners();
-      playButton.alpha = .5;
-      playLabel.alpha = .5;
-    }
-
-    stage.update();
-  }
-
-  function playLearnAction() {
-
-    switchCount++;
-
-    playButton.removeAllEventListeners();
-
-    window.setTimeout(clearSequenceLearn,1000);
-
-    deliverActionLearn([tutorialObjectsInPlay[0],tutorialObjectsInPlay[1],tutorialObjectsInPlay[2],tutorialObjectsInPlay[3]]);
-
-    actionTray.graphics
-    .clear()
-    .beginStroke(black).setStrokeStyle(8).beginFill(black)
-    .drawRoundRect(0,0,160,160,5);
-    stage.update();
-
-  }
-
-    function addButtonEvent(target) {
-      tutorialNextButton.addEventListener("mousedown",highlightButton);
-      tutorialNextButton.addEventListener("pressup",target);
-    }
-
-    function replaceText(toReplace,x,y,newText) {
-      toReplace.text = newText;
-      toReplace.x = x;
-      toReplace.y = y;
-    }
-
-    function highlightButton(event) {
-      if (event.currentTarget.name == "next") {
-        tutorialNextLabel.alpha = .5;
-      } else {
-        event.currentTarget.alpha = .5;
-      }
-      stage.update();
-    }
-
-    function returnToStart(event) {
-      tutorialObjectsInPlay = [];
-      startOverlay.removeAllChildren();
-      stage.update();
-      loadIntro();
-    }
-
-    function contactMe() {
-      contactText.alpha = 1;
-      stage.update();
-      //window.location = "mailto:hello@samwander.com";
-    }
-
-    // BEGIN GAME
-
-    function beginGame(event) {
-
-      createjs.Ticker.setPaused(false);
-
-      event.currentTarget.alpha = 1;
-      startOverlay.cache(0,0,canvas.width,canvas.height);
-      stage.removeChild(startOverlay);
-      sequence = [];
-      loadGame();
-      stage.addChild(startOverlay);
-      stage.update();
-
-      createjs.Tween.get(startOverlay, {override:true}).call(addAnim,[0]).to({y:canvas.height}, 600, createjs.Ease.cubicIn).call(handleBeginGame);
-      createjs.Tween.get(newGameLabel, {override:true}).call(addAnim,[0]).to({alpha:1}, 1600, createjs.Ease.cubicIn).call(rmAnim);
-      createjs.Tween.get(exitLabel, {override:true}).call(addAnim,[0]).to({alpha:1}, 1600, createjs.Ease.cubicIn).call(rmAnim);
-
-      function handleBeginGame() {
+      function cleanNext() {
         rmAnim();
-        startOverlay.uncache();
-        startOverlay.removeAllChildren();
-        stage.removeChild(startOverlay);
-        loadSelectors(selectorsP1);
-        window.setTimeout(popSelectors,2000,selectorsP2);
-      }   
-    }
-  } // end loadIntro
-
-  // ------------- ANIMATION -----------------
-
-  var endTweenCheck = 0;
-
-  function addAnim(t) {
-    animations.push(t);
-  }
-
-  function rmAnim(t) {
-    animations.pop();
-    endTween();
-  }
-
-  function tick(event) {
-    if (!event.paused) {
-      stage.update(event);
-    }
-  }
-
-  function endTween() {
-    if (animations.length < 1) {
-      endTweenCheck++;
-      if (endTweenCheck < 2) {
-      window.setTimeout(endTween,500);
-      } else {
-      createjs.Ticker.setPaused(true);
-      console.log("ticker paused");
-      endTweenCheck = 0;
+        nextOverlay.removeAllChildren();
+        stage.removeChild(nextOverlay);
       }
     }
   }
 
-  // ------------- UTILITIES -----------------
+  // INTERACTION
 
-  function rowVal (r,gridSize,gridSpacing,gridHeight) { // calcs row
-    var gridTop = ((gridHeight - ((gridSize-1) * gridSpacing))/2);
-    return (gridTop-gridSpacing)+((r+1)*gridSpacing)
+  function grabItemLearn(event) {
+
+    // re-opening sequence slot
+
+    if (event.currentTarget.parent == seqBox) {
+        sequence[event.currentTarget.inSlot] = null;
+        event.currentTarget.inSlot = false;
+      } 
+
+    // translate local to global, re-parent to stage
+
+    var pt = event.currentTarget.localToGlobal(event.currentTarget.x,event.currentTarget.y);
+    event.currentTarget.x = (pt.x - event.currentTarget.x);
+    event.currentTarget.y = (pt.y - event.currentTarget.y);
+    stage.addChild(event.currentTarget);
+
+    // slot highlighting
+
+    if (event.currentTarget.type == "logic") {
+        dropZone1.alpha = .7;
+    } else if (event.currentTarget.type == "action") {
+        dropZone3.alpha = .7;
+    } else {
+        dropZone0.alpha = .7;
+        dropZone2.alpha = .7; 
     }
-
-  function colVal (c,gridSize,gridSpacing) { // calcs col
-    var gridLeft = ((canvas.width - ((gridSize-1) * gridSpacing))/2);
-    return (gridLeft+(c*gridSpacing))
+    stage.update();
   }
 
-  function shuffle(array) {
-    var currentIndex = array.length, temporaryValue, randomIndex;
+  function snapToLearn(event) {
 
-    // While there remain elements to shuffle...
-    while (0 !== currentIndex) {
+    var pt = dzContainer.globalToLocal(event.stageX,event.stageY);
 
-      // Pick a remaining element...
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex -= 1;
+    // determine if dragged over a sequence slot, record which one
 
-      // And swap it with the current element.
-      temporaryValue = array[currentIndex];
-      array[currentIndex] = array[randomIndex];
-      array[randomIndex] = temporaryValue;
+    for (var i = 0; i < dzContainer.getObjectsUnderPoint(pt.x,pt.y,0).length; i++) {
+      if (dzContainer.getObjectsUnderPoint(pt.x,pt.y,0)[i].slot != null) {
+      dropPosition = dzContainer.getObjectsUnderPoint(pt.x,pt.y,0)[i];
+      }
     }
 
-    return array;
+    // if slot is open, drop in (otherwise return to item's original position)
+
+    if (dropPosition != null && sequence[dropPosition.slot] == null) {
+      addToSlotLearn(event.currentTarget,dropPosition);
+    } else if (dropPosition != null && sequence[dropPosition.slot] != null && (event.currentTarget.slotType == dropPosition.type)) {
+      returnToOriginLearn(sequence[dropPosition.slot],sequence[dropPosition.slot].originParent,sequence[dropPosition.slot].originX,sequence[dropPosition.slot].originY);
+      addToSlotLearn(event.currentTarget,dropPosition);
+    } else {
+      returnToOriginLearn(event.currentTarget,event.currentTarget.originParent,event.currentTarget.originX,event.currentTarget.originY);
+    }
+
+    // unhighlight slots
+
+    for (var i = 0; i < dzContainer.children.length; i++) {
+      if (dzContainer.children[i].slot != null) {
+        dzContainer.children[i].alpha = .25;
+      }
+    }
+
+    stage.update();
+    dropPosition = null;
+    sequenceReadyLearn();
   }
 
-  function arraysEqual(a, b) {
-    if (a === b) return true;
-    if (a == null || b == null) return false;
-    if (a.length != b.length) return false;
+  function addToSlotLearn(item,pos) {
 
-    for (var i = 0; i < a.length; ++i) {
-      if (a[i] !== b[i]) return false;
+    if (item.type == "position" || item.type == "shape") {
+
+      if (pos.slot % 2 == 0) { 
+        seqBox.addChild(item);
+        item.x = pos.x; 
+        item.y = pos.y;
+        item.inSlot = pos.slot;
+        sequence[pos.slot] = item;
+        targetGameObjectsLearn();
+        targetCount++;
+        if (showLogic == false && targetCount > 2) { showLogicItems(); }
+      } else { 
+        returnToOriginLearn(item,item.originParent,item.originX,item.originY);
+      }
+
+    } else if (item.type == "logic") {
+
+      if (pos.slot == 1) { 
+        seqBox.addChild(item);
+        item.x = pos.x; 
+        item.y = pos.y; 
+        item.inSlot = pos.slot;
+        sequence[pos.slot] = item;
+        targetGameObjectsLearn();
+
+        if (item.name == "AND") {
+          if (triedAnd == false) {
+            triedAnd = true;
+            createjs.Ticker.setPaused(false);
+            createjs.Tween.get(whiteCheck).call(addAnim,[0]).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
+          }
+        } else {
+          if (triedOr == false) {
+            triedOr = true;
+            createjs.Ticker.setPaused(false);
+            createjs.Tween.get(blackCheck).call(addAnim,[0]).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
+          }
+        }
+
+        if (triedOr && triedAnd) {
+          if (triedBoth == false) {
+            triedBoth = true;
+            createjs.Ticker.setPaused(false);
+            createjs.Tween.get(tutorialText2).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1480,"Using AND targets any shapes that match both conditions. Using OR targets shapes that match either condition."]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn).call(handleGoToGame);
+            
+            function handleGoToGame() {
+              createjs.Tween.get(tutorialText1).wait(600).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(rmAnim);;
+              createjs.Tween.get(andCheck).wait(600).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(rmAnim);;
+              createjs.Tween.get(orCheck).wait(600).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(rmAnim);;
+              createjs.Tween.get(whiteCheck).wait(600).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(rmAnim);;
+              createjs.Tween.get(blackCheck).wait(600).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(rmAnim);;
+              createjs.Tween.get(tutorialNextButton).call(addAnim,[0]).wait(1400).to({alpha:1}, 100, createjs.Ease.cubicOut).call(rmAnim);
+              createjs.Tween.get(tutorialNextLabel).call(addAnim,[0]).wait(1400).to({alpha:1}, 400, createjs.Ease.cubicOut).call(rmAnim);
+              
+              addButtonEvent(finishTutorial);
+
+            }
+          }
+        }
+      } else { 
+        returnToOriginLearn(item,item.originParent,item.originX,item.originY); 
+      }
+
+    } else {
+
+      if (pos.slot == 3) { 
+        seqBox.addChild(item);
+        item.x = pos.x; 
+        item.y = pos.y; 
+        item.inSlot = pos.slot;
+        sequence[pos.slot] = item;
+      } else { 
+        returnToOriginLearn(item,item.originParent,item.originX,item.originY); 
+      }
+
     }
-    return true;
+    stage.update();
   }
 
-  function getRandomInt(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
+  function returnToOriginLearn(item,parent,x,y) {
+    parent.addChild(item);
+    item.x = x;
+    item.y = y;
+    item.inSlot = false;
+    if (learnConditions == true) { targetGameObjectsLearn(); }
+    stage.update();
+  }
+
+  function targetGameObjectsLearn() {
+
+    var ruleSet = [];
+
+    // get items from trays
+
+    for (var i = 0; i < 3; i++) {
+      if (sequence[i] != null) {
+      var rule = extractRuleLearn(sequence[i]);
+      ruleSet.push(rule);
+      }
     }
+
+    // loop through objects and test for matches
+
+    for (i in tutorialObjectsInPlay) {
+
+      if (ruleSet.length == 3) {
+
+        if (ruleSet[1](ruleSet[0](tutorialObjectsInPlay[i]),ruleSet[2](tutorialObjectsInPlay[i]))) {
+          tutorialObjectsInPlay[i].alpha = 1;
+        } else {
+          tutorialObjectsInPlay[i].alpha = .2;
+        }
+
+      } else if (ruleSet.length == 2) {
+
+        if (showLogic == false) { showLogicItems(); }
+        tutorialObjectsInPlay[i].alpha = .2;
+   
+      } else if (ruleSet.length == 1) {
+
+        if (ruleSet[0](tutorialObjectsInPlay[i])) {
+          tutorialObjectsInPlay[i].alpha = 1;
+        } else {
+          tutorialObjectsInPlay[i].alpha = .2;
+        }
+      } else {
+        tutorialObjectsInPlay[i].alpha = .2;
+      }
+    }
+  }
+
+  function extractRuleLearn(rule) {
+
+    var ruleComponents;
+
+    if (rule.type == "position") {
+
+      if (rule.name == "col") {
+        ruleComponents = function(obj) {
+          if (obj.x == colVal(rule.val,2,380)) {return true;}
+        }
+      } else {
+        ruleComponents = function(obj) {
+        if (obj.y == rowVal(rule.val,2,380,1000)) {return true;}
+        }
+      }
+
+    } else if (rule.type == "shape") {
+
+        ruleComponents = function(obj) {
+          var shape = [obj.tl,obj.tr,obj.br,obj.bl];
+          if (arraysEqual(shape,rule.val)) {return true;}
+        }
+
+    } else if (rule.type == "logic") {
+
+        if (rule.name == "AND") {
+          ruleComponents = function(a,b) {if (a && b) {return true;}}
+        } else {
+          ruleComponents = function(a,b) {if (a || b) {return true;}}
+        }
+    }
+
+    return ruleComponents;
+
+  }
+  
+  function deliverActionLearn(targets) {
+
+    for (i in targets) {
+        sequence[3].func(targets[i]);
+    }
+  }
+
+  function clearSequenceLearn() {
+
+    var toClear = [];
+
+    for (var i = 0; i < seqBox.children.length; i++) {
+      if (seqBox.children[i].type != null) {
+        toClear.push(seqBox.children[i]);
+      }
+    }
+
+    for (var i = 0; i < toClear.length; i++) {
+      returnToOriginLearn(toClear[i],toClear[i].originParent,toClear[i].originX,toClear[i].originY);
+    }
+
+    for (var i = 0; i < 4; i++) {
+      sequence[i] = null;
+    }
+
+    actTray.graphics
+    .clear()
+    .beginStroke(yellow).setStrokeStyle(8).beginFill(black)
+    .drawRoundRect(0,0,160,160,5);
+
+
+    for (i in tutorialObjectsInPlay) {
+
+      if (tutorialObjectsInPlay[i].tl == 0 && tutorialObjectsInPlay[i].tr == 0 && tutorialObjectsInPlay[i].br == 0 && tutorialObjectsInPlay[i].bl == 0) {
+        madeSquare = true;
+      } else if (tutorialObjectsInPlay[i].tl == 1 && tutorialObjectsInPlay[i].tr == 1 && tutorialObjectsInPlay[i].br == 1 && tutorialObjectsInPlay[i].bl == 1) {
+        madeCircle = true;
+      }
+
+      var findMorph = tutorialObjectsInPlay[i].getChildByName("morph");
+        if (findMorph != null) {
+          removeMorph(tutorialObjectsInPlay[i],findMorph);
+        }
+      tutorialObjectsInPlay[i].alpha = 1;
+      }
+
+    if (switchCount == 1) { 
+
+      // startOverlay.addChild(whiteCircle,whiteCheck,blackSquare,blackCheck);
+
+      createjs.Ticker.setPaused(false);
+      createjs.Tween.get(tutorialText2).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1470,"Player one's goal is to make complete circles. Player two's goal is to make complete squares."]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn);
+      createjs.Tween.get(tutorialText1).call(replaceText,[tutorialText1,centerX-100,1800,"Try making both:"]).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
+      createjs.Tween.get(whiteCircle).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn);
+      createjs.Tween.get(blackSquare).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn);
+      createjs.Tween.get(whiteCheck).wait(1200).to({alpha:.05}, 400, createjs.Ease.cubicIn);
+      if (madeSquare == true) {
+        createjs.Tween.get(blackCheck).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
+      } else {
+        createjs.Tween.get(blackCheck).wait(1200).to({alpha:.05}, 400, createjs.Ease.cubicIn).call(rmAnim);
+      }
+    }
+
+    if (switchCount >= 2 && madeSquare == true && madeCircle == false) { 
+      createjs.Ticker.setPaused(false);
+      createjs.Tween.get(blackCheck).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
+    }
+
+    if (switchCount >= 2 && madeSquare == false && madeCircle == true) { 
+      createjs.Ticker.setPaused(false);
+      createjs.Tween.get(whiteCheck).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
+    }
+
+    if (switchCount >= 2 && madeSquare == true && madeCircle == true) { 
+
+      addButtonEvent(tryConditions);
+
+      tutorialNextButton.y = 1810;
+      tutorialNextLabel.y = 1820;
+      tutorialNextLabel.text = "GOT IT";
+
+      createjs.Ticker.setPaused(false);
+      createjs.Tween.get(tutorialText2).call(addAnim,[0]).to({alpha:0}, 100, createjs.Ease.cubicOut);
+      createjs.Tween.get(tutorialText1).to({y:tutorialText1.y-210},400, createjs.Ease.cubicInOut);
+      createjs.Tween.get(whiteCircle).to({y:whiteCircle.y-210},400, createjs.Ease.cubicInOut);
+      createjs.Tween.get(whiteCheck).to({y:whiteCheck.y-210},400, createjs.Ease.cubicInOut).to({alpha:1}, 400, createjs.Ease.cubicIn);
+      createjs.Tween.get(blackSquare).to({y:blackSquare.y-210},400, createjs.Ease.cubicInOut);
+      createjs.Tween.get(blackCheck).to({y:blackCheck.y-210},400, createjs.Ease.cubicInOut).to({alpha:1}, 400, createjs.Ease.cubicIn);
+      createjs.Tween.get(tutorialNextButton).wait(600).to({alpha:1}, 100, createjs.Ease.cubicIn);
+      createjs.Tween.get(tutorialNextLabel).wait(600).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
+  }
+
+    sequenceReadyLearn();
+    stage.update();
+  }
+
+  // PLAY SEQUENCE
+
+  function sequenceReadyLearn() {
+
+  playReady = false;
+
+  if (learnActions == true) {
+    if (sequence[3] != null) {
+      playReady = true;
+      playButtonLearn.addEventListener("mousedown",highlightButton);
+      playButtonLearn.addEventListener("pressup",playLearnAction);
+      playButtonLearn.alpha = 1;
+      playLabelLearn.alpha = 1;
+    } else {
+      playReady = false;
+    }
+  }
+
+  if (playReady == false) {
+    playButtonLearn.removeAllEventListeners();
+    playButtonLearn.alpha = .5;
+    playLabelLearn.alpha = .5;
+  }
+
+  stage.update();
+}
+
+function playLearnAction() {
+
+  switchCount++;
+
+  playButtonLearn.removeAllEventListeners();
+
+  window.setTimeout(clearSequenceLearn,1000);
+
+  deliverActionLearn([tutorialObjectsInPlay[0],tutorialObjectsInPlay[1],tutorialObjectsInPlay[2],tutorialObjectsInPlay[3]]);
+
+  actTray.graphics
+  .clear()
+  .beginStroke(black).setStrokeStyle(8).beginFill(black)
+  .drawRoundRect(0,0,160,160,5);
+  stage.update();
+
+}
+
+  function addButtonEvent(target) {
+    tutorialNextButton.addEventListener("mousedown",highlightButton);
+    tutorialNextButton.addEventListener("pressup",target);
+  }
+
+  function replaceText(toReplace,x,y,newText) {
+    toReplace.text = newText;
+    toReplace.x = x;
+    toReplace.y = y;
+  }
+
+  function highlightButton(event) {
+    if (event.currentTarget.name == "next") {
+      tutorialNextLabel.alpha = .5;
+    } else {
+      event.currentTarget.alpha = .5;
+    }
+    stage.update();
+  }
+
+  function returnToStart(event) {
+    tutorialObjectsInPlay = [];
+    logo.removeAllChildren();
+    //startOverlay.removeAllChildren();
+    stage.update();
+    loadIntro();
+  }
+
+  function contactMe() {
+    contactText.alpha = 1;
+    stage.update();
+    //window.location = "mailto:hello@samwander.com";
+  }
+
+  // BEGIN GAME
+
+  function beginGame(event) {
+
+    createjs.Ticker.setPaused(false);
+
+    event.currentTarget.alpha = 1;
+    startOverlay.cache(0,0,canvas.width,canvas.height);
+    stage.removeChild(startOverlay);
+    sequence = [];
+    loadGame();
+    stage.addChild(startOverlay);
+    stage.update();
+
+    createjs.Tween.get(startOverlay, {override:true}).call(addAnim,[0]).to({y:canvas.height}, 600, createjs.Ease.cubicIn).call(handleBeginGame);
+    createjs.Tween.get(newGameLabel, {override:true}).call(addAnim,[0]).to({alpha:1}, 1600, createjs.Ease.cubicIn).call(rmAnim);
+    createjs.Tween.get(exitLabel, {override:true}).call(addAnim,[0]).to({alpha:1}, 1600, createjs.Ease.cubicIn).call(rmAnim);
+
+    function handleBeginGame() {
+      rmAnim();
+      startOverlay.uncache();
+      startOverlay.removeAllChildren();
+      stage.removeChild(startOverlay);
+      loadSelectors(selectorsP1);
+      window.setTimeout(popSelectors,2000,selectorsP2);
+    }   
+  }
+} // end loadIntro
+
+// ------------- ANIMATION -----------------
+
+var endTweenCheck = 0;
+
+function addAnim(t) {
+  animations.push(t);
+}
+
+function rmAnim(t) {
+  animations.pop();
+  endTween();
+}
+
+function tick(event) {
+  if (!event.paused) {
+    stage.update(event);
+  }
+}
+
+function endTween() {
+  if (animations.length < 1) {
+    endTweenCheck++;
+    if (endTweenCheck < 2) {
+    window.setTimeout(endTween,500);
+    } else {
+    createjs.Ticker.setPaused(true);
+    console.log("ticker paused");
+    endTweenCheck = 0;
+    }
+  }
+}
+
+// ------------- UTILITIES -----------------
+
+function rowVal (r,gridSize,gridSpacing,gridHeight) { // calcs row
+  var gridTop = ((gridHeight - ((gridSize-1) * gridSpacing))/2);
+  return (gridTop-gridSpacing)+((r+1)*gridSpacing)
+  }
+
+function colVal (c,gridSize,gridSpacing) { // calcs col
+  var gridLeft = ((canvas.width - ((gridSize-1) * gridSpacing))/2);
+  return (gridLeft+(c*gridSpacing))
+}
+
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
+
+function arraysEqual(a, b) {
+  if (a === b) return true;
+  if (a == null || b == null) return false;
+  if (a.length != b.length) return false;
+
+  for (var i = 0; i < a.length; ++i) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+}
+
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
 
 }
