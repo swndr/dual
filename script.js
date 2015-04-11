@@ -81,6 +81,7 @@ function init() {
 
   var startOverlay = new createjs.Container();
   var darkOverlay = new createjs.Container();
+  var winOverlay = new createjs.Container();
 
   // BOARD
 
@@ -998,8 +999,9 @@ function loadSelectors(set) {
   actionsBox.visible = false;
   gameObjects.visible = false;
   darkOverlay.visible = false;
+  winOverlay.visible = false;
 
-  stage.addChild(board,sequenceBox,selectorsBox,actionsBox,gameObjects,darkOverlay);
+  stage.addChild(board,sequenceBox,selectorsBox,actionsBox,gameObjects,winOverlay,darkOverlay);
 
   function loadGame() {
 
@@ -1345,6 +1347,10 @@ function loadSelectors(set) {
   }
 
   function play() {
+
+    selectorsBox.mouseEnabled = false;
+    sequenceBox.mouseEnabled = false;
+    actionsBox.mouseEnabled = false;
 
     playButton.alpha = 1;
     playButton.removeAllEventListeners();
@@ -1734,7 +1740,8 @@ function loadSelectors(set) {
       var victoryColor = lightGray;
     }
 
-    var winOverlay = new createjs.Container().set({x:0,y:canvas.height});
+    winOverlay.visible = true;
+    winOverlay.y = canvas.height;
 
     var winBG = new createjs.Shape();
     winBG.graphics.beginFill(pink).drawRect(0,0,canvas.width,(canvas.height-890));
@@ -1773,7 +1780,6 @@ function loadSelectors(set) {
     blackComplete.textAlign = "left";
 
     winOverlay.addChild(winBG,newGameBanner,newGameBannerText,victory,whiteTitle,whiteTurns,whiteConditions,whiteActions,whiteComplete,blackTitle,blackTurns,blackConditions,blackActions,blackComplete);
-    stage.addChild(winOverlay);
     selectorsBox.mouseEnabled = false;
     sequenceBox.mouseEnabled = false;
     actionsBox.mouseEnabled = false;
@@ -1816,6 +1822,10 @@ function loadSelectors(set) {
 
     clearSequence();
     sequenceReady();
+
+    selectorsBox.mouseEnabled = true;
+    sequenceBox.mouseEnabled = true;
+    actionsBox.mouseEnabled = true;
 
     if (whiteTurn.visible == true) {
 
@@ -1930,11 +1940,15 @@ function loadSelectors(set) {
     stage.update();
   }
 
-  function newGame() {
+  function newGame(event) {
 
     newGameLabel.alpha = 1;
 
-    showOverlay("NEW GAME",confirmNewGame);
+    if (event.currentTarget.name == "new") {
+      showOverlay("NEW GAME",confirmNewGame);
+    } else {
+      confirmNewGame();
+    }
 
     function confirmNewGame() {
 
@@ -1943,7 +1957,10 @@ function loadSelectors(set) {
 
       darkOverlay.visible = false;
 
-      //gameObjects.removeAllChildren();
+      if (winOverlay.visible == true) {
+        createjs.Ticker.setPaused(false);
+        createjs.Tween.get(winOverlay, {override:true}).call(addAnim,[0]).to({y:canvas.height}, 300, createjs.Ease.cubicInOut).call(rmAnim);
+      }
 
       objectsInPlay = [];
 
@@ -1998,7 +2015,6 @@ function loadSelectors(set) {
         rmAnim();
         startOverlay.uncache();
 
-        //gameObjects.removeAllChildren();
         objectsInPlay = [];
         newGameLabel.alpha = 0;
         exitLabel.alpha = 0;
@@ -2009,12 +2025,6 @@ function loadSelectors(set) {
         actionsBox.visible = false;
         gameObjects.visible = false;
         darkOverlay.visible = false;
-
-        // selectorsBox.mouseEnabled = true;
-        // sequenceBox.mouseEnabled = true;
-        // actionsBox.mouseEnabled = true;
-        // newGameButton.mouseEnabled = true;
-        // exitButton.mouseEnabled = true;
 
         clearSequence();
       }
