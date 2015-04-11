@@ -80,6 +80,8 @@ function init() {
   var animations = [];
 
   var startOverlay = new createjs.Container();
+  var darkOverlay = new createjs.Container();
+
   loadIntro();
 
   // BOARD
@@ -97,6 +99,8 @@ function init() {
 
   var boardGrid = new Grid(4,180,890,145);
   board.addChild(bg,boardGrid);
+
+  var gameObjects = new createjs.Container();
 
   // GAME MGMT & SCORES
 
@@ -987,6 +991,18 @@ function loadSelectors(set) {
 
   // ------------- ADD BOARD & GAME OBJECTS -------------------
 
+
+  // START WITH EVERYTHING HIDDEN
+
+  board.visible = false;
+  sequenceBox.visible = false;
+  selectorsBox.visible = false;
+  actionsBox.visible = false;
+  gameObjects.visible = false;
+  darkOverlay.visible = false;
+
+  stage.addChild(board,sequenceBox,selectorsBox,actionsBox,gameObjects,darkOverlay);
+
   function loadGame() {
 
     for (var i = 0; i < 10; i++) {
@@ -1019,10 +1035,15 @@ function loadSelectors(set) {
 
     sequenceTrayStart();
 
-    stage.addChild(board,sequenceBox,selectorsBox,actionsBox);
+    board.visible = true;
+    sequenceBox.visible = true;
+    selectorsBox.visible = true;
+    actionsBox.visible = true;
+    gameObjects.visible = true;
+
     popSelectors(selectorsP1);
     loadGameObjects(4);
-  
+    stage.update();
   }
 
   function loadGameObjects(gridSize) {
@@ -1040,16 +1061,15 @@ function loadSelectors(set) {
       fourm.x = colVal(column,4,180);
       fourm.y = rowVal(row,4,180,890);
       fourm.id = i;
+      fourm.name = "gameObject";
       fourm.complete = false;
 
       objectsInPlay.push(fourm);
-      stage.addChild(fourm);
+      gameObjects.addChild(fourm);
 
       column++;
 
     }
-
-    stage.update();
   }
 
   // ------------- INTERACTION ------------------
@@ -1128,7 +1148,6 @@ function loadSelectors(set) {
     for (var i = 0; i < dropZoneContainer.getObjectsUnderPoint(pt.x,pt.y,0).length; i++) {
       if (dropZoneContainer.getObjectsUnderPoint(pt.x,pt.y,0)[i].slot != null) {
       dropPosition = dropZoneContainer.getObjectsUnderPoint(pt.x,pt.y,0)[i];
-      console.log(dropPosition);
       }
     }
 
@@ -1918,7 +1937,13 @@ function loadSelectors(set) {
     showOverlay("NEW GAME",confirmNewGame);
 
     function confirmNewGame() {
-      stage.removeAllChildren();
+
+      confirm.removeAllEventListeners();
+      cancel.removeAllEventListeners();
+
+      darkOverlay.visible = false;
+
+      gameObjects.removeAllChildren();
 
       objectsInPlay = [];
 
@@ -1955,6 +1980,11 @@ function loadSelectors(set) {
 
     function confirmExit() {
 
+      confirm.removeAllEventListeners();
+      cancel.removeAllEventListeners();
+
+      darkOverlay.visible = false;
+
       createjs.Ticker.setPaused(false);
 
       startOverlay.y = canvas.height;
@@ -1965,6 +1995,7 @@ function loadSelectors(set) {
 
       function prepNewGame() {
         rmAnim();
+        gameObjects.removeAllChildren();
         objectsInPlay = [];
         newGameLabel.alpha = 0;
         exitLabel.alpha = 0;
@@ -1985,35 +2016,44 @@ function loadSelectors(set) {
     stage.update();
   }
 
+  // SHOW OVERLAY
+
+  var darkOverlayBG = new createjs.Shape();
+  darkOverlayBG.graphics.beginFill(black).drawRect(0,0,canvas.width,canvas.height);
+  darkOverlayBG.alpha = .95;
+
+  var confirm = new createjs.Shape().set({x:0,y:500});
+  confirm.graphics.beginFill(black).drawRect(0,0,canvas.width,300);
+  confirm.alpha = 0.01;
+
+  var confirmLabel = new createjs.Text("","bold 100px Avenir-Heavy",white).set({x:centerX,y:600});
+  confirmLabel.textAlign = "center";
+
+  var cancel = new createjs.Shape().set({x:0,y:1200});
+  cancel.graphics.beginFill(black).drawRect(0,0,canvas.width,300);
+  cancel.alpha = 0.01;
+
+  var cancelLabel = new createjs.Text("CANCEL","bold 100px Avenir-Heavy",white).set({x:centerX,y:1300});
+  cancelLabel.textAlign = "center";
+
+  darkOverlay.addChild(darkOverlayBG,confirm,cancel,confirmLabel,cancelLabel);
+  stage.addChild(darkOverlay);
+
   function showOverlay(confirmText,confirmAction) {
 
     createjs.Ticker.setPaused(false);
 
-    var darkOverlay = new createjs.Container().set({x:0,y:0});
-    var darkOverlayBG = new createjs.Shape();
-    darkOverlayBG.graphics.beginFill(black).drawRect(0,0,canvas.width,canvas.height);
-    darkOverlayBG.alpha = .95;
+    darkOverlay.visible = true;
 
-    var confirm = new createjs.Shape().set({x:0,y:500});
-    confirm.graphics.beginFill(black).drawRect(0,0,canvas.width,300);
-    confirm.alpha = 0.01;
     confirm.addEventListener("mousedown",highlightConfirm);
     confirm.addEventListener("pressup",confirmAction);
 
-    var confirmLabel = new createjs.Text(confirmText,"bold 100px Avenir-Heavy",white).set({x:centerX,y:600});
-    confirmLabel.textAlign = "center";
+    confirmLabel.text = confirmText;
+    confirmLabel.alpha = 1;
 
-    var cancel = new createjs.Shape().set({x:0,y:1200});
-    cancel.graphics.beginFill(black).drawRect(0,0,canvas.width,300);
-    cancel.alpha = 0.01;
     cancel.addEventListener("mousedown",highlightCancel);
     cancel.addEventListener("pressup",cancelAction);
-
-    var cancelLabel = new createjs.Text("CANCEL","bold 100px Avenir-Heavy",white).set({x:centerX,y:1300});
-    cancelLabel.textAlign = "center";
-
-    darkOverlay.addChild(darkOverlayBG,confirm,cancel,confirmLabel,cancelLabel);
-    stage.addChild(darkOverlay);
+    cancelLabel.alpha = 1;
 
     darkOverlay.mouseEnabled = true;
     selectorsBox.mouseEnabled = false;
@@ -2035,9 +2075,13 @@ function loadSelectors(set) {
     }
 
     function cancelAction() {
+
+      confirm.removeAllEventListeners();
+      cancel.removeAllEventListeners();
+
       createjs.Ticker.setPaused(false);
       createjs.Tween.get(darkOverlay, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicOut).call(rmAnim);
-      stage.removeChild(darkOverlay);
+      darkOverlay.visible = false;
       stage.update();
       selectorsBox.mouseEnabled = true;
       sequenceBox.mouseEnabled = true;
@@ -3087,6 +3131,8 @@ function loadSelectors(set) {
 
     function showNext() {
 
+      next.removeAllEventListeners();
+
       createjs.Ticker.setPaused(false);
 
       next.alpha = 1;
@@ -3108,7 +3154,6 @@ function loadSelectors(set) {
       closeNext.addEventListener("mousedown",highlightButton);
       closeNext.addEventListener("pressup",nextToStart);
 
-
       var nTitle = new createjs.Text("DUAL was designed to introduce some basic programming concepts.","bold 60px Avenir-Book", white).set({x:centerX,y:250});
       nTitle.lineWidth = 1200;
       nTitle.textAlign = "center";
@@ -3118,36 +3163,36 @@ function loadSelectors(set) {
       nSubTitle.lineHeight = 55;
       nSubTitle.textAlign = "center";
 
-      var nLoop = new createjs.Text("LOOP","200 60px Avenir-Medium", white).set({x:170,y:650});
-      nLoop.textAlign = "left";
-
-      var nLoopText = new createjs.Text("When you hit play, the program loops through every shape on the grid: first to check if each shape meets your set of conditions and then to perform each action in your sequence.","200 40px Avenir-Medium", white).set({x:650,y:650});
-      nLoopText.lineWidth = 700;
-      nLoopText.lineHeight = 55;
-      nLoopText.textAlign = "left";
-
-      var nSelection = new createjs.Text("SELECTION","200 60px Avenir-Medium", white).set({x:170,y:1000});
+      var nSelection = new createjs.Text("SELECTION","200 60px Avenir-Medium", white).set({x:170,y:650});
       nSelection.textAlign = "left";
 
-      var nSelectionText = new createjs.Text("When you use conditions you\'re testing to see if shapes return TRUE or FALSE. In code these are called conditional statements. You also learned about logical operators: when you use AND a program returns true if both conditions are met. OR returns true if either condition is met.","200 40px Avenir-Medium", white).set({x:650,y:1000});
+      var nSelectionText = new createjs.Text("When you use conditions you\'re testing to see if shapes return TRUE or FALSE. In code these are called conditional statements. You also learned about logical operators: when you use AND a program returns true if both conditions are met. OR returns true if either condition is met.","200 40px Avenir-Medium", white).set({x:650,y:650});
       nSelectionText.lineWidth = 700;
       nSelectionText.lineHeight = 55;
       nSelectionText.textAlign = "left";
 
-      var nSequence = new createjs.Text("SEQUENCE","200 60px Avenir-Medium", white).set({x:170,y:1500});
+      var nSequence = new createjs.Text("SEQUENCE","200 60px Avenir-Medium", white).set({x:170,y:1150});
       nSequence.textAlign = "left";
 
-      var nSeqText = new createjs.Text("A program reads code in sequential order, responding to changing states as it goes along. This is exactly how your sequences work each turn.","200 40px Avenir-Medium", white).set({x:650,y:1500});
+      var nSeqText = new createjs.Text("A program reads code in sequential order, responding to changing states as it goes along. This is exactly how your sequences work each turn.","200 40px Avenir-Medium", white).set({x:650,y:1150});
       nSeqText.lineWidth = 700;
       nSeqText.lineHeight = 55;
       nSeqText.textAlign = "left";
+
+      var nLoop = new createjs.Text("LOOP","200 60px Avenir-Medium", white).set({x:170,y:1430});
+      nLoop.textAlign = "left";
+
+      var nLoopText = new createjs.Text("When you hit play, the program loops through every shape on the grid: first to check if each shape meets your set of conditions and then to perform each action in your sequence.","200 40px Avenir-Medium", white).set({x:650,y:1430});
+      nLoopText.lineWidth = 700;
+      nLoopText.lineHeight = 55;
+      nLoopText.textAlign = "left";
 
       var nConclusion = new createjs.Text("If you enjoy playing DUAL you might like to learn more about programming.","200 40px Avenir-Medium", white).set({x:centerX,y:1800});
       nConclusion.lineWidth = 800;
       nConclusion.lineHeight = 55;
       nConclusion.textAlign = "center";
 
-      nextOverlay.addChild(nextOverlayBG,closeNext,nTitle,nSubTitle,nLoop,nLoopText,nSelection,nSelectionText,nSequence,nSeqText,nConclusion);
+      nextOverlay.addChild(nextOverlayBG,closeNext,nTitle,nSubTitle,nSelection,nSelectionText,nSequence,nSeqText,nLoop,nLoopText,nConclusion);
       stage.addChild(nextOverlay);
 
       createjs.Tween.get(startOverlay, {override:true}).call(addAnim,[0]).to({y:-canvas.height}, 600, createjs.Ease.cubicIn);
@@ -3155,6 +3200,9 @@ function loadSelectors(set) {
 
 
       function nextToStart() {
+
+        next.addEventListener("mousedown",highlightButton);
+        next.addEventListener("pressup",showNext);
 
         createjs.Ticker.setPaused(false);
         createjs.Tween.get(startOverlay, {override:true}).call(addAnim,[0]).to({y:0}, 600, createjs.Ease.cubicIn);
@@ -3586,7 +3634,7 @@ function loadSelectors(set) {
 
       event.currentTarget.alpha = 1;
       startOverlay.cache(0,0,canvas.width,canvas.height);
-      stage.removeAllChildren();
+      stage.removeChild(startOverlay);
       sequence = [];
       loadGame();
       stage.addChild(startOverlay);
