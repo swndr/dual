@@ -36,10 +36,15 @@ function init() {
   var rowSelectors = [];
   var colSelectors = [];
   var shapeSelectors = [];
-  var shuffledRowSelectors;
-  var shuffledColSelectors;
-  var shuffledShapeSelectors;
-  var shuffledSelectors = [];
+
+  var shuffledRowSelectorsP1;
+  var shuffledColSelectorsP1;
+  var shuffledShapeSelectorsP1;
+
+  var shuffledRowSelectorsP2;
+  var shuffledColSelectorsP2;
+  var shuffledShapeSelectorsP2;
+
   var selectorsP1 = [];
   var selectorsP2 = [];
 
@@ -296,76 +301,87 @@ function init() {
   var RCRC = [0,1,0,1]; shapeSelectors.push(RCRC);
   var CRCR = [1,0,1,0]; shapeSelectors.push(CRCR);
 
-function popSelectors(set) {
+function popSelectorsP1() {
 
-  shuffledSelectors = [];
-
-  shuffledRowSelectors = shuffle(rowSelectors); // randomize pos selectors
-  shuffledColSelectors = shuffle(colSelectors); // randomize pos selectors
-  shuffledShapeSelectors = shuffle(shapeSelectors); // randomize shape selectors
+  shuffledRowSelectorsP1 = shuffle(rowSelectors); // randomize pos selectors
+  shuffledColSelectorsP1 = shuffle(colSelectors); // randomize pos selectors
+  shuffledShapeSelectorsP1 = shuffle(shapeSelectors); // randomize shape selectors
 
     for (var i = 0; i < 10; i++) {
       if (i < 2) {
-        shuffledSelectors[i] = shuffledRowSelectors[i];
+        selectorsP1[i] = shuffledRowSelectorsP1[i];
+        //selectorsP1[i].new = true;
       } else if (i >= 2 && i < 4) {
-        shuffledSelectors[i] = shuffledColSelectors[i];
+        selectorsP1[i] = shuffledColSelectorsP1[i];
+        //selectorsP1[i].new = true;
       } else {
-        shuffledSelectors[i] = new ShapeButton(shuffledShapeSelectors[i][0],shuffledShapeSelectors[i][1],shuffledShapeSelectors[i][2],shuffledShapeSelectors[i][3],0,0);
+        selectorsP1[i] = new ShapeButton(shuffledShapeSelectorsP1[i][0],shuffledShapeSelectorsP1[i][1],shuffledShapeSelectorsP1[i][2],shuffledShapeSelectorsP1[i][3],0,0);
+        //selectorsP1[i].new = true;
       }
     }
 
-  function buildSet(set) {
-
-    if (comparePosSets(shuffledSelectors,set,0,2)) {
-      shuffledRowSelectors = shuffle(rowSelectors); // randomize pos selectors
-      for (var i = 0; i < 2; i++) { shuffledSelectors[i] = shuffledRowSelectors[i];}
-      buildSet(set);
-    }
-    
-    else if (comparePosSets(shuffledSelectors,set,2,4)) {
-      shuffledColSelectors = shuffle(colSelectors); // randomize pos selectors
-      for (var i = 2; i < 4; i++) { shuffledSelectors[i] = shuffledColSelectors[i];}
-      buildSet(set);
-    }
-
-    else if (compareShapeSets(shuffledSelectors,set,4,10)) {
-      shuffledShapeSelectors = shuffle(shapeSelectors); // randomize shape selectors
-      for (var i = 4; i < 10; i++) { shuffledSelectors[i] = new ShapeButton(shuffledShapeSelectors[i][0],shuffledShapeSelectors[i][1],shuffledShapeSelectors[i][2],shuffledShapeSelectors[i][3],0,0);}
-      buildSet(set);
-    }
-
-  function comparePosSets(newSet,currentSet,start,end) {
-
-    var duplicate = false;
-
-    for (var i = start; i < end; i++) {
-        for (var n = start; n < end; n++) {
-          if (currentSet[i] != null && (currentSet[i].val == newSet[n].val)) {
-            duplicate = true;
-          }
-        }
-      }
-      return duplicate;
-    }
-
-    function compareShapeSets(newSet,currentSet,start,end) {
-
-    var duplicate = false;
-
-    for (var i = start; i < end; i++) {
-        for (var n = start; n < end; n++) {
-          if (currentSet[i] != null && ((currentSet[i].val[0] == newSet[n].val[0]) && (currentSet[i].val[1] == newSet[n].val[1]) && (currentSet[i].val[2] == newSet[n].val[2]) && (currentSet[i].val[3] == newSet[n].val[3]))) {
-            duplicate = true;
-          }
-        }
-      }
-      return duplicate;
-    }
-
+    console.log(selectorsP1);
   }
 
-  buildSet(set);
-}
+  function popSelectorsP2() {
+
+  shuffledRowSelectorsP2 = shuffle(rowSelectors); // randomize pos selectors
+  shuffledColSelectorsP2 = shuffle(colSelectors); // randomize pos selectors
+  shuffledShapeSelectorsP2 = shuffle(shapeSelectors); // randomize shape selectors
+
+    for (var i = 0; i < 10; i++) {
+      if (i < 2) {
+        selectorsP2[i] = shuffledRowSelectorsP2[i];
+        //selectorsP2[i].new = true;
+      } else if (i >= 2 && i < 4) {
+        selectorsP2[i] = shuffledColSelectorsP2[i];
+        //selectorsP2[i].new = true;
+      } else {
+        selectorsP2[i] = new ShapeButton(shuffledShapeSelectorsP2[i][0],shuffledShapeSelectorsP2[i][1],shuffledShapeSelectorsP2[i][2],shuffledShapeSelectorsP2[i][3],0,0);
+        //selectorsP2[i].new = true;
+      }
+    }
+  }
+
+  function replaceSelectorsP1(selector) {
+    var replacement;
+
+    if (selector.name == "row") {
+      var extract = shuffledRowSelectorsP1.splice(getRandomInt(0,(shuffledRowSelectorsP1.length-1)),1,selector);
+    } else if (selector.name == "col") {
+      var extract = shuffledColSelectorsP1.splice(getRandomInt(0,(shuffledColSelectorsP1.length-1)),1,selector);
+    } else {
+      var extract = selectorsP1.splice(getRandomInt(3,(selectorsP1.length-1)),1,selector);
+    }
+
+    replacement = extract[0];
+
+    replacement.inSlot = false;
+    replacement.new = true;
+    console.log(replacement);
+
+    return replacement;
+  }
+
+  function replaceSelectorsP2(selector) {
+    var replacement;
+    
+    if (selector.name == "row") {
+      var extract = shuffledRowSelectorsP2.splice(getRandomInt(0,(shuffledRowSelectorsP2.length-1)),1,selector);
+    } else if (selector.name == "col") {
+      var extract = shuffledColSelectorsP2.splice(getRandomInt(0,(shuffledColSelectorsP2.length-1)),1,selector);
+    } else {
+      var extract = selectorsP2.splice(getRandomInt(3,(selectorsP2.length-1)),1,selector);
+    }
+
+    replacement = extract[0];
+
+    replacement.inSlot = false;
+    replacement.new = true;
+    console.log(replacement);
+
+    return replacement;
+  }
 
 function loadSelectors(set) {
 
@@ -386,7 +402,7 @@ function loadSelectors(set) {
 
   for (var i = 0; i < 10; i++) {
 
-    if (set[i] == null) {
+    if (set[i].new == true) {
 
         animateDuration = getRandomInt(200,500);
         elasticOriginX = getRandomInt(-200,200);
@@ -395,27 +411,27 @@ function loadSelectors(set) {
 
       if (!(i % 2)) {
 
-        shuffledSelectors[i].x = elasticOriginX;
-        shuffledSelectors[i].y = elasticOriginY;
-        shuffledSelectors[i].rotation = elasticRotation;
-        shuffledSelectors[i].originX = 34;
-        shuffledSelectors[i].originY = 110 + (buttonRow * (buttonSize + buttonMargin));
+        set[i].x = elasticOriginX;
+        set[i].y = elasticOriginY;
+        set[i].rotation = elasticRotation;
+        set[i].originX = 34;
+        set[i].originY = 110 + (buttonRow * (buttonSize + buttonMargin));
 
       } else {
 
-        shuffledSelectors[i].x = elasticOriginX;
-        shuffledSelectors[i].y = elasticOriginY;
-        shuffledSelectors[i].rotation = elasticRotation;
-        shuffledSelectors[i].originX = (34 + buttonSize + buttonMargin);
-        shuffledSelectors[i].originY = 110 + (buttonRow * (buttonSize + buttonMargin));
+        set[i].x = elasticOriginX;
+        set[i].y = elasticOriginY;
+        set[i].rotation = elasticRotation;
+        set[i].originX = (34 + buttonSize + buttonMargin);
+        set[i].originY = 110 + (buttonRow * (buttonSize + buttonMargin));
       }
 
-      var placeholder = new PlaceholderButton(shuffledSelectors[i].originX,shuffledSelectors[i].originY);
+      var placeholder = new PlaceholderButton(set[i].originX,set[i].originY);
 
-      selectorsBox.addChild(placeholder,shuffledSelectors[i]);
-      createjs.Tween.get(shuffledSelectors[i], {override:true}).call(addAnim,[0]).to({rotation:0,x:shuffledSelectors[i].originX,y:shuffledSelectors[i].originY}, animateDuration, createjs.Ease.backOut).call(rmAnim);
+      selectorsBox.addChild(placeholder,set[i]);
+      createjs.Tween.get(set[i], {override:true}).call(addAnim,[0]).to({rotation:0,x:set[i].originX,y:set[i].originY}, animateDuration, createjs.Ease.backOut).call(rmAnim);
 
-      set[i] = shuffledSelectors[i];
+      set[i].new = false;
 
     } else {
 
@@ -433,13 +449,12 @@ function loadSelectors(set) {
 
       var placeholder = new PlaceholderButton(set[i].x,set[i].y);
       selectorsBox.addChild(placeholder,set[i]);
-    }
+   }
 
     if (i % 2) { buttonRow++; }
 
   }
     stage.update();
-    //window.setTimeout(endTween,1500);
   }
 
   // LOGIC ITEMS
@@ -737,6 +752,7 @@ function loadSelectors(set) {
     posButton.name = axis;
     posButton.val = label;
     posButton.inSlot = false;
+    posButton.new = true;
     posButton.cache(0,0,buttonSize,buttonSize);
 
     return posButton;
@@ -810,6 +826,7 @@ function loadSelectors(set) {
     shapeButton.y = y;
     shapeButton.val = [tl,tr,br,bl];
     shapeButton.inSlot = false;
+    shapeButton.new = true;
     shapeButton.cache(0,0,buttonSize,buttonSize);
 
     return shapeButton;
@@ -1041,7 +1058,8 @@ function loadSelectors(set) {
     actionsBox.visible = true;
     gameObjects.visible = true;
 
-    popSelectors(selectorsP1);
+    popSelectorsP1();
+    popSelectorsP2();
     loadGameObjects(4);
     stage.update();
   }
@@ -1711,7 +1729,6 @@ function loadSelectors(set) {
     exitButton.addEventListener("mousedown",exitHighlight);
     exitButton.addEventListener("pressup",exit);
 
-
     clearSequence();
 
     gameOver = true;
@@ -1827,7 +1844,7 @@ function loadSelectors(set) {
     sequenceBox.mouseEnabled = true;
     actionsBox.mouseEnabled = true;
 
-    if (whiteTurn.visible == true) {
+    if (wTurn == true) {
 
       loadSelectors(selectorsP2);
 
@@ -1842,11 +1859,9 @@ function loadSelectors(set) {
 
       for (var i = 0; i < selectorsP1.length; i++) {
         if (selectorsP1[i].inSlot !== false) {
-          selectorsP1[i] = null;
+          selectorsP1[i] = replaceSelectorsP1(selectorsP1[i]);
         }
       }
-
-      window.setTimeout(popSelectors,2000,selectorsP1);
 
     } else {
 
@@ -1929,11 +1944,9 @@ function loadSelectors(set) {
 
       for (var i = 0; i < selectorsP2.length; i++) {
         if (selectorsP2[i].inSlot !== false) {
-          selectorsP2[i] = null;
+          selectorsP2[i] = replaceSelectorsP2(selectorsP2[i]);
         }
       }
-      
-      window.setTimeout(popSelectors,2000,selectorsP2);
 
     }
 
@@ -3379,7 +3392,7 @@ function loadSelectors(set) {
           startOverlayBG.graphics
           .clear()
           .beginFill(green).drawRect(0,0,canvas.width,canvas.height);
-          popSelectors(selectorsP2);
+          popSelectorsP2();
         }
       }
     }
@@ -3861,7 +3874,7 @@ function playLearnAction() {
       exitButton.mouseEnabled = true;
 
       loadSelectors(selectorsP1);
-      window.setTimeout(popSelectors,2000,selectorsP2);
+      //window.setTimeout(popSelectors,2000,selectorsP2);
     }   
   }
 } // end loadIntro
