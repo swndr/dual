@@ -36,14 +36,21 @@ function init() {
   var rowSelectors = [];
   var colSelectors = [];
   var shapeSelectors = [];
+  var shapeArrays = [];
 
-  var shuffledRowSelectorsP1;
-  var shuffledColSelectorsP1;
-  var shuffledShapeSelectorsP1;
+  var shuffledSelectors = [];
 
-  var shuffledRowSelectorsP2;
-  var shuffledColSelectorsP2;
-  var shuffledShapeSelectorsP2;
+  var shuffledRowSelectors = [];
+  var shuffledColSelectors = [];
+  var shuffledShapeSelectors = [];
+
+  var shuffledRowSelectorsP1 = [];
+  var shuffledColSelectorsP1 = [];
+  var shuffledShapeSelectorsP1 = [];
+
+  var shuffledRowSelectorsP2 = [];
+  var shuffledColSelectorsP2 = [];
+  var shuffledShapeSelectorsP2 =[];
 
   var selectorsP1 = [];
   var selectorsP2 = [];
@@ -255,7 +262,6 @@ function init() {
  
   }
 
-
   function buildSequenceLocked(row) {
 
     var lockStatus = new createjs.Container().set({x:80,y:((row * 200) - 20)});
@@ -283,177 +289,143 @@ function init() {
 
   // shapes
 
-  var CCRR = [1,1,0,0]; shapeSelectors.push(CCRR);
-  var RRCC = [0,0,1,1]; shapeSelectors.push(RRCC);
-  var CRRC = [1,0,0,1]; shapeSelectors.push(CRRC);
-  var RCCR = [0,1,1,0]; shapeSelectors.push(RCCR);
+  var CCRR = [1,1,0,0]; shapeArrays.push(CCRR);
+  var RRCC = [0,0,1,1]; shapeArrays.push(RRCC);
+  var CRRC = [1,0,0,1]; shapeArrays.push(CRRC);
+  var RCCR = [0,1,1,0]; shapeArrays.push(RCCR);
 
-  var CRRR = [1,0,0,0]; shapeSelectors.push(CRRR);
-  var RCRR = [0,1,0,0]; shapeSelectors.push(RCRR);
-  var RRCR = [0,0,1,0]; shapeSelectors.push(RRCR);
-  var RRRC = [0,0,0,1]; shapeSelectors.push(RRRC);
+  var CRRR = [1,0,0,0]; shapeArrays.push(CRRR);
+  var RCRR = [0,1,0,0]; shapeArrays.push(RCRR);
+  var RRCR = [0,0,1,0]; shapeArrays.push(RRCR);
+  var RRRC = [0,0,0,1]; shapeArrays.push(RRRC);
 
-  var RCCC = [0,1,1,1]; shapeSelectors.push(RCCC);
-  var CRCC = [1,0,1,1]; shapeSelectors.push(CRCC);
-  var CCRC = [1,1,0,1]; shapeSelectors.push(CCRC);
-  var CCCR = [1,1,1,0]; shapeSelectors.push(CCCR);
+  var RCCC = [0,1,1,1]; shapeArrays.push(RCCC);
+  var CRCC = [1,0,1,1]; shapeArrays.push(CRCC);
+  var CCRC = [1,1,0,1]; shapeArrays.push(CCRC);
+  var CCCR = [1,1,1,0]; shapeArrays.push(CCCR);
 
-  var RCRC = [0,1,0,1]; shapeSelectors.push(RCRC);
-  var CRCR = [1,0,1,0]; shapeSelectors.push(CRCR);
+  var RCRC = [0,1,0,1]; shapeArrays.push(RCRC);
+  var CRCR = [1,0,1,0]; shapeArrays.push(CRCR);
 
-function popSelectorsP1() {
+  for (i in shapeArrays) {
+    var shapeSelector = new ShapeButton(shapeArrays[i][0],shapeArrays[i][1],shapeArrays[i][2],shapeArrays[i][3],0,0);
+    shapeSelectors.push(shapeSelector);
+  }
 
-  shuffledRowSelectorsP1 = shuffle(rowSelectors); // randomize pos selectors
-  shuffledColSelectorsP1 = shuffle(colSelectors); // randomize pos selectors
-  shuffledShapeSelectorsP1 = shuffle(shapeSelectors); // randomize shape selectors
+
+function popSelectors() {
+
+  var shuffledSelectors = new Array(10);
+
+  shuffledRowSelectors = shuffle(rowSelectors).slice(); // randomize pos selectors
+  shuffledColSelectors = shuffle(colSelectors).slice(); // randomize pos selectors
+  shuffledShapeSelectors = shuffle(shapeSelectors).slice(); // randomize shape selectors
 
     for (var i = 0; i < 10; i++) {
       if (i < 2) {
-        selectorsP1[i] = shuffledRowSelectorsP1[i];
-        //selectorsP1[i].new = true;
+        shuffledSelectors[i] = shuffledRowSelectors.shift();
       } else if (i >= 2 && i < 4) {
-        selectorsP1[i] = shuffledColSelectorsP1[i];
-        //selectorsP1[i].new = true;
+        shuffledSelectors[i] = shuffledColSelectors.shift();
       } else {
-        selectorsP1[i] = new ShapeButton(shuffledShapeSelectorsP1[i][0],shuffledShapeSelectorsP1[i][1],shuffledShapeSelectorsP1[i][2],shuffledShapeSelectorsP1[i][3],0,0);
-        //selectorsP1[i].new = true;
+        shuffledSelectors[i] = shuffledShapeSelectors.shift();
       }
     }
 
-    console.log(selectorsP1);
+    return {
+      all: shuffledSelectors,
+      row: shuffledRowSelectors,
+      col: shuffledColSelectors,
+      shape: shuffledShapeSelectors
+    };
+  } 
+
+  function replaceSelectors(selector,set) {
+
+    if (selector.name == "row") {
+      var replacement = set.row.splice(getRandomInt(0,set.row.length-1),1,selector)[0];
+    } else if (selector.name == "col") {
+      var replacement = set.col.splice(getRandomInt(0,set.col.length-1),1,selector)[0];
+    } else if (selector.name == "shape") {
+      var replacement = set.shape.splice(getRandomInt(0,set.shape.length-1),1,selector)[0];
+    }
+
+    replacement.inSlot = false;
+    replacement.refresh = true;
+    console.log(replacement);
+    return replacement;
   }
 
-  function popSelectorsP2() {
+  function loadSelectors(set) {
 
-  shuffledRowSelectorsP2 = shuffle(rowSelectors); // randomize pos selectors
-  shuffledColSelectorsP2 = shuffle(colSelectors); // randomize pos selectors
-  shuffledShapeSelectorsP2 = shuffle(shapeSelectors); // randomize shape selectors
+    createjs.Ticker.setPaused(false);
+
+    var toClear = [];
+    buttonRow = 0;
+
+    for (i in selectorsBox.children) {
+      if (selectorsBox.children[i].type == "position" || selectorsBox.children[i].type == "shape" || selectorsBox.children[i].type == "placeholder") {
+        toClear.push(selectorsBox.children[i]);
+      } 
+    }
+
+    for (var i = 0; i < toClear.length; i++) {
+        selectorsBox.removeChild(toClear[i]);
+      }
 
     for (var i = 0; i < 10; i++) {
-      if (i < 2) {
-        selectorsP2[i] = shuffledRowSelectorsP2[i];
-        //selectorsP2[i].new = true;
-      } else if (i >= 2 && i < 4) {
-        selectorsP2[i] = shuffledColSelectorsP2[i];
-        //selectorsP2[i].new = true;
-      } else {
-        selectorsP2[i] = new ShapeButton(shuffledShapeSelectorsP2[i][0],shuffledShapeSelectorsP2[i][1],shuffledShapeSelectorsP2[i][2],shuffledShapeSelectorsP2[i][3],0,0);
-        //selectorsP2[i].new = true;
-      }
-    }
-  }
+      console.log(set.all[i].refresh);
 
-  function replaceSelectorsP1(selector) {
-    var replacement;
+      if (set.all[i].refresh == true) {
 
-    if (selector.name == "row") {
-      var extract = shuffledRowSelectorsP1.splice(getRandomInt(0,(shuffledRowSelectorsP1.length-1)),1,selector);
-    } else if (selector.name == "col") {
-      var extract = shuffledColSelectorsP1.splice(getRandomInt(0,(shuffledColSelectorsP1.length-1)),1,selector);
-    } else {
-      var extract = selectorsP1.splice(getRandomInt(3,(selectorsP1.length-1)),1,selector);
-    }
+          animateDuration = getRandomInt(200,500);
+          elasticOriginX = getRandomInt(-200,200);
+          elasticOriginY = getRandomInt(50,700);
+          elasticRotation = getRandomInt(-80,80);
 
-    replacement = extract[0];
+        if (!(i % 2)) {
 
-    replacement.inSlot = false;
-    replacement.new = true;
-    console.log(replacement);
+          set.all[i].x = elasticOriginX;
+          set.all[i].y = elasticOriginY;
+          set.all[i].rotation = elasticRotation;
+          set.all[i].originX = 34;
+          set.all[i].originY = 110 + (buttonRow * (buttonSize + buttonMargin));
 
-    return replacement;
-  }
+        } else {
 
-  function replaceSelectorsP2(selector) {
-    var replacement;
-    
-    if (selector.name == "row") {
-      var extract = shuffledRowSelectorsP2.splice(getRandomInt(0,(shuffledRowSelectorsP2.length-1)),1,selector);
-    } else if (selector.name == "col") {
-      var extract = shuffledColSelectorsP2.splice(getRandomInt(0,(shuffledColSelectorsP2.length-1)),1,selector);
-    } else {
-      var extract = selectorsP2.splice(getRandomInt(3,(selectorsP2.length-1)),1,selector);
-    }
+          set.all[i].x = elasticOriginX;
+          set.all[i].y = elasticOriginY;
+          set.all[i].rotation = elasticRotation;
+          set.all[i].originX = (34 + buttonSize + buttonMargin);
+          set.all[i].originY = 110 + (buttonRow * (buttonSize + buttonMargin));
+        }
 
-    replacement = extract[0];
+        var placeholder = new PlaceholderButton(set.all[i].originX,set.all[i].originY);
 
-    replacement.inSlot = false;
-    replacement.new = true;
-    console.log(replacement);
+        selectorsBox.addChild(placeholder,set.all[i]);
+        createjs.Tween.get(set.all[i], {override:true}).call(addAnim,[0]).to({rotation:0,x:set.all[i].originX,y:set.all[i].originY}, animateDuration, createjs.Ease.backOut).call(rmAnim);
 
-    return replacement;
-  }
-
-function loadSelectors(set) {
-
-  createjs.Ticker.setPaused(false);
-
-  var toClear = [];
-  buttonRow = 0;
-
-  for (i in selectorsBox.children) {
-    if (selectorsBox.children[i].type == "position" || selectorsBox.children[i].type == "shape" || selectorsBox.children[i].type == "placeholder") {
-      toClear.push(selectorsBox.children[i]);
-    } 
-  }
-
-  for (var i = 0; i < toClear.length; i++) {
-      selectorsBox.removeChild(toClear[i]);
-    }
-
-  for (var i = 0; i < 10; i++) {
-
-    if (set[i].new == true) {
-
-        animateDuration = getRandomInt(200,500);
-        elasticOriginX = getRandomInt(-200,200);
-        elasticOriginY = getRandomInt(50,700);
-        elasticRotation = getRandomInt(-80,80);
-
-      if (!(i % 2)) {
-
-        set[i].x = elasticOriginX;
-        set[i].y = elasticOriginY;
-        set[i].rotation = elasticRotation;
-        set[i].originX = 34;
-        set[i].originY = 110 + (buttonRow * (buttonSize + buttonMargin));
+        set.all[i].refresh = false;
 
       } else {
 
-        set[i].x = elasticOriginX;
-        set[i].y = elasticOriginY;
-        set[i].rotation = elasticRotation;
-        set[i].originX = (34 + buttonSize + buttonMargin);
-        set[i].originY = 110 + (buttonRow * (buttonSize + buttonMargin));
-      }
+        if (!(i % 2)) {
+          set.all[i].x = 34;
+          set.all[i].y = 110 + (buttonRow * (buttonSize + buttonMargin));
+          set.all[i].originX = set.all[i].x
+          set.all[i].originY = set.all[i].y
+        } else {
+          set.all[i].x = (34 + buttonSize + buttonMargin);
+          set.all[i].y = 110 + (buttonRow * (buttonSize + buttonMargin));
+          set.all[i].originX = set.all[i].x
+          set.all[i].originY = set.all[i].y
+        }
 
-      var placeholder = new PlaceholderButton(set[i].originX,set[i].originY);
+        var placeholder = new PlaceholderButton(set.all[i].x,set.all[i].y);
+        selectorsBox.addChild(placeholder,set.all[i]);
+     }
 
-      selectorsBox.addChild(placeholder,set[i]);
-      createjs.Tween.get(set[i], {override:true}).call(addAnim,[0]).to({rotation:0,x:set[i].originX,y:set[i].originY}, animateDuration, createjs.Ease.backOut).call(rmAnim);
-
-      set[i].new = false;
-
-    } else {
-
-      if (!(i % 2)) {
-        set[i].x = 34;
-        set[i].y = 110 + (buttonRow * (buttonSize + buttonMargin));
-        set[i].originX = set[i].x
-        set[i].originY = set[i].y
-      } else {
-        set[i].x = (34 + buttonSize + buttonMargin);
-        set[i].y = 110 + (buttonRow * (buttonSize + buttonMargin));
-        set[i].originX = set[i].x
-        set[i].originY = set[i].y
-      }
-
-      var placeholder = new PlaceholderButton(set[i].x,set[i].y);
-      selectorsBox.addChild(placeholder,set[i]);
-   }
-
-    if (i % 2) { buttonRow++; }
-
-  }
+      if (i % 2) { buttonRow++; }
+    }
     stage.update();
   }
 
@@ -752,7 +724,7 @@ function loadSelectors(set) {
     posButton.name = axis;
     posButton.val = label;
     posButton.inSlot = false;
-    posButton.new = true;
+    posButton.refresh = true;
     posButton.cache(0,0,buttonSize,buttonSize);
 
     return posButton;
@@ -824,9 +796,10 @@ function loadSelectors(set) {
     shapeButton.addChild(button,TL,TR,BR,BL);
     shapeButton.x = x;
     shapeButton.y = y;
+    shapeButton.name = "shape";
     shapeButton.val = [tl,tr,br,bl];
     shapeButton.inSlot = false;
-    shapeButton.new = true;
+    shapeButton.refresh = true;
     shapeButton.cache(0,0,buttonSize,buttonSize);
 
     return shapeButton;
@@ -1058,8 +1031,8 @@ function loadSelectors(set) {
     actionsBox.visible = true;
     gameObjects.visible = true;
 
-    popSelectorsP1();
-    popSelectorsP2();
+    selectorsP1 = popSelectors();
+    selectorsP2 = popSelectors();
     loadGameObjects(4);
     stage.update();
   }
@@ -1857,9 +1830,10 @@ function loadSelectors(set) {
       actionsBox.getChildByName("bg").graphics.beginFill(black);
       actionsBox.getChildByName("bg").graphics.drawRoundRect(0,0,336,1054,10);
 
-      for (var i = 0; i < selectorsP1.length; i++) {
-        if (selectorsP1[i].inSlot !== false) {
-          selectorsP1[i] = replaceSelectorsP1(selectorsP1[i]);
+      for (var i = 0; i < selectorsP1.all.length; i++) {
+        if (selectorsP1.all[i].inSlot !== false) {
+          var swap = replaceSelectors(selectorsP1.all[i],selectorsP1);
+          selectorsP1.all[i] = swap;
         }
       }
 
@@ -1942,9 +1916,10 @@ function loadSelectors(set) {
       actionsBox.getChildByName("bg").graphics.beginFill("#F9F9F9");
       actionsBox.getChildByName("bg").graphics.drawRoundRect(0,0,336,1054,10);
 
-      for (var i = 0; i < selectorsP2.length; i++) {
-        if (selectorsP2[i].inSlot !== false) {
-          selectorsP2[i] = replaceSelectorsP2(selectorsP2[i]);
+      for (var i = 0; i < selectorsP2.all.length; i++) {
+        if (selectorsP2.all[i].inSlot !== false) {
+          var swap = replaceSelectors(selectorsP2.all[i],selectorsP2);
+          selectorsP2.all[i] = swap;
         }
       }
 
