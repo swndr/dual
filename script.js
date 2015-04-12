@@ -87,6 +87,11 @@ function init() {
   bg.graphics.rect(0,0,canvas.width,890);
   bg.cache(0,0,canvas.width,890);
 
+  var winGrid = new createjs.Shape();
+  winGrid.graphics.beginFill(pink);
+  winGrid.graphics.rect(0,0,canvas.width,890);
+  winGrid.alpha = 0;
+
   // BUILD GRID
 
   var boardGrid = new Grid(4,180,890,145);
@@ -320,13 +325,6 @@ function generateConditions(set,p) {
     }
 
     return set;
-
-    // return {
-    //   all: shuffledSelectors,
-    //   row: rowSelectors,
-    //   col: colSelectors,
-    //   shape: shapeSelectors
-    // };
   }
 
 
@@ -1019,6 +1017,7 @@ function generateConditions(set,p) {
   // START WITH EVERYTHING HIDDEN
 
   board.visible = false;
+  winGrid.visible = false;
   sequenceBox.visible = false;
   selectorsBox.visible = false;
   actionsBox.visible = false;
@@ -1026,7 +1025,7 @@ function generateConditions(set,p) {
   darkOverlay.visible = false;
   winOverlay.visible = false;
 
-  stage.addChild(board,sequenceBox,selectorsBox,actionsBox,gameObjects,winOverlay,darkOverlay);
+  stage.addChild(board,winGrid,sequenceBox,selectorsBox,actionsBox,gameObjects,winOverlay,darkOverlay);
 
   function loadGame() {
 
@@ -1066,8 +1065,6 @@ function generateConditions(set,p) {
     actionsBox.visible = true;
     gameObjects.visible = true;
 
-    // selectorsP1 = popSelectors(1);
-    // selectorsP2 = popSelectors(2);
     selectorsP1 = generateConditions(selectorsP1,1);
     selectorsP2 = generateConditions(selectorsP2,2);
     loadGameObjects(4);
@@ -1769,6 +1766,7 @@ function generateConditions(set,p) {
     }
 
     winOverlay.visible = true;
+    winGrid.visible = true;
     winOverlay.y = canvas.height;
 
     var winBG = new createjs.Shape();
@@ -1785,26 +1783,26 @@ function generateConditions(set,p) {
     var victory = new createjs.Text(winner,"bold 100px Avenir-Heavy",victoryColor).set({x:centerX,y:90});
     victory.textAlign = "center";
 
-    var whiteTitle = new createjs.Text("WHITE /","bold 55px Avenir-Heavy",white).set({x:60,y:300});
+    var whiteTitle = new createjs.Text("WHITE /","bold 55px Avenir-Heavy",white).set({x:70,y:300});
     whiteTitle.textAlign = "left";
-    var whiteTurns = new createjs.Text(wTurns + " TURNS","100 55px Avenir-Book",white).set({x:60,y:400});
+    var whiteTurns = new createjs.Text(wTurns + " TURNS","100 55px Avenir-Book",white).set({x:70,y:400});
     whiteTurns.textAlign = "left"; 
-    var whiteConditions = new createjs.Text(wConditions + " CONDITIONS USED","100 55px Avenir-Book",white).set({x:60,y:500});
+    var whiteConditions = new createjs.Text(wConditions + " CONDITIONS USED","100 55px Avenir-Book",white).set({x:70,y:500});
     whiteConditions.textAlign = "left"; 
-    var whiteActions = new createjs.Text(wActions + " ACTIONS USED","100 55px Avenir-Book",white).set({x:60,y:600});
+    var whiteActions = new createjs.Text(wActions + " ACTIONS USED","100 55px Avenir-Book",white).set({x:70,y:600});
     whiteActions.textAlign = "left";
-    var whiteComplete = new createjs.Text(wComplete + " COMPLETED CIRCLES","100 55px Avenir-Book",white).set({x:60,y:700});
+    var whiteComplete = new createjs.Text(wComplete + " COMPLETED CIRCLES","100 55px Avenir-Book",white).set({x:70,y:700});
     whiteComplete.textAlign = "left"; 
 
     var blackTitle = new createjs.Text("BLACK /","bold 55px Avenir-Heavy",black).set({x:(canvas.width/2)+60,y:300});
     blackTitle.textAlign = "left";
-    var blackTurns = new createjs.Text(bTurns + " TURNS","100 55px Avenir-Book",black).set({x:(canvas.width/2)+60,y:400});
+    var blackTurns = new createjs.Text(bTurns + " TURNS","100 55px Avenir-Book",black).set({x:(canvas.width/2)+50,y:400});
     blackTurns.textAlign = "left"; 
-    var blackConditions = new createjs.Text(bConditions + " CONDITIONS USED","100 55px Avenir-Book",black).set({x:(canvas.width/2)+60,y:500});
+    var blackConditions = new createjs.Text(bConditions + " CONDITIONS USED","100 55px Avenir-Book",black).set({x:(canvas.width/2)+50,y:500});
     blackConditions.textAlign = "left"; 
-    var blackActions = new createjs.Text(bActions + " ACTIONS USED","100 55px Avenir-Book",black).set({x:(canvas.width/2)+60,y:600});
+    var blackActions = new createjs.Text(bActions + " ACTIONS USED","100 55px Avenir-Book",black).set({x:(canvas.width/2)+50,y:600});
     blackActions.textAlign = "left";
-    var blackComplete = new createjs.Text(bComplete + " COMPLETED SQUARES","100 55px Avenir-Book",black).set({x:(canvas.width/2)+60,y:700});
+    var blackComplete = new createjs.Text(bComplete + " COMPLETED SQUARES","100 55px Avenir-Book",black).set({x:(canvas.width/2)+50,y:700});
     blackComplete.textAlign = "left";
 
     winOverlay.addChild(winBG,newGameBanner,newGameBannerText,victory,whiteTitle,whiteTurns,whiteConditions,whiteActions,whiteComplete,blackTitle,blackTurns,blackConditions,blackActions,blackComplete);
@@ -1813,7 +1811,8 @@ function generateConditions(set,p) {
     actionsBox.mouseEnabled = false;
     stage.update();
 
-    createjs.Tween.get(winOverlay, {override:true}).wait(50).call(addAnim,[0]).to({y:890}, 300, createjs.Ease.cubicInOut).call(rmAnim);
+    createjs.Tween.get(winGrid, {override:true}).call(addAnim,[0]).to({alpha:1}, 200, createjs.Ease.cubicInOut);
+    createjs.Tween.get(winOverlay, {override:true}).wait(50).to({y:890}, 300, createjs.Ease.cubicInOut).call(rmAnim);
 
     function newGameBannerHighlight() {
       newGameBanner.alpha = .9;
@@ -1985,7 +1984,8 @@ function generateConditions(set,p) {
 
       if (winOverlay.visible == true) {
         createjs.Ticker.setPaused(false);
-        createjs.Tween.get(winOverlay, {override:true}).call(addAnim,[0]).to({y:canvas.height}, 300, createjs.Ease.cubicInOut).call(rmAnim);
+        createjs.Tween.get(winGrid, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicInOut);
+        createjs.Tween.get(winOverlay, {override:true}).to({y:canvas.height}, 300, createjs.Ease.cubicInOut).call(rmAnim);
       }
 
       objectsInPlay = [];
@@ -2017,8 +2017,10 @@ function generateConditions(set,p) {
         selectorsBox.removeChild(toClear[i]);
       }
 
-      loadGame();
+      winOverlay.visible = false;
+      winGrid.visible = false;
 
+      loadGame();
       stage.update();
 
       loadSelectors(selectorsP1);
@@ -3365,7 +3367,7 @@ function generateConditions(set,p) {
         tutorialNextButton.removeAllEventListeners();
         createjs.Ticker.setPaused(false);
 
-        createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,500,"You\'ll get a random set of conditions to play with each turn. Use these to target shapes on the grid."]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut).call(loadSelectors,[selectorsP1]);
+        createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,500,"You\'ll get a set of conditions to target shapes on the grid. Any you don\'t use will be available on your next turn."]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut).call(loadSelectors,[selectorsP1]);
         createjs.Tween.get(tutorialNextButton, {override:true}).to({alpha:0}, 100, createjs.Ease.cubicIn).wait(400).to({y:900},100).to({alpha:1}, 100, createjs.Ease.cubicIn);
         createjs.Tween.get(tutorialNextLabel, {override:true}).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(600).call(replaceText,[tutorialNextLabel,centerX,910,"NEXT"]).to({alpha:1}, 600, createjs.Ease.cubicIn).call(addButtonEvent,[showSeq]).wait(0).call(rmAnim);
         createjs.Tween.get(startOverlay, {override:true}).wait(400).to({y:-224}, 600, createjs.Ease.cubicIn);
@@ -3380,7 +3382,7 @@ function generateConditions(set,p) {
         tutorialNextButton.removeAllEventListeners();
         createjs.Ticker.setPaused(false);
 
-        createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,450,"Drop conditions and actions here then hit play. You can build longer sequences after each turn, up to four steps. With longer sequences, thinking ahead is key!"]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut);
+        createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,500,"Drop conditions and actions here then hit play. You can build longer sequences after each turn, up to four steps."]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut);
         
         createjs.Tween.get(selectorsBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
         createjs.Tween.get(sequenceBox, {override:true}).to({alpha:1}, 600, createjs.Ease.cubicIn);
@@ -3396,7 +3398,7 @@ function generateConditions(set,p) {
         tutorialNextButton.removeAllEventListeners();
         createjs.Ticker.setPaused(false);
 
-        createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,450,"As well as switching between round and square segments, you can flip and rotate whole shapes. With this power you can target many more shapes in a sequence."]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut);
+        createjs.Tween.get(tutorialText3, {override:true}).call(addAnim,[0]).to({alpha:0}, 200, createjs.Ease.cubicIn).wait(200).call(replaceText,[tutorialText3,centerX,450,"As well as switching between black and white segments, you can flip and rotate whole shapes. If you don't have a condition you need, see if flipping or rotating shapes helps!"]).wait(400).to({alpha:1}, 400, createjs.Ease.cubicOut);
         
         createjs.Tween.get(selectorsBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
         createjs.Tween.get(sequenceBox, {override:true}).to({alpha:.1}, 600, createjs.Ease.cubicIn);
@@ -3467,20 +3469,21 @@ function generateConditions(set,p) {
 
       document.getElementById("link").style.display="none";
 
-      learn.addEventListener("mousedown",highlightButton);
-      learn.addEventListener("pressup",beginTutorial);
-
-      start.addEventListener("mousedown",highlightButton);
-      start.addEventListener("pressup",beginGame);
-
-      next.addEventListener("mousedown",highlightButton);
-      next.addEventListener("pressup",showNext);
-
       createjs.Ticker.setPaused(false);
       createjs.Tween.get(startOverlay, {override:true}).call(addAnim,[0]).to({y:0}, 600, createjs.Ease.cubicIn);
       createjs.Tween.get(nextOverlay, {override:true}).to({y:canvas.height}, 600, createjs.Ease.cubicIn).call(cleanNext);
 
       function cleanNext() {
+
+        learn.addEventListener("mousedown",highlightButton);
+        learn.addEventListener("pressup",beginTutorial);
+
+        start.addEventListener("mousedown",highlightButton);
+        start.addEventListener("pressup",beginGame);
+
+        next.addEventListener("mousedown",highlightButton);
+        next.addEventListener("pressup",showNext);
+
         rmAnim();
         closeNext.alpha = 1;
         stage.removeChild(nextOverlay);
@@ -3924,7 +3927,6 @@ function playLearnAction() {
       exitButton.mouseEnabled = true;
 
       loadSelectors(selectorsP1);
-      //window.setTimeout(popSelectors,2000,selectorsP2);
     }   
   }
 } // end loadIntro
