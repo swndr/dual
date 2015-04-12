@@ -33,25 +33,6 @@ function init() {
   var playCount = 0;
   var playReady = false;
 
-  // var rowSelectors = [];
-  // var colSelectors = [];
-  // var shapeSelectors = [];
-  // var shapeArrays = [];
-
-  // var shuffledSelectors = [];
-
-  // var shuffledRowSelectors = [];
-  // var shuffledColSelectors = [];
-  // var shuffledShapeSelectors = [];
-
-  // var shuffledRowSelectorsP1 = [];
-  // var shuffledColSelectorsP1 = [];
-  // var shuffledShapeSelectorsP1 = [];
-
-  // var shuffledRowSelectorsP2 = [];
-  // var shuffledColSelectorsP2 = [];
-  // var shuffledShapeSelectorsP2 =[];
-
   var selectorsP1 = [];
   var selectorsP2 = [];
 
@@ -1961,7 +1942,7 @@ function generateConditions(set,p) {
         steps = 8;
 
       }
-      
+
       refreshSelectors(selectorsP2,selectorsP1);
 
       wTurn = true;
@@ -2021,6 +2002,21 @@ function generateConditions(set,p) {
       exitButton.mouseEnabled = true;
 
       clearSequence();
+
+      var toClear = [];
+
+      for (var i = 0; i < selectorsBox.children.length; i++) {
+        if (selectorsBox.children[i].slotType != null) {
+          if (selectorsBox.children[i].slotType == "condition") {
+          toClear.push(selectorsBox.children[i]);
+          }
+        }
+      }
+
+      for (var i = 0; i < toClear.length; i++) {
+        selectorsBox.removeChild(toClear[i]);
+      }
+
       loadGame();
 
       stage.update();
@@ -2072,6 +2068,21 @@ function generateConditions(set,p) {
         darkOverlay.visible = false;
 
         clearSequence();
+
+        var toClear = [];
+
+        for (var i = 0; i < selectorsBox.children.length; i++) {
+          if (selectorsBox.children[i].slotType != null) {
+            if (selectorsBox.children[i].slotType == "condition") {
+            toClear.push(selectorsBox.children[i]);
+            }
+          }
+        }
+
+        for (var i = 0; i < toClear.length; i++) {
+          selectorsBox.removeChild(toClear[i]);
+        }
+
       }
     }
   }
@@ -2797,45 +2808,49 @@ function generateConditions(set,p) {
   closeArrow.graphics.lineTo(120,60);
   closeNext.addChild(closeNextButton,closeArrow);
 
-  var nTitle = new createjs.Text("DUAL was designed to introduce some basic programming concepts.","bold 60px Avenir-Book", white).set({x:centerX,y:250});
+  var nTitle = new createjs.Text("DUAL was designed to introduce players to basic programming concepts.","400 60px Avenir-Heavy", white).set({x:centerX,y:250});
   nTitle.lineWidth = 1200;
   nTitle.textAlign = "center";
 
-  var nSubTitle = new createjs.Text("All computer programs are built from three simple structures: loop, selection and sequence (and now you know about them all).","200 40px Avenir-Medium", white).set({x:centerX,y:450});
+  var nSubTitle = new createjs.Text("All computer programs are built from three simple structures: selection, sequence and loop (and now you know about them all).","200 40px Avenir-Medium", white).set({x:centerX,y:450});
   nSubTitle.lineWidth = 1200;
   nSubTitle.lineHeight = 55;
   nSubTitle.textAlign = "center";
 
-  var nSelection = new createjs.Text("SELECTION","200 60px Avenir-Medium", white).set({x:170,y:650});
+  var nSelection = new createjs.Text("SELECTION","200 60px Avenir-Medium", white).set({x:170,y:640});
   nSelection.textAlign = "left";
 
-  var nSelectionText = new createjs.Text("When you use conditions you\'re testing to see if shapes return TRUE or FALSE. In code these are called conditional statements. You also learned about logical operators: when you use AND a program returns true if both conditions are met. OR returns true if either condition is met.","200 40px Avenir-Medium", white).set({x:650,y:650});
+  var nSelectionText = new createjs.Text("When you use conditions you\'re testing to see if shapes return TRUE or FALSE. In code these are called conditional statements. You also learned about logical operators: when you use AND a program returns true if both conditions are met. OR returns true if either condition is met.","200 40px Avenir-Medium", white).set({x:650,y:640});
   nSelectionText.lineWidth = 700;
   nSelectionText.lineHeight = 55;
   nSelectionText.textAlign = "left";
 
-  var nSequence = new createjs.Text("SEQUENCE","200 60px Avenir-Medium", white).set({x:170,y:1150});
+  var nSequence = new createjs.Text("SEQUENCE","200 60px Avenir-Medium", white).set({x:170,y:1140});
   nSequence.textAlign = "left";
 
-  var nSeqText = new createjs.Text("A program reads code in sequential order, responding to changing states as it goes along. This is exactly how your sequences work each turn.","200 40px Avenir-Medium", white).set({x:650,y:1150});
+  var nSeqText = new createjs.Text("A program reads code in sequential order, responding to changing states as it goes along. This is exactly how your sequences work each turn.","200 40px Avenir-Medium", white).set({x:650,y:1140});
   nSeqText.lineWidth = 700;
   nSeqText.lineHeight = 55;
   nSeqText.textAlign = "left";
 
-  var nLoop = new createjs.Text("LOOP","200 60px Avenir-Medium", white).set({x:170,y:1430});
+  var nLoop = new createjs.Text("LOOP","200 60px Avenir-Medium", white).set({x:170,y:1420});
   nLoop.textAlign = "left";
 
-  var nLoopText = new createjs.Text("When you hit play, the program loops through every shape on the grid: first to check if each shape meets your set of conditions and then to perform each action in your sequence.","200 40px Avenir-Medium", white).set({x:650,y:1430});
+  var nLoopText = new createjs.Text("When you hit play, the program loops through every shape on the grid: first to check if each shape meets your set of conditions and then to perform each action in your sequence.","200 40px Avenir-Medium", white).set({x:650,y:1420});
   nLoopText.lineWidth = 700;
   nLoopText.lineHeight = 55;
   nLoopText.textAlign = "left";
 
-  var nConclusion = new createjs.Text("If you enjoy playing DUAL you might like to learn more about programming.","200 40px Avenir-Medium", white).set({x:centerX,y:1800});
+  var nButton = new createjs.Shape().set({x:centerX-400,y:1770});
+  nButton.graphics.beginFill("#EAEAEA");
+  nButton.graphics.drawRoundRect(0,0,800,160,20);
+
+  var nConclusion = new createjs.Text("LEARN MORE","200 80px Avenir-Heavy", pink).set({x:centerX,y:1800});
   nConclusion.lineWidth = 800;
-  nConclusion.lineHeight = 55;
+  nConclusion.lineHeight = 65;
   nConclusion.textAlign = "center";
 
-  nextOverlay.addChild(nextOverlayBG,closeNext,nTitle,nSubTitle,nSelection,nSelectionText,nSequence,nSeqText,nLoop,nLoopText,nConclusion);
+  nextOverlay.addChild(nextOverlayBG,closeNext,nTitle,nSubTitle,nSelection,nSelectionText,nSequence,nSeqText,nLoop,nLoopText,nButton,nConclusion);
 
   startOverlay.visible = false;
   stage.addChild(startOverlay);
@@ -2955,10 +2970,6 @@ function generateConditions(set,p) {
     next.addEventListener("mousedown",highlightButton);
     next.addEventListener("pressup",showNext);
     next.alpha = 1;
-
-    contact.addEventListener("mousedown",highlightButton);
-    contact.addEventListener("click",contactMe);
-    contact.alpha = 1;
 
     seqBox.x = (canvas.width/2)+10;
     seqBox.y = 1125;
@@ -3424,7 +3435,6 @@ function generateConditions(set,p) {
           startOverlayBG.graphics
           .clear()
           .beginFill(green).drawRect(0,0,canvas.width,canvas.height);
-          popSelectorsP2();
         }
       }
     }
@@ -3432,6 +3442,8 @@ function generateConditions(set,p) {
 
   function showNext() {
 
+    learn.removeAllEventListeners();
+    start.removeAllEventListeners();
     next.removeAllEventListeners();
 
     createjs.Ticker.setPaused(false);
@@ -3444,10 +3456,22 @@ function generateConditions(set,p) {
     stage.addChild(nextOverlay);
 
     createjs.Tween.get(startOverlay, {override:true}).call(addAnim,[0]).to({y:-canvas.height}, 600, createjs.Ease.cubicIn);
-    createjs.Tween.get(nextOverlay, {override:true}).to({y:0}, 600, createjs.Ease.cubicIn).call(rmAnim);
+    createjs.Tween.get(nextOverlay, {override:true}).to({y:0}, 600, createjs.Ease.cubicIn).call(showLink);
 
+    function showLink() {
+      rmAnim();
+      document.getElementById("link").style.display="block";
+    }
 
     function nextToStart() {
+
+      document.getElementById("link").style.display="none";
+
+      learn.addEventListener("mousedown",highlightButton);
+      learn.addEventListener("pressup",beginTutorial);
+
+      start.addEventListener("mousedown",highlightButton);
+      start.addEventListener("pressup",beginGame);
 
       next.addEventListener("mousedown",highlightButton);
       next.addEventListener("pressup",showNext);
@@ -3597,7 +3621,7 @@ function generateConditions(set,p) {
         returnToOriginLearn(item,item.originParent,item.originX,item.originY); 
       }
 
-    } else {
+    } else if (item.type == "action") {
 
       if (pos.slot == 3) { 
         seqBox.addChild(item);
@@ -3869,12 +3893,6 @@ function playLearnAction() {
     } else {
       window.setTimeout(returnToStart,500);
     }
-  }
-
-  function contactMe() {
-    contactText.alpha = 1;
-    stage.update();
-    //window.location = "mailto:hello@samwander.com";
   }
 
   // BEGIN GAME
