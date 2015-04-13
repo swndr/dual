@@ -1988,6 +1988,10 @@ function generateConditions(set,p) {
         createjs.Tween.get(winOverlay, {override:true}).to({y:canvas.height}, 300, createjs.Ease.cubicInOut).call(rmAnim);
       }
 
+      for (i in objectsInPlay) {
+        objectsInPlay[i] = null;
+      }
+
       objectsInPlay = [];
 
       for (var i = 0; i < 10; i++) {
@@ -2057,6 +2061,10 @@ function generateConditions(set,p) {
       function prepNewGame() {
         rmAnim();
         startOverlay.uncache();
+
+        for (i in objectsInPlay) {
+          objectsInPlay[i] = null;
+        }
 
         objectsInPlay = [];
         newGameLabel.alpha = 0;
