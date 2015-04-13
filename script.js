@@ -2541,6 +2541,17 @@ function generateConditions(set,p) {
 
   // ------------ INTRO AND TUTORIAL -----------------------
 
+  var learnActions = false;
+  var learnConditions = false;
+  var switchCount = 0;
+  var targetCount = 0;
+  var showLogic = false;
+  var triedAnd = false;
+  var triedOr = false;
+  var triedBoth = false;
+  var madeCircle = false;
+  var madeSquare = false;
+
   var startOverlayBG = new createjs.Shape();
   startOverlayBG.graphics.beginFill(green).drawRect(0,0,canvas.width,canvas.height);
 
@@ -2861,16 +2872,16 @@ function generateConditions(set,p) {
 
   function loadIntro() {
 
-    var learnActions = false;
-    var learnConditions = false;
-    var switchCount = 0;
-    var targetCount = 0;
-    var showLogic = false;
-    var triedAnd = false;
-    var triedOr = false;
-    var triedBoth = false;
-    var madeCircle = false;
-    var madeSquare = false;
+    learnActions = false;
+    learnConditions = false;
+    switchCount = 0;
+    targetCount = 0;
+    showLogic = false;
+    triedAnd = false;
+    triedOr = false;
+    triedBoth = false;
+    madeCircle = false;
+    madeSquare = false;
 
     tutorialObjectsInPlay = [];
     logo.removeAllChildren();
@@ -2890,12 +2901,11 @@ function generateConditions(set,p) {
     actTray.visible = false;
     seqTray.visible = false;
     tutorialConditions.visible = false;
-    transformTLLearn.visible = false;
-    transformTRLearn.visible = false;
-    transformBRLearn.visible = false;
-    transformBLLearn.visible = false;
+    switchTutorial.visible = false;
     andLogicLearn.visible = false;
     orLogicLearn.visible = false;
+
+    playButtonLearn.removeAllEventListeners();
 
     startOverlay.addChild(startOverlayBG,tutorialGrid,logo,tagline,learn,start,next,closeTutorial,tutorialBG,tutorialTray,tutorialText1,tutorialText2,tutorialText3,tutorialNextButton,tutorialNextLabel,seqBox,switchTutorial,tutorialConditions,arrow,whiteCircle,whiteCheck,andCheck,orCheck,blackSquare,blackCheck);
 
@@ -2942,6 +2952,7 @@ function generateConditions(set,p) {
     tutorialNextButton.visible = false;
     tutorialNextLabel.visible = false;
 
+    switchTutorial.alpha = 0;
     seqBox.alpha = 0;
     arrow.alpha = 0;
 
@@ -2996,34 +3007,42 @@ function generateConditions(set,p) {
 
     // SWITCH ITEMS
 
+    transformTLLearn.removeAllEventListeners();
     transformTLLearn.addEventListener("mousedown",grabItemLearn);
     transformTLLearn.addEventListener("pressmove",dragAndDrop);
     transformTLLearn.addEventListener("pressup",snapToLearn);
-   
+    
+    transformTRLearn.removeAllEventListeners();
     transformTRLearn.addEventListener("mousedown",grabItemLearn);
     transformTRLearn.addEventListener("pressmove",dragAndDrop);
     transformTRLearn.addEventListener("pressup",snapToLearn);
  
+    transformBLLearn.removeAllEventListeners();
     transformBLLearn.addEventListener("mousedown",grabItemLearn);
     transformBLLearn.addEventListener("pressmove",dragAndDrop);
     transformBLLearn.addEventListener("pressup",snapToLearn);
    
+    transformBRLearn.removeAllEventListeners();
     transformBRLearn.addEventListener("mousedown",grabItemLearn);
     transformBRLearn.addEventListener("pressmove",dragAndDrop);
     transformBRLearn.addEventListener("pressup",snapToLearn);
   
+    rowSelectorLearn.removeAllEventListeners();
     rowSelectorLearn.addEventListener("mousedown",grabItemLearn);
     rowSelectorLearn.addEventListener("pressmove",dragAndDrop);
     rowSelectorLearn.addEventListener("pressup",snapToLearn);
   
+    colSelectorLearn.removeAllEventListeners();
     colSelectorLearn.addEventListener("mousedown",grabItemLearn);
     colSelectorLearn.addEventListener("pressmove",dragAndDrop);
     colSelectorLearn.addEventListener("pressup",snapToLearn);
     
+    shapeSelector1.removeAllEventListeners();
     shapeSelector1.addEventListener("mousedown",grabItemLearn);
     shapeSelector1.addEventListener("pressmove",dragAndDrop);
     shapeSelector1.addEventListener("pressup",snapToLearn);
-   
+    
+    shapeSelector2.removeAllEventListeners();
     shapeSelector2.addEventListener("mousedown",grabItemLearn);
     shapeSelector2.addEventListener("pressmove",dragAndDrop);
     shapeSelector2.addEventListener("pressup",snapToLearn);
@@ -3088,7 +3107,7 @@ function generateConditions(set,p) {
         createjs.Tween.get(tutorialText2).wait(400).to({alpha:1}, 400, createjs.Ease.cubicIn);
         createjs.Tween.get(tutorialNextButton).wait(200).to({alpha:1}, 100, createjs.Ease.cubicIn);
         createjs.Tween.get(tutorialNextLabel).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn);
-        createjs.Tween.get(closeTutorial).wait(1400).to({alpha:.9}, 400, createjs.Ease.cubicIn).call(readyToLoadTutorialItems);
+        createjs.Tween.get(closeTutorial).wait(1500).to({alpha:.9}, 200, createjs.Ease.cubicIn).call(readyToLoadTutorialItems);
 
         logo.y = 0;
         D.y = rowVal(0,2,380,1000);
@@ -3097,7 +3116,6 @@ function generateConditions(set,p) {
         U.uncache();
         A.y = rowVal(1,2,380,1000);
         A.uncache();
-
         L.y = rowVal(1,2,380,1000);
         L.uncache();
         stage.update();
@@ -3131,11 +3149,6 @@ function generateConditions(set,p) {
     actTray.visible = true;
     playButtonLearn.visible = true;
     playLabelLearn.visible = true;
-
-    transformTLLearn.visible = true;
-    transformTRLearn.visible = true;
-    transformBRLearn.visible = true;
-    transformBLLearn.visible = true;
     
     createjs.Tween.get(tutorialText1).call(addAnim,[0]).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut);
     createjs.Tween.get(tutorialText2).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1600,"Drag items into the action tray and hit play to see what happens."]).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn);
@@ -3244,10 +3257,6 @@ function generateConditions(set,p) {
       actTray.visible = false;
       playButtonLearn.visible = false;
       playLabelLearn.visible = false;
-      transformTLLearn.visible = false;
-      transformTRLearn.visible = false;
-      transformBRLearn.visible = false;
-      transformBLLearn.visible = false;
 
       andCheck.visible = true;
       orCheck.visible = true;
@@ -3733,6 +3742,7 @@ function generateConditions(set,p) {
     for (i in targets) {
         sequence[3].func(targets[i]);
     }
+
   }
 
   function clearSequenceLearn() {
@@ -3888,13 +3898,30 @@ function playLearnAction() {
   }
 
   function returnToStart(event) {
-    if (animations.length < 1) {
-      tutorialObjectsInPlay = [];
-      logo.removeAllChildren();
+    if (createjs.Ticker.paused == true) {
+
+      andCheck.visible = false;
+      orCheck.visible = false;
+      whiteCircle.visible = false;
+      whiteCheck.visible = false;
+      blackSquare.visible = false;
+      blackCheck.visible = false;
+      dropZone0.visible = false;
+      dropZone1.visible = false;
+      dropZone2.visible = false;
+      dropZone3.visible = false;
+      required.visible = false;
+      actTray.visible = false;
+      seqTray.visible = false;
+      tutorialConditions.visible = false;
+      switchTutorial.visible = false;
+      andLogicLearn.visible = false;
+      orLogicLearn.visible = false;
+
       stage.update();
       loadIntro();
     } else {
-      window.setTimeout(returnToStart,500);
+      window.setTimeout(returnToStart,300);
     }
   }
 
