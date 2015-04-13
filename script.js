@@ -346,7 +346,7 @@ function generateConditions(set,p) {
 
     replacement.inSlot = false;
     replacement.refresh = true;
-    console.log(replacement);
+    //console.log(replacement);
     return replacement;
   }
 
@@ -2900,8 +2900,8 @@ function generateConditions(set,p) {
     required.visible = false;
     actTray.visible = false;
     seqTray.visible = false;
-    tutorialConditions.visible = false;
-    switchTutorial.visible = false;
+    // tutorialConditions.visible = false;
+    // switchTutorial.visible = false;
     andLogicLearn.visible = false;
     orLogicLearn.visible = false;
 
@@ -2952,10 +2952,6 @@ function generateConditions(set,p) {
     tutorialNextButton.visible = false;
     tutorialNextLabel.visible = false;
 
-    switchTutorial.alpha = 0;
-    seqBox.alpha = 0;
-    arrow.alpha = 0;
-
     whiteCircle.x = centerX+210;
     whiteCircle.y = canvas.height-215;
     whiteCircle.alpha = 0;
@@ -2984,18 +2980,19 @@ function generateConditions(set,p) {
     next.addEventListener("pressup",showNext);
     next.alpha = 1;
 
+    seqBox.visible = false;
     seqBox.x = (canvas.width/2)+10;
     seqBox.y = 1125;
-    arrow.x = (canvas.width/2)-120;
-    arrow.y = 1170;
-
+    seqBox.alpha = 0;
+    switchTutorial.visible = false;
+    switchTutorial.alpha = 0;
+    tutorialConditions.visible = false;
     tutorialConditions.x = 310;
     tutorialConditions.alpha = 0;
-
-    seqBox.visible = false;
-    switchTutorial.visible = false;
-    tutorialConditions.visible = false;
     arrow.visible = false;
+    arrow.x = (canvas.width/2)-120;
+    arrow.y = 1170;
+    arrow.alpha = 0;
 
     startOverlay.visible = true;
     stage.update();
@@ -3101,8 +3098,6 @@ function generateConditions(set,p) {
 
       function tutorialReady() {
 
-        addButtonEvent(trySwitchingCorners);
-
         createjs.Tween.get(tutorialText1).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn);
         createjs.Tween.get(tutorialText2).wait(400).to({alpha:1}, 400, createjs.Ease.cubicIn);
         createjs.Tween.get(tutorialNextButton).wait(200).to({alpha:1}, 100, createjs.Ease.cubicIn);
@@ -3122,6 +3117,7 @@ function generateConditions(set,p) {
 
       function readyToLoadTutorialItems() {
         rmAnim();
+        addButtonEvent(trySwitchingCorners);
       }
     }
   }
@@ -3136,14 +3132,23 @@ function generateConditions(set,p) {
 
     sequence[3] = null;
 
+    tutorialTray.visible = true;
+    tutorialTray.alpha = 0;
     seqBox.visible = true;
+    seqBox.alpha = 0;
     switchTutorial.visible = true;
+    switchTutorial.alpha = 0;
     arrow.visible = true;
+    arrow.alpha = 0;
 
     whiteCircle.visible = true;
+    whiteCircle.alpha = 0;
     whiteCheck.visible = true;
+    whiteCheck.alpha = 0;
     blackSquare.visible = true;
+    blackSquare.alpha = 0;
     blackCheck.visible = true;
+    blackCheck.alpha = 0;
 
     dropZone3.visible = true;
     actTray.visible = true;
@@ -3154,10 +3159,10 @@ function generateConditions(set,p) {
     createjs.Tween.get(tutorialText2).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1600,"Drag items into the action tray and hit play to see what happens."]).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn);
     createjs.Tween.get(tutorialNextButton).wait(200).to({alpha:0}, 100, createjs.Ease.cubicOut);
     createjs.Tween.get(tutorialNextLabel).wait(200).to({alpha:0}, 400, createjs.Ease.cubicOut);
-    createjs.Tween.get(tutorialTray).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
-    createjs.Tween.get(switchTutorial).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn);
-    createjs.Tween.get(arrow).wait(1400).to({alpha:1}, 400, createjs.Ease.cubicIn);
-    createjs.Tween.get(seqBox).wait(1600).to({alpha:1}, 400, createjs.Ease.cubicIn).wait(200).call(rmAnim);
+    createjs.Tween.get(tutorialTray).to({alpha:0}).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(switchTutorial).to({alpha:0}).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(arrow).to({alpha:0}).wait(1400).to({alpha:1}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(seqBox).to({alpha:0}).wait(1600).to({alpha:1}, 400, createjs.Ease.cubicIn).wait(200).call(rmAnim);
 
   }
 
@@ -3300,10 +3305,10 @@ function generateConditions(set,p) {
 
     createjs.Tween.get(tutorialText2).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1480,"You can use one condition or two. If you want to use two you need to add one of these logic items."]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn);
     createjs.Tween.get(tutorialText1).call(replaceText,[tutorialText1,centerX-120,1810,"Try both:"]).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
-    createjs.Tween.get(andCheck).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
-    createjs.Tween.get(orCheck).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
-    createjs.Tween.get(whiteCheck).wait(800).to({alpha:.05}, 400, createjs.Ease.cubicIn);
-    createjs.Tween.get(blackCheck).wait(800).to({alpha:.05}, 400, createjs.Ease.cubicIn).call(rmAnim);
+    createjs.Tween.get(andCheck).to({alpha:0}).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(orCheck).to({alpha:0}).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(whiteCheck).to({alpha:0}).wait(800).to({alpha:.05}, 400, createjs.Ease.cubicIn);
+    createjs.Tween.get(blackCheck).to({alpha:0}).wait(800).to({alpha:.05}, 400, createjs.Ease.cubicIn).call(rmAnim);
 
     tutorialNextLabel.text = "GO TO GAME"
     tutorialNextButton.y = 1780;
@@ -3789,13 +3794,13 @@ function generateConditions(set,p) {
       createjs.Ticker.setPaused(false);
       createjs.Tween.get(tutorialText2).call(addAnim,[0]).to({alpha:0}, 400, createjs.Ease.cubicOut).call(replaceText,[tutorialText2,centerX,1470,"Player one's goal is to make complete circles. Player two's goal is to make complete squares."]).wait(200).to({alpha:1}, 400, createjs.Ease.cubicIn);
       createjs.Tween.get(tutorialText1).call(replaceText,[tutorialText1,centerX-100,1800,"Try making both:"]).wait(800).to({alpha:1}, 400, createjs.Ease.cubicIn);
-      createjs.Tween.get(whiteCircle).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn);
-      createjs.Tween.get(blackSquare).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn);
-      createjs.Tween.get(whiteCheck).wait(1200).to({alpha:.05}, 400, createjs.Ease.cubicIn);
+      createjs.Tween.get(whiteCircle).to({alpha:0,x:centerX+210,y:canvas.height-215}).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn);
+      createjs.Tween.get(blackSquare).to({alpha:0,x:centerX+170,y:canvas.height-155}).wait(1000).to({alpha:1}, 400, createjs.Ease.cubicIn);
+      createjs.Tween.get(whiteCheck).to({alpha:0,x:centerX+290,y:canvas.height-255}).wait(1200).to({alpha:.05}, 400, createjs.Ease.cubicIn);
       if (madeSquare == true) {
-        createjs.Tween.get(blackCheck).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
+        createjs.Tween.get(blackCheck).to({alpha:0,x:centerX+290,y:canvas.height-155}).wait(1200).to({alpha:1}, 400, createjs.Ease.cubicIn).call(rmAnim);
       } else {
-        createjs.Tween.get(blackCheck).wait(1200).to({alpha:.05}, 400, createjs.Ease.cubicIn).call(rmAnim);
+        createjs.Tween.get(blackCheck).to({alpha:0,x:centerX+290,y:canvas.height-155}).wait(1200).to({alpha:.05}, 400, createjs.Ease.cubicIn).call(rmAnim);
       }
     }
 
@@ -3898,8 +3903,7 @@ function playLearnAction() {
   }
 
   function returnToStart(event) {
-    if (createjs.Ticker.paused == true) {
-
+      endTween();
       andCheck.visible = false;
       orCheck.visible = false;
       whiteCircle.visible = false;
@@ -3913,6 +3917,9 @@ function playLearnAction() {
       required.visible = false;
       actTray.visible = false;
       seqTray.visible = false;
+      seqBox.visible = false;
+      arrow.visible = false;
+      tutorialTray.visible = false;
       tutorialConditions.visible = false;
       switchTutorial.visible = false;
       andLogicLearn.visible = false;
@@ -3920,9 +3927,6 @@ function playLearnAction() {
 
       stage.update();
       loadIntro();
-    } else {
-      window.setTimeout(returnToStart,300);
-    }
   }
 
   // BEGIN GAME
@@ -3984,7 +3988,7 @@ function endTween() {
     window.setTimeout(endTween,500);
     } else {
     createjs.Ticker.setPaused(true);
-    console.log("ticker paused");
+    //console.log("ticker paused");
     endTweenCheck = 0;
     }
   }
